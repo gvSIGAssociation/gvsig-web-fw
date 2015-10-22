@@ -1,2 +1,2 @@
-# gvsig-web-fw
+# gvSIG Web Framework
 Geospatial web framework that includes many geographical tools for Spring MVC based applications.

@@ -1,0 +1,15 @@
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+	version="2.0">
+   <uri>http://gvsig.org/web-framework/TLD/tools</uri>
+   <tlib-version>${project.version}</tlib-version>
+   <short-name>gvsig-fw-tools</short-name>
+   <tag-file>
+     <name>user-layers</name>
+     <path>/META-INF/tags/tools/user-layers.tagx</path>
+   </tag-file>
+   <tag-file>
+     <name>predefined-layers</name>
+     <path>/META-INF/tags/tools/predefined-layers.tagx</path>
+   </tag-file>
+</taglib>

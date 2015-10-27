@@ -1,0 +1,2404 @@
+/*
+ * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
+ * Copyright (C) 2013 Generalitat Valenciana
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+(function(jQuery, window, document) {
+	/**
+	 * Register of supported User Layer Tabs types
+	 */
+	GvNIX_Map_Leaflet.USERLAYERTAB = {};
+
+	/**
+	 * This object contains the common data and methods for a user layer tab.
+	 */
+	GvNIX_Map_Leaflet.USERLAYERTAB.Base = {
+
+		/**
+		 * Common default options
+		 */
+		"default_options" : {
+		},
+
+		/**
+		 * Minimun user layer state data
+		 */
+		"_state" : {
+			"sId" : null, // User Layer Tab ID
+			"title" : "",
+			"aCrs" : null,
+			"typeTab" : "Base", // Type of tab
+			"typeLayer" : "Base", // Type of layer
+			"layerId" : null,
+		    "containerId": "", // The id of the content (dialog for maps) that contains the tabs
+		    "oUtil" : null,
+		    "waitLabel" : "Loading..."
+		},
+
+		/**
+		 * Common user layer methods
+		 */
+		"_prototype" : {
+
+			/**
+			 * constructor To override
+			 */
+			"_fnConstructor" : function() {
+				this.__fnConstructor();
+			},
+
+			/**
+			 * Base constructor
+			 */
+			"__fnConstructor" : function() {
+				var s = this.s;
+				var st = this._state;
+				st.typeTab = s.type;
+				st.typeLayer = s.layer_type;
+				st.title = s.title;
+				st.oUtil = GvNIX_Map_Leaflet.Util;
+				st.waitLabel = s.wait_label;
+			},
+
+
+			/**
+			 * Default debug message function.
+			 */
+			"debug" : function(message) {
+				this._debug();
+			},
+
+			/**
+			 * Default debug message function. Should be override
+			 */
+			"_debug" : function(message) {
+				console.log("[UserLayerTab:'" + this._state.sId + "'] "
+						+ message);
+			},
+
+			/**
+			 * Get tab ID
+			 */
+			"fnGetId" : function() {
+				return this._fnGetId();
+			},
+
+			/**
+			 * Get tab ID
+			 */
+			"_fnGetId" : function() {
+				return this._state.sId;
+			},
+
+			/**
+			 * Get tab title
+			 */
+			"fnGetTitle" : function() {
+				return this._fnGetTitle();
+			},
+
+			/**
+			 * Get tab title
+			 */
+			"_fnGetTitle" : function() {
+				return this._state.title;
+			},
+
+			/**
+			 * Get selected layers
+			 */
+			"fnGetSelectedLayers" : function() {
+				return this._fnGetSelectedLayers();
+			},
+
+			/**
+			 * Get selected layers
+			 */
+			"_fnGetSelectedLayers" : function() {
+				return null;
+			},
+
+			/**
+			 * Register the function to call when click on button connect
+			 */
+			"_fnRegisterActionToButtonConnect" : function() {
+				this.__fnRegisterActionToButtonConnect();
+			},
+
+			/**
+			 * Register the function to call when click on button connect
+			 */
+			"__fnRegisterActionToButtonConnect" : function() {
+				var st = this._state;
+				var buttonConnect = jQuery("#".concat(st.sId).concat("_connectbutton"), "#".concat(st.containerId));
+				if(buttonConnect){
+					if(st.fnOnSearchLayers){
+						buttonConnect.click(jQuery.proxy(st.fnOnSearchLayers, this));
+					}else{
+						buttonConnect.click(jQuery.proxy(this._fnGetDataFromServer, this));
+					}
+				}
+			},
+
+			/**
+			 * Register function to change server button for reset
+			 * the information gotten from the server
+			 */
+			"_fnRegisterActionToButtonResetServer" : function() {
+				this.__fnRegisterActionToButtonResetServer();
+			},
+
+			/**
+			 * Register function to change server button for reset
+			 * the information gotten from the server
+			 */
+			"__fnRegisterActionToButtonResetServer" : function() {
+				var st = this._state;
+				var buttonChangeServer = jQuery("#".concat(st.sId).concat("_changeserver_button"), "#".concat(st.containerId));
+				buttonChangeServer.click(jQuery.proxy(this._fnResetServer, this));
+			},
+
+			/**
+			 * Register actions to the different buttons of the
+			 * tab
+			 */
+			"fnRegisterButtonsAction" : function() {
+				this._fnRegisterButtonsAction();
+			},
+
+			/**
+			 * Register actions to the different buttons of the
+			 * tab
+			 */
+			"_fnRegisterButtonsAction" : function() {
+				//Do nothing
+			},
+
+
+			/**
+			 * Generate the code necessary to add the selected layers into the map
+			 */
+			"fnCreateLayersOptions" : function(layersSelected) {
+				return this._fnCreateLayersOptions(layersSelected);
+			},
+
+			/**
+			 * Generate the code necessary to add the selected layers into the map
+			 */
+			"_fnCreateLayersOptions" : function(layersSelected) {
+				return null;
+			},
+
+			/**
+			 * Get layer id using layer options to complete the id
+			 */
+			"fnGetLayerId" : function(layerOptions) {
+				return this._fnGetLayerId(layerOptions);
+			},
+
+			/**
+			 * Get layer id
+			 */
+			"_fnGetLayerId" : function() {
+				return null;
+			},
+
+			/**
+			 * Set error message into error_message div.
+			 */
+			"_fnSetErrorMessage" : function(idDivError, message) {
+				return this.__fnSetErrorMessage(idDivError, message);
+			},
+
+			/**
+			 * Set error message into error_message div.
+			 */
+			"__fnSetErrorMessage" : function(idDivError, message) {
+				var st = this._state;
+				if(st.containerId){
+					jQuery(idDivError, "#".concat(st.containerId)).html(message);
+				}
+			},
+
+			/**
+			 * Clear error_message div
+			 */
+			"_fnClearErrorMessage" : function(idDivError) {
+				return this.__fnClearErrorMessage(idDivError);
+			},
+
+			/**
+			 * Clear error_message div
+			 */
+			"__fnClearErrorMessage" : function(idDivError) {
+				var st = this._state;
+				if(st.containerId){
+					jQuery(idDivError, "#".concat(st.containerId)).html("");
+				}
+			},
+
+			/**
+			 * Clean and restore the objects of the tab
+			 */
+			"fnCleanUserLayerTab" : function() {
+				return this._fnCleanUserLayerTab();
+			},
+
+			/**
+			 * Clean and restore the objects of the tab
+			 */
+			"_fnCleanUserLayerTab" : function() {
+				return;
+			},
+
+			/**
+			 * Set layers, styles, crs, etc. from object oDataToSet
+			 */
+			"fnSetData" : function(oDataToSet) {
+				this._fnSetData(oDataToSet);
+			},
+
+			/**
+			 * Set layers, styles, crs, etc. from object oDataToSet
+			 */
+			"_fnSetData" : function(oDataToSet) {
+				null;
+			},
+
+			/**
+			 * Get layer type
+			 */
+			"fnGetLayerType" : function() {
+				return this._fnGetLayerType();
+			},
+
+			/**
+			 * Get layer type
+			 */
+			"_fnGetLayerType" : function() {
+				return this._state.typeLayer;
+			}
+		}
+	};
+
+	/**
+	 * Register class to management tab of WMS layer
+	 */
+
+	GvNIX_Map_Leaflet.USERLAYERTAB.wms = function(sId, containerId, aCrs, options) {
+		// Check that we are a new instance
+		if (!this instanceof GvNIX_Map_Leaflet.USERLAYERTAB.wms) {
+			alert("Warning: GvNIX_Map_Leaflet  USERLAYERTAB wms must be initialised with the keyword 'new'");
+		}
+		this._default_options = jQuery.extend({},
+				GvNIX_Map_Leaflet.USERLAYERTAB.Base.default_options);
+
+		this.s = jQuery.extend({}, this._default_options, options);
+
+		// Set this group _state attributes to those passed by the parameters
+		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
+			"sId" : sId,
+			"title" : "",
+			"containerId": containerId,
+			"path" : "",
+			"typeLayer" : "",
+			"treeDivId" : null,
+			"aCrs" : aCrs,
+			"oWMSInfo" : null,
+			"oTree" : null,
+			"fnOnSearchLayers" : null,
+			"oUtil" : null,
+			"msgLayersNotFound" : "Layers not found",
+			"msgServerRequired" : "Server value is required",
+			"msgLayersRequired" : "Select at least one layer",
+			"format" : null,
+
+		});
+
+		this.fnSettings = function() {
+			return this.s;
+		};
+
+		// Constructor
+		this._fnConstructor();
+	};
+
+	/**
+	 * Tab type wms. Class method declaration
+	 */
+	GvNIX_Map_Leaflet.USERLAYERTAB.wms.prototype = jQuery.extend({},
+			GvNIX_Map_Leaflet.USERLAYERTAB.Base._prototype, {
+				"_debug" : function(message) {
+					var st = this._state;
+					console.log("[UserLayerTab WMS:" + st.sId + "] " + message);
+				},
+
+				// overwrite constructor to create wms instance
+				"_fnConstructor" : function() {
+					// Call to super
+					this.__fnConstructor();
+					var s = this.s;
+					var st = this._state;
+					// Get id of the tree when we are going to paint layers to
+					// select
+					st.treeDivId = s.tree_div_id;
+					st.path = s.path;
+					// Set error messages
+					st.msgLayersNotFound = s.msg_layers_not_found;
+					st.msgLayersRequired = s.msg_layers_required;
+					st.msgServerRequired = s.msg_server_required;
+					//set format
+					st.format = s.format;
+
+					// set input with crs established in constructor
+					if(st.aCrs){
+						jQuery("#".concat(st.sId).concat("_map_crs_input")).val(st.aCrs);
+						jQuery("#".concat(st.sId).concat("_map_crs")).show();
+					}
+
+					// Get if the user has his own implementation to connect to the server
+					// and get the layers
+					if (s.fn_search_layers) {
+						st.fnOnSearchLayers = this.Util.getFunctionByName(
+								s.fn_search_layers, jQuery.proxy(
+										this.debug, this));
+					}
+
+				},
+
+				/**
+				 * Get selected layers of the tree
+				 */
+				"_fnGetSelectedLayers" : function() {
+					var st = this._state;
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_error_message"));
+					if(st.oTree){
+						var selectedNodes = st.oTree.getSelectedNodes();
+						if(selectedNodes.length === 0){
+							selectedNodes = false;
+							this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgLayersRequired);
+						}
+					}else{
+						selectedNodes = false;
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgLayersRequired);
+					}
+					return selectedNodes;
+				},
+
+				/**
+				 * Get data from WMS server indicated into server input
+				 */
+				"_fnGetDataFromServer" : function() {
+					this.__fnGetDataFromServer();
+				},
+
+				/**
+				 * Get data from WMS server indicated into server input
+				 */
+				"__fnGetDataFromServer" : function() {
+					var st = this._state;
+					// clean div that contains error messages
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_error_message"));
+					var urlServ = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
+					if(urlServ){
+						st.oUtil.startWaitMeAnimation(st.waitLabel);
+						var params = { url: urlServ, crs: st.aCrs, format: st.format };
+						jQuery.ajax({
+							url : st.path + "?findWmsCapabilities",
+							data: params,
+							cache: false,
+							success : function(element) {
+								st.oUtil.stopWaitMeAnimation();
+								st.oWMSInfo = element;
+								if(st.treeDivId)
+								{
+									// clean tree and label
+									if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+									}else{
+										jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).show();
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+									}
+									// Check if have any result and create the tree
+									if(element.layersTree){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
+											source: element.layersTree,
+											checkbox: true,
+											selectMode: 3
+										});
+
+										st.oTree = jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("getTree");
+									}else{
+										st.oTree = null;
+										// set empty tree message
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).html(st.msgLayersNotFound);
+									}
+								}
+							},
+							error : function(object) {
+								// clean tree and messages
+								if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+									jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+								}
+								jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+								jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).hide();
+								// get the error message and put in after form
+								jQuery("#".concat(st.sId).concat("_error_message"), "#".concat(st.containerId)).html(object.responseText);
+								// stop wait animation
+								st.oUtil.stopWaitMeAnimation();
+								// show error console
+								console.log('Se ha producido un error en la obtencion de las capas correspondientes al servidor introducido');
+							}
+						});
+					}else{
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgServerRequired);
+					}
+
+
+				},
+
+				/**
+				 * Register actions to the different buttons of the
+				 * tab
+				 */
+				"_fnRegisterButtonsAction" : function(){
+					this._fnRegisterActionToButtonConnect();
+				},
+
+				/**
+				 * Generate the code necessary to add the selected layers into the map
+				 */
+				"_fnCreateLayersOptions" : function(layersSelected) {
+					var st = this._state;
+					var keysLayersSel = [];
+					// get the selected layers
+					for(i in layersSelected){
+						var layerSel = layersSelected[i];
+						// check if the layer is root
+						if(layerSel.key.indexOf("rootLayer_") !== 0){
+							keysLayersSel.push(layerSel.key);
+						}
+					}
+
+					// generate root layer options and put selected layers
+					// into layers parameter
+					var layerOptions = {
+							"layer_type": st.typeLayer,
+						    "span": (st.oWMSInfo.id.toString()).concat("_span"),
+					        "url": st.oWMSInfo.serviceUrl,
+					        "layers":keysLayersSel.join(),
+					        "format": st.oWMSInfo.formatSelected,
+					        "transparent":"true",
+					        "version":st.oWMSInfo.version,
+					        "crs": st.oWMSInfo.crsSelected,
+					        "opacity": "1.0",
+					        "allow_disable": true,
+					        "node_icon": ".whhg icon-layerorderdown",
+					        "title": st.oWMSInfo.serviceTitle,
+					        };
+					return layerOptions;
+				},
+
+				/**
+				 *  Get layer id
+				 */
+				"_fnGetLayerId" : function() {
+					var st = this._state;
+					return st.oWMSInfo.id.toString();
+
+				},
+
+				/**
+				 * Clean and restore the objects of the tab
+				 */
+				"_fnCleanUserLayerTab" : function() {
+					var st = this._state;
+					st.oWMSInfo = null;
+					st.oTree = null;
+				}
+
+	});
+
+
+	/**
+	 * Register class to management tab of WMTS layer
+	 */
+
+	GvNIX_Map_Leaflet.USERLAYERTAB.wmts = function(sId, containerId, aCrs, options) {
+		// Check that we are a new instance
+		if (!this instanceof GvNIX_Map_Leaflet.USERLAYERTAB.wmts) {
+			alert("Warning: GvNIX_Map_Leaflet USERLAYERTAB wmts must be initialised with the keyword 'new'");
+		}
+		this._default_options = jQuery.extend({},
+				GvNIX_Map_Leaflet.USERLAYERTAB.Base.default_options);
+
+		this.s = jQuery.extend({}, this._default_options, options);
+
+		// Set this group _state attributes to those passed by the parameters
+		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
+			"sId" : sId,
+			"title" : "",
+			"path" : "",
+			"containerId": containerId,
+			"aCrs" : aCrs,
+			"typeLayer" : "",
+			"treeDivId" : null,
+			"oTree" : null,
+			"oWMTSInfo" : null,
+			"fnOnSearchLayers" : null,
+			"oUtil" : null,
+			"aCrsSupported" : null,
+			"msgLayersNotFound" : "Layers not found",
+			"msgServerRequired" : "Server value is required",
+			"msgLayersRequired" : "Select at least one layer",
+			"titleSelectCrs" : "Select CRS:"
+
+		});
+
+		this.fnSettings = function() {
+			return this.s;
+		};
+
+		// Constructor
+		this._fnConstructor();
+	};
+
+	/**
+	 * Tab type wmts. Class method declaration
+	 */
+	GvNIX_Map_Leaflet.USERLAYERTAB.wmts.prototype = jQuery.extend({},
+			GvNIX_Map_Leaflet.USERLAYERTAB.Base._prototype, {
+				"_debug" : function(message) {
+					var st = this._state;
+					console.log("[UserLayerTab WMTS:" + st.sId + "] " + message);
+				},
+
+				// overwrite constructor to create leaflet layerGroup instance
+				"_fnConstructor" : function() {
+					// Call to super
+					this.__fnConstructor();
+					var s = this.s;
+					var st = this._state;
+					st.treeDivId = s.tree_div_id;
+					st.path = s.path;
+					st.msgLayersNotFound = s.msg_layers_not_found;
+					st.msgLayersRequired = s.msg_layers_required;
+					st.msgServerRequired = s.msg_server_required;
+					st.titleSelectCrs = s.title_select_crs;
+
+					// set input with crs established in constructor
+					if(st.aCrs){
+						jQuery("#".concat(st.sId).concat("_map_crs_input")).val(st.aCrs);
+						jQuery("#".concat(st.sId).concat("_map_crs")).show();
+					}
+
+					if (s.fn_search_layers) {
+						st.fnOnSearchLayers = this.Util.getFunctionByName(
+								s.fn_search_layers, jQuery.proxy(
+										this.debug, this));
+					}
+				},
+
+				/**
+				 * Get selected layers of the tree
+				 */
+				"_fnGetSelectedLayers" : function() {
+					var st = this._state;
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_error_message"));
+					if(st.oTree){
+						var selectedNodes = st.oTree.getSelectedNodes();
+						if(selectedNodes.length === 0){
+							selectedNodes = false;
+							this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgLayersRequired);
+						}
+					}else{
+						selectedNodes = false;
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgLayersRequired);
+					}
+					return selectedNodes;
+				},
+
+
+
+				/**
+				 * Get data from WMTS server indicated into server input
+				 */
+				"_fnGetDataFromServer" : function() {
+					var st = this._state;
+
+					// if crs isn't set, get all crs supported from server
+					if(st.aCrs){
+						this.__fnGetDataFromServer();
+					}else{
+						// get crs supported crs and draw a select with the result
+						// of the request
+						this._fnGetCrsFromServer();
+					}
+				},
+
+				/**
+				 * Get data from WMTS server indicated into server input
+				 */
+				"_fnOnChangeCrs" : function() {
+					var st = this._state;
+
+					// get value selected from select of supported crs
+					var selectSupportedCrs = jQuery("#".concat(st.sId).concat("_crs"),"#".concat(st.containerId));
+
+					if(selectSupportedCrs && selectSupportedCrs.length > 0){
+						this.__fnGetDataFromServer(selectSupportedCrs.val());
+					}
+
+				},
+
+				/**
+				 * Get data from WMTS server indicated into server input
+				 */
+				"__fnGetDataFromServer" : function(crs) {
+					var st = this._state;
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_error_message"));
+					var urlServ = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
+					var crsSelected = st.aCrs;
+					var useCrsSelect = false;
+					if(crs){
+						crsSelected = crs;
+						useCrsSelect = true;
+					}
+					if(urlServ){
+						var params = { url: urlServ, crs: crsSelected, useCrsSelected: useCrsSelect };
+						st.oUtil.startWaitMeAnimation(st.waitLabel);
+						jQuery.ajax({
+							url : st.path + "?findWmtsCapabilities",
+							data: params,
+							cache: false,
+							success : function(element) {
+								st.oUtil.stopWaitMeAnimation();
+								st.oWMTSInfo = element;
+								if(st.treeDivId)
+								{
+									if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+									}else{
+										jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).show();
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+									}
+									// Check if have any result
+									if(element.layersTree){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
+											source: element.layersTree,
+											checkbox: true,
+											selectMode: 1
+										});
+										st.oTree = jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("getTree");
+									}else{
+										st.oTree = null;
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).html(st.msgLayersNotFound);
+									}
+								}
+							},
+							error : function(object) {
+								// clean tree and messages
+								if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+									jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+								}
+								jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+								jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).hide();
+								// get the error message and put in after form
+								jQuery("#".concat(st.sId).concat("_error_message"), "#".concat(st.containerId)).html(object.responseText);
+								// stop wait animation
+								st.oUtil.stopWaitMeAnimation();
+								// show error console
+								console.log('Se ha producido un error en la obtencion de las capas correspondientes al servidor introducido');
+							}
+				      });
+					}else{
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgServerRequired);
+					}
+
+				},
+
+				/**
+				 * Get list of crs supported by server set by user into input
+				 * server and create a select
+				 */
+				"_fnGetCrsFromServer" : function(){
+					this.__fnGetCrsFromServer();
+				},
+
+				/**
+				 * Get list of crs supported by server set by user into input
+				 * server and create a select
+				 */
+				"__fnGetCrsFromServer" : function(){
+					var st = this._state;
+					var oThis = this;
+					//clean div that contains select and errors
+					jQuery("#".concat(st.sId).concat("_supported_crs"),"#".concat(st.containerId)).html("");
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_error_message"));
+					var urlServ = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
+					if(urlServ){
+						var params = { url: urlServ};
+						st.oUtil.startWaitMeAnimation(st.waitLabel);
+						jQuery.ajax({
+							url : st.path + "?findSupportedCrsWmts",
+							data: params,
+							cache: false,
+							success : function(element) {
+								st.oUtil.stopWaitMeAnimation();
+								if(st.treeDivId)
+								{
+									if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+									}else{
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+									}
+									jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).hide();
+									// Check if have any result
+									if(element){
+										oThis._fnDrawSelectSupportedCrs(element,oThis);
+										// launch get data from server with the first value selected
+										oThis._fnOnChangeCrs();
+									}else{
+										st.oTree = null;
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).html(st.msgLayersNotFound);
+									}
+								}
+							},
+							error : function(object) {
+								// clean tree and messages
+								if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+									jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+								}
+								jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+								jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).hide();
+								// get the error message and put in after form
+								jQuery("#".concat(st.sId).concat("_error_message"), "#".concat(st.containerId)).html(object.responseText);
+								// stop wait animation
+								st.oUtil.stopWaitMeAnimation();
+								// show error console
+								console.log('Se ha producido un error en la obtencion de las capas correspondientes al servidor introducido');
+							}
+				      });
+					}else{
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgServerRequired);
+					}
+				},
+
+				/**
+				 * Generate select of supported crs by the server
+				 */
+				"_fnDrawSelectSupportedCrs" : function(aSupportedCrs,oThis){
+					this.__fnDrawSelectSupportedCrs(aSupportedCrs,oThis);
+				},
+
+				/**
+				 * Generate select of supported crs by the server
+				 */
+				"__fnDrawSelectSupportedCrs" : function(aSupportedCrs, oThis){
+					var st = oThis._state;
+					// set select crs
+					var htmlCrsSelect = "";
+					htmlCrsSelect = htmlCrsSelect.concat("<h5>");
+					// Title multilanguage for select supported crs
+					htmlCrsSelect = htmlCrsSelect.concat(st.titleSelectCrs);
+					htmlCrsSelect = htmlCrsSelect.concat("</h5>");
+
+					htmlCrsSelect = htmlCrsSelect.concat("<select id='").concat(st.sId).concat("_crs'");
+					htmlCrsSelect = htmlCrsSelect.concat(" class='form-control form-control '>");
+					for(i = 0; i < aSupportedCrs.length; i++){
+						htmlCrsSelect = htmlCrsSelect.concat("<option value='");
+						htmlCrsSelect = htmlCrsSelect.concat(aSupportedCrs[i]).concat("'");
+						htmlCrsSelect = htmlCrsSelect.concat(">").concat(aSupportedCrs[i]);
+						htmlCrsSelect = htmlCrsSelect.concat("</option>");
+					}
+					htmlCrsSelect = htmlCrsSelect.concat("</select>");
+
+					// set the html in the tab
+					var divSupportedCrs = jQuery("#".concat(st.sId).concat("_supported_crs"),"#".concat(st.containerId));
+					divSupportedCrs.prepend(htmlCrsSelect);
+					divSupportedCrs.show();
+
+					var selectChangeFunction = jQuery("#".concat(st.sId).concat("_supported_crs"), "#".concat(st.containerId));
+					selectChangeFunction.change(jQuery.proxy(oThis._fnOnChangeCrs, oThis));
+				},
+
+				/**
+				 * Register actions to the different buttons of the
+				 * tab
+				 */
+				"_fnRegisterButtonsAction" : function(){
+					this._fnRegisterActionToButtonConnect();
+				},
+
+				/**
+           		 * Generate the code necessary to add the selected layers into the map
+           		 * Return false if it hasn't layers selected
+				 */
+				"_fnCreateLayersOptions" : function(layersSelected) {
+					var st = this._state;
+					var layerOptions = false;
+					// create layer option for each of the selected layers
+					for(i in layersSelected){
+						var layerSel = layersSelected[i];
+						// if starts with rootLayer, doesn't push it.
+						if(layerSel.key.indexOf("rootLayer_") !== 0){
+							layerOptions = {
+								"layer_type": st.typeLayer,
+								"layer" : layerSel.key,
+							    "span": (st.oWMTSInfo.id.toString()).concat("_span"),
+						        "url": st.oWMTSInfo.serviceUrl,
+						        "version":st.oWMTSInfo.version,
+						        "opacity": "1",
+						        "allow_disable": true,
+						        "service" : st.oWMTSInfo.serviceType,
+						        "tilematrix_set" : st.oWMTSInfo.tileMatrixSelectedId,
+						        "node_icon": ".whhg icon-layerorderup",
+						        "title": layerSel.title,
+						        };
+						}
+					}
+
+					return layerOptions;
+				},
+
+				/**
+				 *  Get layer id using layer options to complete the id
+				 */
+				"_fnGetLayerId" : function(layerOptions) {
+					var st = this._state;
+					return (st.oWMTSInfo.id.toString()).concat("_").concat(layerOptions.layer);
+
+				},
+
+				/**
+				 * Clean and restore the objects of the tab
+				 */
+				"_fnCleanUserLayerTab" : function() {
+					var st = this._state;
+					st.oWMTSInfo = null;
+					st.oTree = null;
+				}
+
+			});
+
+
+	/**
+	 * Register class to management tab of TILE layer
+	 */
+
+	GvNIX_Map_Leaflet.USERLAYERTAB.tile = function(sId, containerId, aCrs, options) {
+		// Check that we are a new instance
+		if (!this instanceof GvNIX_Map_Leaflet.USERLAYERTAB.tile) {
+			alert("Warning: GvNIX_Map_Leaflet USERLAYERTAB tile layer must be initialised with the keyword 'new'");
+		}
+		this._default_options = jQuery.extend({},
+				GvNIX_Map_Leaflet.USERLAYERTAB.Base.default_options);
+
+		this.s = jQuery.extend({}, this._default_options, options);
+
+		// Set this group _state attributes to those passed by the parameters
+		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
+			"sId" : sId,
+			"title" : "",
+			"containerId": containerId,
+			"aCrs" : aCrs,
+			"typeLayer" : "",
+			"idLayer" : "",
+			"nameLayer": "",
+			"oUtil" : null,
+			"msgTitleLayerRequired" : "Title of layer is required",
+			"msgServerRequired" : "Server value is required"
+		});
+
+		this.fnSettings = function() {
+			return this.s;
+		};
+
+		// Constructor
+		this._fnConstructor();
+	};
+
+	/**
+	 * Tab type tile. Class method declaration
+	 */
+	GvNIX_Map_Leaflet.USERLAYERTAB.tile.prototype = jQuery.extend({},
+			GvNIX_Map_Leaflet.USERLAYERTAB.Base._prototype, {
+				"_debug" : function(message) {
+					var st = this._state;
+					console.log("[UserLayerTab TILE:" + st.sId + "] " + message);
+				},
+
+				// overwrite constructor to create leaflet layerGroup instance
+				"_fnConstructor" : function() {
+					// Call to super
+					this.__fnConstructor();
+					var st = this._state;
+					var s = this.s;
+					st.msgTitleLayerRequired = s.msg_title_layer_required;
+					st.msgServerRequired = s.msg_server_required;
+				},
+
+				/**
+				 * Get the layer introduced into server input
+				 */
+				"_fnGetSelectedLayers" : function() {
+					var st = this._state;
+					var today = new Date();
+					// Clear div for error messages
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_error_message"));
+					var urlSelected = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
+					if(urlSelected){
+						st.nameLayer = jQuery("#".concat(st.sId).concat("_name"), "#".concat(st.containerId)).val();
+						if(st.nameLayer){
+							st.idLayer = st.oUtil.getHashCode(urlSelected.concat(today.toString()));
+						}else{
+							// set required title message
+							this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgTitleLayerRequired);
+							urlSelected = false;
+						}
+					}
+					else{
+						// set required server message
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgServerRequired);
+						urlSelected = false;
+					}
+					return urlSelected;
+				},
+
+				/**
+           		 * Generate the code necessary to add the selected layer into the map
+				 */
+				"_fnCreateLayersOptions" : function(layersSelected) {
+					var st = this._state;
+
+					var layerOptions = {
+						"layer_type": st.typeLayer,
+					    "span": st.idLayer.concat("_span"),
+				        "url": layersSelected,
+				        "opacity": "1",
+				        "allow_disable": true,
+				        "node_icon": "/resources/images/tile_layer_icon.jpg",
+				        "title": st.nameLayer
+				    };
+
+					return layerOptions;
+				},
+
+				/**
+				 * Get layer id
+				 */
+				"_fnGetLayerId" : function() {
+					var st = this._state;
+					return (st.idLayer);
+				},
+
+			});
+
+	/**
+	 * Register class to management tab of WMS layer
+	 */
+
+	GvNIX_Map_Leaflet.USERLAYERTAB.wms_wizard = function(sId, containerId, aCrs, options) {
+		// Check that we are a new instance
+		if (!this instanceof GvNIX_Map_Leaflet.USERLAYERTAB.wms_wizard) {
+			alert("Warning: GvNIX_Map_Leaflet  USERLAYERTAB wms_wizard must be initialised with the keyword 'new'");
+		}
+		this._default_options = jQuery.extend({},
+				GvNIX_Map_Leaflet.USERLAYERTAB.Base.default_options);
+
+		this.s = jQuery.extend({}, this._default_options, options);
+
+		// Set this group _state attributes to those passed by the parameters
+		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
+			"sId" : sId,
+			"title" : "",
+			"containerId": containerId,
+			"path" : "",
+			"typeLayer" : "",
+			"treeDivId" : null,
+			"aCrs" : aCrs,
+			"oWMSInfo" : null,
+			"oTree" : null,
+			"fnOnSearchLayers" : null,
+			"oUtil" : null,
+			"msgLayersNotFound" : "Layers not found",
+			"msgServerRequired" : "Server value is required",
+			"msgLayersRequired" : "Select at least one layer",
+			"msgFormatsRequired" : "Select an image format and CRS",
+			"msgReviseStyles" : "Styles and formats values have changed, please check the selected values",
+			"msgConnectRequired" : "Establish the connexion to the server first to get the information and layers of this one",
+			"msgSupportError" : "The server doesn't support CRS or formats established",
+			"msgCrsSupported" : "Supported CRS: ",
+			"msgFormatsSupported" : "Supported Formats: ",
+			"titleFormat" : "Select Format",
+			"titleCRS" : "Select CRS",
+			"format" : null,
+			"wizard" : null,
+			"oldSelectedLayers" : null, // set temp layers selected to refresh styles
+			"wizardNextLabel" : "Next",
+			"wizardPreviousLabel" : "Previous",
+			"waitLabel" : "Loading..."
+
+
+		});
+
+		this.fnSettings = function() {
+			return this.s;
+		};
+
+		// Constructor
+		this._fnConstructor();
+	};
+
+	/**
+	 * Tab type wms-wizard. Class method declaration
+	 */
+	GvNIX_Map_Leaflet.USERLAYERTAB.wms_wizard.prototype = jQuery.extend({},
+			GvNIX_Map_Leaflet.USERLAYERTAB.Base._prototype, {
+				"_debug" : function(message) {
+					var st = this._state;
+					console.log("[UserLayerTab WMS-WIZARD:" + st.sId + "] " + message);
+				},
+
+				// overwrite constructor to create wms_wizard instance
+				"_fnConstructor" : function() {
+					// Call to super
+					this.__fnConstructor();
+					var s = this.s;
+					var st = this._state;
+					// Get id of the tree when we are going to paint layers to
+					// select
+					st.treeDivId = s.tree_div_id;
+					st.path = s.path;
+					// Set error messages and titles
+					st.msgLayersNotFound = s.msg_layers_not_found;
+					st.msgLayersRequired = s.msg_layers_required;
+					st.msgServerRequired = s.msg_server_required;
+					st.msgFormatsRequired = s.msg_formats_required;
+					st.msgReviseStyles = s.msg_revise_styles;
+					st.msgConnectRequired = s.msg_connect_required;
+					st.msgSupportError = s.msg_support_error;
+					st.msgCrsSupported = s.msg_crs_supported;
+					st.msgFormatsSupported = s.msg_formats_supported;
+					st.titleFormat = s.title_format;
+					st.titleCRS = s.title_crs;
+					st.wizardNextLabel = s.wizard_next_label;
+					st.wizardPreviousLabel = s.wizard_previous_label;
+
+
+					//set format
+					st.format = s.format;
+
+					// Get if the user has his own implementation to connect to the server
+					// and get the layers
+					if (s.fn_search_layers) {
+						st.fnOnSearchLayers = this.Util.getFunctionByName(
+								s.fn_search_layers, jQuery.proxy(
+										this.debug, this));
+					}
+
+				},
+
+				/**
+				 * Register actions to the different buttons of the
+				 * tab
+				 */
+				"_fnRegisterButtonsAction" : function(){
+					this._fnRegisterActionToButtonResetServer();
+				},
+
+				/**
+				 * Restore the objects of the tab and enable the input when you
+				 * set the server
+				 */
+				"_fnResetServer" : function() {
+					var st = this._state;
+					jQuery("#".concat(st.sId).concat("_changeserver_button"), "#".concat(st.containerId)).hide();
+					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).prop('disabled', false);
+					this._fnCleanUserLayerTab();
+
+				},
+
+				/**
+				 * Get selected layers of the tree
+				 */
+				"_fnGetSelectedLayers" : function() {
+					var st = this._state;
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_tree_error"));
+					if(st.oTree){
+						var selectedNodes = st.oTree.getSelectedNodes();
+						if(selectedNodes.length === 0){
+							selectedNodes = false;
+						}
+					}else{
+						selectedNodes = false;
+					}
+
+					if(selectedNodes == false){
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgLayersRequired);
+						//go to step where can select layers
+						st.wizard.steps("goToStep",2);
+					}
+
+					return selectedNodes;
+				},
+
+				/**
+				 * Get data from WMS server indicated into server input
+				 */
+				"_fnGetDataFromServer" : function() {
+					this.__fnGetDataFromServer();
+				},
+
+				/**
+				 * Get data from WMS server indicated into server input
+				 * Return false in case of error
+				 */
+				"__fnGetDataFromServer" : function() {
+					var st = this._state;
+
+					//Clean elements of styles and format
+					var divStyles = jQuery("#".concat(st.sId).concat("_styles"),"#".concat(st.containerId));
+					// Clear the content of the div
+					divStyles.html("");
+					var divFormats = jQuery("#".concat(st.sId).concat("_formats"),"#".concat(st.containerId));
+					// Clear the content of the div
+					divFormats.html("");
+
+					// clean div that contains error messages
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_connection_error"));
+
+					var urlServ = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
+					if(urlServ){
+						st.oUtil.startWaitMeAnimation(st.waitLabel);
+						var params = { url: urlServ, wizard: "true", crs: st.aCrs };
+						jQuery.ajax({
+							url : st.path + "?findWmsCapabilities",
+							data: params,
+							cache: false,
+							success : function(element) {
+								st.oUtil.stopWaitMeAnimation();
+								st.oWMSInfo = element;
+
+								// Show server info
+								jQuery("#".concat(st.sId).concat("_server_info"), "#".concat(st.containerId)).show();
+
+								if(st.oWMSInfo.version){
+									jQuery("#".concat(st.sId).concat("_version_p"), "#".concat(st.containerId)).html(st.oWMSInfo.version);
+									jQuery("#".concat(st.sId).concat("_version_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_version_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.oWMSInfo.serviceTitle){
+									jQuery("#".concat(st.sId).concat("_title_p"), "#".concat(st.containerId)).html(st.oWMSInfo.serviceTitle);
+									jQuery("#".concat(st.sId).concat("_title_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_title_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.oWMSInfo.serviceAbstract){
+									jQuery("#".concat(st.sId).concat("_description_p"), "#".concat(st.containerId)).html(st.oWMSInfo.serviceAbstract);
+									jQuery("#".concat(st.sId).concat("_description_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_description_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.oWMSInfo.crsSupported){
+									jQuery("#".concat(st.sId).concat("_crs_supported_p"), "#".concat(st.containerId)).html(st.oWMSInfo.crsSupported.join("</BR>"));
+									jQuery("#".concat(st.sId).concat("_crs_supported_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_crs_supported_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.oWMSInfo.formatsSupported){
+									jQuery("#".concat(st.sId).concat("_format_supported_p"), "#".concat(st.containerId)).html(st.oWMSInfo.formatsSupported.join("</BR>"));
+									jQuery("#".concat(st.sId).concat("_format_supported_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_format_supported_div"), "#".concat(st.containerId)).hide();
+								}
+
+								//show tree
+								if(st.treeDivId)
+								{
+									// clean tree and label
+									if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+									}else{
+										jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).show();
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+									}
+									// Check if have any result and create the tree
+									if(element.layersTree){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
+											source: element.layersTree,
+											checkbox: true,
+											selectMode: 3
+										});
+
+										st.oTree = jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("getTree");
+									}else{
+										st.oTree = null;
+										// set empty tree message
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).html(st.msgLayersNotFound);
+									}
+								}
+
+								// disable input, show change server button and go to step 1
+								jQuery("#".concat(st.sId).concat("_changeserver_button"), "#".concat(st.containerId)).show();
+								jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).prop('disabled', true);
+								st.wizard.steps("goToStep",1);
+							},
+							error : function(object) {
+								jQuery("#".concat(st.sId).concat("_server_info"), "#".concat(st.containerId)).hide();
+
+								// clean tree and messages
+								if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+									jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+								}
+								jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+								jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).hide();
+								// get the error message and put in after form
+								jQuery("#".concat(st.sId).concat("_connection_error"), "#".concat(st.containerId)).html(object.responseText);
+								// stop wait animation
+								st.oUtil.stopWaitMeAnimation();
+								// show error console
+								console.log('Se ha producido un error en la obtencion de las capas correspondientes al servidor introducido');
+								// with error return false
+								st.wizard.steps("goToStep",0);
+							}
+						});
+					}else{
+						// with error return false
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_connection_error"),st.msgServerRequired);
+					}
+
+				},
+
+
+				/**
+				 * Register the function to call when click on button connect
+				 */
+				"fnCreateWizard" : function() {
+					this._fnCreateWizard();
+				},
+
+				/**
+				 * Register the function to call when click on button connect
+				 */
+				"_fnCreateWizard" : function() {
+					 var st = this._state;
+					 var callbackFunction = jQuery.proxy(this._fnChangeStepControl, this);
+					 st.wizard = jQuery("#".concat(st.sId),"#".concat(st.containerId)).steps({
+						    headerTag: "h3",
+						    bodyTag: "section",
+						    transitionEffect: "slide",
+						    enableFinishButton : false,
+						    onStepChanging: function (event, currentIndex, newIndex)
+						    {
+						    	return callbackFunction(event, currentIndex, newIndex);
+						    },
+					 		labels: {
+					 			next : st.wizardNextLabel,
+					 			previous: st.wizardPreviousLabel
+					 		}
+						});
+					 // Create wizard cleans input value
+					 if(st.aCrs){
+						jQuery("#".concat(st.sId).concat("_map_crs_input"),"#".concat(st.containerId)).val(st.aCrs);
+   					 }
+				},
+
+				/**
+				 * Control the event that happens when the user changes wizard tab
+				 */
+				"_fnChangeStepControl" : function (event, currentIndex, newIndex)
+			    {
+			    	return this.__fnChangeStepControl(event, currentIndex, newIndex);
+			    },
+
+			    /**
+				 * Control the event that happens when the user changes wizard tab
+				 */
+				"__fnChangeStepControl" : function (event, currentIndex, newIndex)
+			    {
+			    	var st = this._state;
+			    	// check if the user has gotten an object of the server connection to continue
+			    	if(currentIndex == 0 && st.oWMSInfo == null && newIndex != 0){
+						if(st.fnOnSearchLayers){
+							return st.fnOnSearchLayers();
+						}else{
+							this._fnGetDataFromServer();
+							this._fnClearErrorMessage("#".concat(st.sId).concat("_info_error"));
+							return false;
+						}
+			    	}
+
+			    	// check if formats and crs are supported by the server
+			    	if(newIndex > 1){
+			    		if((st.aCrs != null &&
+			    				(!st.oWMSInfo.crsSelected || (st.oWMSInfo.crsSelected && st.oWMSInfo.crsSelected == 0))
+			    		    ) || !st.oWMSInfo.formatSelected){
+			    			var errorMsg = st.msgSupportError.concat("</BR>");
+			    			if(st.aCrs != null){
+			    				errorMsg = errorMsg.concat(st.msgCrsSupported).concat(" ").concat(st.aCrs);
+			    				errorMsg = errorMsg.concat("</BR>");
+			    			}
+			    			var supportedFormat = st.format;
+			    			if(!supportedFormat){
+			    				supportedFormat = "image/png*, image/jpeg*";
+			    			}
+			    			errorMsg = errorMsg.concat(st.msgFormatsSupported).concat(" ").concat(supportedFormat);
+			    			this._fnSetErrorMessage("#".concat(st.sId).concat("_info_error"),errorMsg);
+			    			st.wizard.steps("goToStep",1);
+			    			return false;
+			    		}else{
+			    			this._fnClearErrorMessage("#".concat(st.sId).concat("_info_error"));
+			    		}
+			    	}
+
+			    	// if we are in the step select layers push 'next'
+			    	if(currentIndex == 2 && newIndex > currentIndex){
+			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_tree_error"));
+			    		var selectedLayers = this._fnGetSelectedLayers();
+			    		if(selectedLayers === false){
+			    			return false;
+			    		}else{
+			    			if(!st.oldSelectedLayers){
+			    				// set oldSelectedLayers
+			    				st.oldSelectedLayers = selectedLayers;
+			    				// draw the form to select styles of the layers
+		    					this._fnDrawFormStylesLayer(selectedLayers);
+		    					//	draw the form to select styles of the layers
+		    					this._fnDrawFormFormatsLayer(selectedLayers);
+			    			}else{
+			    				// check if selected layers have changed
+			    				if(!(jQuery(selectedLayers).not(st.oldSelectedLayers).length === 0 &&
+			    						jQuery(st.oldSelectedLayers).not(selectedLayers).length === 0)){
+			    					// set oldSelectedLayers
+			    					st.oldSelectedLayers = selectedLayers;
+			    					// draw the form to select styles of the layers
+			    					this._fnDrawFormStylesLayer(selectedLayers);
+			    					//	draw the form to select styles of the layers
+			    					this._fnDrawFormFormatsLayer(selectedLayers);
+			    				}
+			    			}
+			    		}
+			    	}
+
+			    	if(currentIndex == 3){
+			    		// clean error message of step 3 (styles)
+			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_styles_error"));
+			    	}
+
+			    	if(currentIndex == 4 && newIndex != 4){
+				    	// clean error message of step 4 (formats)
+			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_format_error"));
+			    	}
+
+			    	return true;
+			    },
+
+			    /**
+				 * Draw a form into wizard tab 'styles' that depends of
+				 * selected layers in wizard tab 'select layers'
+				 */
+			    "_fnDrawFormStylesLayer" : function (aSelectedLayers)
+			    {
+			    	return this.__fnDrawFormStylesLayer(aSelectedLayers);
+			    },
+
+			    /**
+				 * Draw a form into wizard tab 'styles' that depends of
+				 * selected layers in wizard tab 'select layers'
+				 */
+				"__fnDrawFormStylesLayer" : function (aSelectedLayers)
+			    {
+					var st = this._state;
+					var divStyles = jQuery("#".concat(st.sId).concat("_styles"),"#".concat(st.containerId));
+					// Clear the content of the div
+					divStyles.html("");
+					var htmlForStylesTab = "";
+					for(i in aSelectedLayers){
+						var layerSel = aSelectedLayers[i];
+						// Check the first style of every layer
+						var checkStyle = true;
+						// check if the layer is root
+						if(layerSel.key.indexOf("rootLayer_") !== 0){
+							var layer = st.oWMSInfo.layers[layerSel.key]
+							if(layer){
+								// Create text and radio buttons for each layer
+								htmlForStylesTab = htmlForStylesTab.concat("<div>");
+								// Create h5 for title
+								htmlForStylesTab = htmlForStylesTab.concat("<h5>");
+								htmlForStylesTab = htmlForStylesTab.concat(layer.title);
+								htmlForStylesTab = htmlForStylesTab.concat("</h5>");
+								// Create raddion button for each style
+								for(j in layer.styles){
+									var style = layer.styles[j];
+									htmlForStylesTab = htmlForStylesTab.concat("<input class='wizard_radio' type='radio' name='").concat(st.sId).concat("_").concat(layer.name).concat("'");
+									htmlForStylesTab = htmlForStylesTab.concat(" value='").concat(style.name).concat("'");
+									if(checkStyle){
+										htmlForStylesTab = htmlForStylesTab.concat(" checked ");
+										checkStyle = false;
+									}
+									htmlForStylesTab = htmlForStylesTab.concat(">").concat(style.title);
+									htmlForStylesTab = htmlForStylesTab.concat("</BR>");
+								}
+								htmlForStylesTab = htmlForStylesTab.concat("</div>");
+							}
+						}
+					}
+					divStyles.prepend(htmlForStylesTab);
+			    },
+
+
+			    /**
+				 * Draw a form into wizard tab 'formats' that depends of
+				 * selected layers in wizard tab 'select layers'
+				 */
+			    "_fnDrawFormFormatsLayer" : function (aSelectedLayers)
+			    {
+			    	return this.__fnDrawFormFormatsLayer(aSelectedLayers);
+			    },
+
+			    /**
+				 * Draw a form into wizard tab 'formats' that depends of
+				 * selected layers in wizard tab 'select layers'
+				 */
+				"__fnDrawFormFormatsLayer" : function (aSelectedLayers)
+			    {
+					var st = this._state;
+					var divFormats = jQuery("#".concat(st.sId).concat("_formats"),"#".concat(st.containerId));
+					// Clear the content of the div
+					divFormats.html("");
+					// set select format
+					var htmlForFormatsTab = "<div>";
+					htmlForFormatsTab = htmlForFormatsTab.concat("<h5>");
+					// Title multilanguage for formats
+					htmlForFormatsTab = htmlForFormatsTab.concat(st.titleFormat);
+					htmlForFormatsTab = htmlForFormatsTab.concat("</h5>");
+
+					htmlForFormatsTab = htmlForFormatsTab.concat("<select id='").concat(st.sId).concat("_selectFormatLayer'");
+					htmlForFormatsTab = htmlForFormatsTab.concat(" class='form-control form-control '>");
+					var aFormats = st.oWMSInfo.formatsSupported;
+					htmlForFormatsTab = htmlForFormatsTab.concat("<option value=''/>");
+					for(i = 0; i < aFormats.length; i++){
+						htmlForFormatsTab = htmlForFormatsTab.concat("<option value='");
+						htmlForFormatsTab = htmlForFormatsTab.concat(aFormats[i]).concat("'");
+						htmlForFormatsTab = htmlForFormatsTab.concat(">").concat(aFormats[i]);
+						htmlForFormatsTab = htmlForFormatsTab.concat("</option>");
+					}
+					htmlForFormatsTab = htmlForFormatsTab.concat("</select>");
+					htmlForFormatsTab = htmlForFormatsTab.concat("</div>");
+
+
+					// set select crs
+					htmlForFormatsTab = htmlForFormatsTab.concat("<div>");
+					htmlForFormatsTab = htmlForFormatsTab.concat("<h5>");
+					// Title multilanguage for formats
+					htmlForFormatsTab = htmlForFormatsTab.concat(st.titleCRS);
+					htmlForFormatsTab = htmlForFormatsTab.concat("</h5>");
+
+					// if crs is set by the map
+					if(st.aCrs){
+						htmlForFormatsTab = htmlForFormatsTab.concat("<input id='").concat(st.sId).concat("_selectCrsLayer'");
+						htmlForFormatsTab = htmlForFormatsTab.concat(" class='form-control form-control' readonly ");
+						htmlForFormatsTab = htmlForFormatsTab.concat(" value='").concat(st.aCrs).concat("' />");
+					}else{
+						// get the common crs for layers selected
+						var aCommonCRS = [];
+						for(i in aSelectedLayers){
+							var layerSel = aSelectedLayers[i];
+							// check if the layer is root
+							if(layerSel.key.indexOf("rootLayer_") !== 0){
+								var layer = st.oWMSInfo.layers[layerSel.key]
+								if(layer){
+									if(aCommonCRS.length != 0 ){
+										aCommonCRS = aCommonCRS.filter(function(el) {
+										    return layer.crs.indexOf(el) != -1
+										  });
+									}else{
+										aCommonCRS = layer.crs;
+									}
+								}
+							}
+						}
+
+						htmlForFormatsTab = htmlForFormatsTab.concat("<select id='").concat(st.sId).concat("_selectCrsLayer'");
+						htmlForFormatsTab = htmlForFormatsTab.concat(" multiple class='form-control form-control '>");
+						for(i = 0; i < aCommonCRS.length; i++){
+							htmlForFormatsTab = htmlForFormatsTab.concat("<option value='");
+							htmlForFormatsTab = htmlForFormatsTab.concat(aCommonCRS[i]).concat("'");
+							htmlForFormatsTab = htmlForFormatsTab.concat(">").concat(aCommonCRS[i]);
+							htmlForFormatsTab = htmlForFormatsTab.concat("</option>");
+						}
+						htmlForFormatsTab = htmlForFormatsTab.concat("</select>");
+					}
+					htmlForFormatsTab = htmlForFormatsTab.concat("</div>");
+
+					// set the html in the tab
+					divFormats.prepend(htmlForFormatsTab);
+
+			    },
+
+			    /**
+				 * Get the styles selected in wizard tab 'styles'
+				 */
+			    "_fnGetSelectedStylesLayer" : function (aSelectedLayers)
+			    {
+			    	return this.__fnGetSelectedStylesLayer(aSelectedLayers);
+			    },
+
+			    /**
+				 * Get the styles selected in wizard tab 'styles'
+				 */
+				"__fnGetSelectedStylesLayer" : function (aSelectedLayers)
+			    {
+					var st = this._state;
+					var styles = {};
+					var valueStyle = [];
+					var valueStyleWithLayerId = [];
+					for(i in aSelectedLayers){
+						var keyLayerSelected = aSelectedLayers[i];
+						var valueSelected = jQuery(("input[name='").concat(st.sId).concat("_").concat(keyLayerSelected).concat("']:checked"),
+								"#".concat(st.containerId)).val();
+						valueStyle.push(valueSelected);
+						valueStyleWithLayerId.push(keyLayerSelected.concat("_").concat(valueSelected));
+					}
+					styles = {
+							   "values" : valueStyle.join(),
+							   "values_with_id" : valueStyleWithLayerId.join()
+							 };
+					return styles;
+
+
+			    },
+
+			    /**
+				 * Get the crs selected in wizard tab 'formats'
+				 */
+			    "_fnGetSelectedCRS" : function ()
+			    {
+			    	return this.__fnGetSelectedCRS();
+			    },
+
+			    /**
+				 * Get the crs selected in wizard tab 'formats'
+				 */
+				"__fnGetSelectedCRS" : function ()
+			    {
+					var st = this._state;
+					var value = jQuery("#".concat(st.sId).concat("_selectCrsLayer"),"#".concat(st.containerId)).val();
+					if(!value){
+						return false;
+					}else{
+						return value;
+					}
+
+			    },
+
+			    /**
+				 * Get the image format selected in wizard tab 'formats'
+				 */
+			    "_fnGetSelectedFormat" : function ()
+			    {
+			    	return this.__fnGetSelectedFormat();
+			    },
+
+			    /**
+				 * Get the image format selected in wizard tab 'formats'
+				 */
+				"__fnGetSelectedFormat" : function ()
+			    {
+					var st = this._state;
+					var value = jQuery("#".concat(st.sId).concat("_selectFormatLayer"),"#".concat(st.containerId)).val();
+					if(!value){
+						return false;
+					}else{
+						return value;
+					}
+
+			    },
+
+				/**
+				 * Generate the code necessary to add the selected layers into the map
+				 * Return false if it hasn't layers selected or generates an error
+				 */
+				"_fnCreateLayersOptions" : function(layersSelected) {
+					var st = this._state;
+					var keysLayersSel = [];
+
+    				if(!(jQuery(layersSelected).not(st.oldSelectedLayers).length === 0 &&
+    						jQuery(st.oldSelectedLayers).not(layersSelected).length === 0)){
+    					// set oldSelectedLayers
+    					st.oldSelectedLayers = layersSelected;
+    					// draw the form to select styles of the layers
+    					this._fnDrawFormStylesLayer(layersSelected);
+    					//	draw the form to select styles of the layers
+    					this._fnDrawFormFormatsLayer(layersSelected);
+    					// If layers have changed, the values of steps 2 and 3
+    					// will have changed also and therefore the user must inspect and
+    					// select new values in these tabs.
+    					st.wizard.steps("goToStep",3);
+    					// show message to user
+    					this._fnSetErrorMessage("#".concat(st.sId).concat("_styles_error"),st.msgReviseStyles);
+						return false;
+	    			}
+
+					// get the selected layers
+					for(i in layersSelected){
+						var layerSel = layersSelected[i];
+						// check if the layer is root
+						if(layerSel.key.indexOf("rootLayer_") !== 0){
+							var layer = st.oWMSInfo.layers[layerSel.key]
+							if(layer){
+								keysLayersSel.push(layerSel.key);
+							}
+						}
+					}
+
+					// clean error message for step 3 (formats)
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_format_error"));
+
+					// get styles selected
+					var stylesSelected = this._fnGetSelectedStylesLayer(keysLayersSel);
+					// get format selected
+					var formatSelected =  this._fnGetSelectedFormat();
+					// get crs selected
+					var crsSelected = this._fnGetSelectedCRS();
+
+					if(formatSelected === false || crsSelected === false){
+						// show error message and go to step select formats
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_format_error"),st.msgFormatsRequired);
+						st.wizard.steps("goToStep",4);
+						return false;
+					}else{
+						// generate root layer options and put selected layers
+						// into layers parameter
+						var layerOptions = {
+								"layer_type": st.typeLayer,
+							    "span": (st.oWMSInfo.id.toString()).concat("_span"),
+						        "url": st.oWMSInfo.serviceUrl,
+						        "layers":keysLayersSel.join(),
+						        "format": formatSelected,
+						        "transparent":"true",
+						        "version":st.oWMSInfo.version,
+						        "crs": crsSelected,
+						        "opacity": "1.0",
+						        "styles" : stylesSelected.values,
+						        "styles_with_id" : stylesSelected.values_with_id,
+						        "allow_disable": true,
+						        "node_icon": ".whhg icon-layerorderdown",
+						        "title": st.oWMSInfo.serviceTitle,
+						        };
+						return layerOptions;
+					}
+				},
+
+				/**
+				 *  Get layer id
+				 */
+				"_fnGetLayerId" : function() {
+					var st = this._state;
+					return st.oWMSInfo.id.toString();
+
+				},
+
+				/**
+				 * Clean and restore the objects of the tab
+				 */
+				"_fnCleanUserLayerTab" : function() {
+					var st = this._state;
+					st.oWMSInfo = null;
+					st.oTree = null;
+				},
+
+				/**
+				 * Set layers, styles, crs, etc. from object oDataToSet
+				 */
+				"_fnSetData" : function(oData) {
+					// get url and simulate connect
+					var st = this._state;
+					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val(oData.url);
+					this._fnGetDataFromServer();
+
+					// get array of layers selected and set them
+					st.wizard.next();
+					//this._fnChangeStepControl(null, 0, 1);
+					// Get the tree and check the layers
+					var tree  = st.oTree;
+					var aLayersSel =  oData.layerSelected.split(",");
+					for(i = 0; i < aLayersSel.length; i++){
+						var node = tree.getNodeByKey(aLayersSel[i]);
+						node.setSelected();
+					}
+
+					var aux = tree.getSelectedNodes();
+					var length = aux.length;
+
+					// get array of styles selected and set them
+					st.wizard.next();
+					//st.wizard.steps("goToStep",2);
+					//this._fnChangeStepControl(null, 1, 2);
+
+					// get format and crs and selected and them
+				}
+
+	});
+
+	/**
+	 * Register class to management tab of WMTS layer
+	 */
+
+	GvNIX_Map_Leaflet.USERLAYERTAB.wmts_wizard = function(sId, containerId, aCrs, options) {
+		// Check that we are a new instance
+		if (!this instanceof GvNIX_Map_Leaflet.USERLAYERTAB.wmts_wizard) {
+			alert("Warning: GvNIX_Map_Leaflet  USERLAYERTAB wmts_wizard must be initialised with the keyword 'new'");
+		}
+		this._default_options = jQuery.extend({},
+				GvNIX_Map_Leaflet.USERLAYERTAB.Base.default_options);
+
+		this.s = jQuery.extend({}, this._default_options, options);
+
+		// Set this group _state attributes to those passed by the parameters
+		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
+			"sId" : sId,
+			"title" : "",
+			"containerId": containerId,
+			"path" : "",
+			"typeLayer" : "",
+			"treeDivId" : null,
+			"aCrs" : aCrs,
+			"oWMTSInfo" : null,
+			"oTree" : null,
+			"fnOnSearchLayers" : null,
+			"oUtil" : null,
+			"msgLayersNotFound" : "Layers not found",
+			"msgServerRequired" : "Server value is required",
+			"msgLayersRequired" : "Select at least one layer",
+			"msgCrsRequired" : "Select a CRS",
+			"msgConnectRequired" : "Establish the connexion to the server first to get the information and layers of this one",
+			"titleCRS" : "Select CRS",
+			"format" : null,
+			"wizard" : null,
+			"oldSelectedLayers" : null // set temp layers selected to refresh styles
+
+		});
+
+		this.fnSettings = function() {
+			return this.s;
+		};
+
+		// Constructor
+		this._fnConstructor();
+	};
+
+
+	/**
+	 * Tab type wms-wizard. Class method declaration
+	 */
+	GvNIX_Map_Leaflet.USERLAYERTAB.wmts_wizard.prototype = jQuery.extend({},
+			GvNIX_Map_Leaflet.USERLAYERTAB.Base._prototype, {
+				"_debug" : function(message) {
+					var st = this._state;
+					console.log("[UserLayerTab WMTS-WIZARD:" + st.sId + "] " + message);
+				},
+
+				// overwrite constructor to create wmts_wizard instance
+				"_fnConstructor" : function() {
+					// Call to super
+					this.__fnConstructor();
+					var s = this.s;
+					var st = this._state;
+					// Get id of the tree when we are going to paint layers to
+					// select
+					st.treeDivId = s.tree_div_id;
+					st.path = s.path;
+					// Set error messages and titles
+					st.msgLayersNotFound = s.msg_layers_not_found;
+					st.msgLayersRequired = s.msg_layers_required;
+					st.msgServerRequired = s.msg_server_required;
+					st.msgCrsRequired = s.msg_crs_required;
+					st.msgConnectRequired = s.msg_connect_required;
+					st.titleCRS = s.title_crs;
+					st.wizardNextLabel = s.wizard_next_label;
+					st.wizardPreviousLabel = s.wizard_previous_label;
+					//set format
+					st.format = s.format;
+
+					// Get if the user has his own implementation to connect to the server
+					// and get the layers
+					if (s.fn_search_layers) {
+						st.fnOnSearchLayers = this.Util.getFunctionByName(
+								s.fn_search_layers, jQuery.proxy(
+										this.debug, this));
+					}
+
+				},
+
+				/**
+				 * Get selected layers of the tree
+				 */
+				"_fnGetSelectedLayers" : function() {
+					var st = this._state;
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_tree_error"));
+					if(st.oTree){
+						var selectedNodes = st.oTree.getSelectedNodes();
+						if(selectedNodes.length === 0){
+							selectedNodes = false;
+						}
+					}else{
+						selectedNodes = false;
+					}
+
+					if(selectedNodes == false){
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgLayersRequired);
+						//go to step where can select layers
+						st.wizard.steps("goToStep",2);
+					}
+
+					return selectedNodes;
+				},
+
+				/**
+				 * Get data from WMTS server indicated into server input
+				 */
+				"_fnGetDataFromServer" : function() {
+					this.__fnGetDataFromServer();
+				},
+
+				/**
+				 * Get data from WMTS server indicated into server input
+				 * Return false in case of error
+				 */
+				"__fnGetDataFromServer" : function() {
+					var st = this._state;
+
+					var divCrs = jQuery("#".concat(st.sId).concat("_crs"),"#".concat(st.containerId));
+					// Clear the content of the div
+					divCrs.html("");
+					// clean div that contains error messages
+					this._fnClearErrorMessage("#".concat(st.sId).concat("_connection_error"));
+					var urlServ = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
+
+					if(urlServ){
+						st.oUtil.startWaitMeAnimation(st.waitLabel);
+						var params = { url: urlServ, wizard: "true", crs: st.aCrs, useCrsSelected: false};
+						jQuery.ajax({
+							url : st.path + "?findWmtsCapabilities",
+							data: params,
+							cache: false,
+							success : function(element) {
+								st.oUtil.stopWaitMeAnimation();
+								st.oWMTSInfo = element;
+
+								// Show server info
+								jQuery("#".concat(st.sId).concat("_server_info"), "#".concat(st.containerId)).show();
+
+								if(st.oWMTSInfo.version){
+									jQuery("#".concat(st.sId).concat("_version_p"), "#".concat(st.containerId)).html(st.oWMTSInfo.version);
+									jQuery("#".concat(st.sId).concat("_version_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_version_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.oWMTSInfo.serviceTitle){
+									jQuery("#".concat(st.sId).concat("_title_p"), "#".concat(st.containerId)).html(st.oWMTSInfo.serviceTitle);
+									jQuery("#".concat(st.sId).concat("_title_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_title_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.oWMTSInfo.serviceAbstract){
+									jQuery("#".concat(st.sId).concat("_description_p"), "#".concat(st.containerId)).html(st.oWMTSInfo.serviceAbstract);
+									jQuery("#".concat(st.sId).concat("_description_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_description_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.treeDivId)
+								{
+									// clean tree and label
+									if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+									}else{
+										jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).show();
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+									}
+									// Check if have any result and create the tree
+									if(element.layersTree){
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
+											source: element.layersTree,
+											checkbox: true,
+											selectMode: 1
+										});
+
+										st.oTree = jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("getTree");
+									}else{
+										st.oTree = null;
+										// set empty tree message
+										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).html(st.msgLayersNotFound);
+									}
+								}
+								// disable input, show change server button and go to step 1
+								jQuery("#".concat(st.sId).concat("_changeserver_button"), "#".concat(st.containerId)).show();
+								jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).prop('disabled', true);
+								st.wizard.steps("goToStep",1);
+							},
+							error : function(object) {
+								jQuery("#".concat(st.sId).concat("_server_info"), "#".concat(st.containerId)).hide();
+
+								// clean tree and messages
+								if (jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).children().length > 0){
+									jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree("destroy");
+								}
+								jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
+								jQuery("#".concat(st.treeDivId).concat("_label"), "#".concat(st.containerId)).hide();
+								// get the error message and put in after form
+								jQuery("#".concat(st.sId).concat("_connection_error"), "#".concat(st.containerId)).html(object.responseText);
+								// stop wait animation
+								st.oUtil.stopWaitMeAnimation();
+								// show error console
+								console.log('Se ha producido un error en la obtencion de las capas correspondientes al servidor introducido');
+							}
+						});
+					}else{
+						// with error return false
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_connection_error"),st.msgServerRequired);
+					}
+
+				},
+
+				/**
+				 * Register actions to the different buttons of the
+				 * tab
+				 */
+				"_fnRegisterButtonsAction" : function(){
+					this._fnRegisterActionToButtonResetServer();
+				},
+
+				/**
+				 * Restore the objects of the tab and enable the input when you
+				 * set the server
+				 */
+				"_fnResetServer" : function() {
+					var st = this._state;
+					jQuery("#".concat(st.sId).concat("_changeserver_button"), "#".concat(st.containerId)).hide();
+					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).prop('disabled', false);
+					this._fnCleanUserLayerTab();
+
+				},
+
+				/**
+				 * Register the function to call when click on button connect
+				 */
+				"fnCreateWizard" : function() {
+					this._fnCreateWizard();
+				},
+
+				/**
+				 * Register the function to call when click on button connect
+				 */
+				"_fnCreateWizard" : function() {
+					 var st = this._state;
+					 var callbackFunction = jQuery.proxy(this._fnChangeStepControl, this);
+					 st.wizard = jQuery("#".concat(st.sId),"#".concat(st.containerId)).steps({
+						    headerTag: "h3",
+						    bodyTag: "section",
+						    transitionEffect: "slide",
+						    enableFinishButton : false,
+						    onStepChanging: function (event, currentIndex, newIndex)
+						    {
+						    	return callbackFunction(event, currentIndex, newIndex);
+						    },
+					 		labels: {
+					 			next : st.wizardNextLabel,
+					 			previous: st.wizardPreviousLabel
+					 		}
+						});
+					 // Create wizard cleans input value
+					 if(st.aCrs){
+						jQuery("#".concat(st.sId).concat("_map_crs_input"),"#".concat(st.containerId)).val(st.aCrs);
+   					 }
+				},
+
+				/**
+				 * Control the event that happens when the user changes wizard tab
+				 */
+				"_fnChangeStepControl" : function (event, currentIndex, newIndex)
+			    {
+			    	return this.__fnChangeStepControl(event, currentIndex, newIndex);
+			    },
+
+			    /**
+				 * Control the event that happens when the user changes wizard tab
+				 */
+				"__fnChangeStepControl" : function (event, currentIndex, newIndex)
+			    {
+			    	var st = this._state;
+			    	// check if the user has gotten an object of the server connection to continue
+			    	if(currentIndex == 0 && st.oWMTSInfo == null && newIndex != 0){
+						if(st.fnOnSearchLayers){
+							return st.fnOnSearchLayers();
+						}else{
+							this._fnGetDataFromServer();
+							return false;
+						}
+			    	}
+
+
+			    	// if we are in the step select layers push 'next'
+			    	if(currentIndex == 2 && newIndex > currentIndex){
+			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_tree_error"));
+			    		var selectedLayers = this._fnGetSelectedLayers();
+			    		if(selectedLayers === false){
+			    			return false;
+			    		}else{
+			    			if(!st.oldSelectedLayers){
+			    				// set oldSelectedLayers
+			    				st.oldSelectedLayers = selectedLayers;
+		    					//	draw the form to select styles of the layers
+		    					this._fnDrawFormCrsLayer(selectedLayers);
+			    			}else{
+			    				// check if selected layers have changed
+			    				if(!(jQuery(selectedLayers).not(st.oldSelectedLayers).length === 0 &&
+			    						jQuery(st.oldSelectedLayers).not(selectedLayers).length === 0)){
+			    					// set oldSelectedLayers
+			    					st.oldSelectedLayers = selectedLayers;
+			    					//	draw the form to select styles of the layers
+			    					this._fnDrawFormCrsLayer(selectedLayers);
+			    				}
+			    			}
+			    		}
+			    	}
+
+			    	if(currentIndex == 3 && newIndex != 3){
+			    		// clean error message of step 3 (crs)
+			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_crs_error"));
+			    	}
+
+			    	return true;
+			    },
+
+			    /**
+				 * Draw a form into wizard tab 'formats' that depends of
+				 * selected layers in wizard tab 'select layers'
+				 */
+			    "_fnDrawFormCrsLayer" : function (aSelectedLayers)
+			    {
+			    	return this.__fnDrawFormCrsLayer(aSelectedLayers);
+			    },
+
+			    /**
+				 * Draw a form into wizard tab 'crs' that depends of
+				 * selected layers in wizard tab 'select layers'
+				 */
+				"__fnDrawFormCrsLayer" : function (aSelectedLayers)
+			    {
+					var st = this._state;
+					var divCrs = jQuery("#".concat(st.sId).concat("_crs"),"#".concat(st.containerId));
+					// Clear the content of the div
+					divCrs.html("");
+
+					// set select crs
+					var htmlForCrsTab  = "<div>";
+					htmlForCrsTab = htmlForCrsTab.concat("<h5>");
+					// Title multilanguage for formats
+					htmlForCrsTab = htmlForCrsTab.concat(st.titleCRS);
+					htmlForCrsTab = htmlForCrsTab.concat("</h5>");
+
+					// if crs is set by the map
+					if(st.aCrs){
+						htmlForCrsTab = htmlForCrsTab.concat("<input id='").concat(st.sId).concat("_selectCrsLayer'");
+						htmlForCrsTab = htmlForCrsTab.concat(" class='form-control form-control' readonly ");
+						htmlForCrsTab = htmlForCrsTab.concat(" value='").concat(st.aCrs).concat("' />");
+					}else{
+						// get the common crs for layers selected
+						var aCommonCRS = [];
+						for(i in aSelectedLayers){
+							var layerSel = aSelectedLayers[i];
+							// check if the layer is root
+							if(layerSel.key.indexOf("rootLayer_") !== 0){
+								var layer = st.oWMTSInfo.layers[layerSel.key]
+								if(layer){
+									if(aCommonCRS.length != 0 ){
+										aCommonCRS = aCommonCRS.filter(function(el) {
+										    return layer.crs.indexOf(el) != -1
+										  });
+									}else{
+										aCommonCRS = layer.crs;
+									}
+								}
+							}
+						}
+
+						htmlForCrsTab = htmlForCrsTab.concat("<select id='").concat(st.sId).concat("_selectCrsLayer'");
+						htmlForCrsTab = htmlForCrsTab.concat(" multiple class='form-control form-control '>");
+						for(i = 0; i < aCommonCRS.length; i++){
+							htmlForCrsTab = htmlForCrsTab.concat("<option value='");
+							htmlForCrsTab = htmlForCrsTab.concat(aCommonCRS[i]).concat("'");
+							htmlForCrsTab = htmlForCrsTab.concat(">").concat(aCommonCRS[i]);
+							htmlForCrsTab = htmlForCrsTab.concat("</option>");
+						}
+						htmlForCrsTab = htmlForCrsTab.concat("</select>");
+					}
+					htmlForCrsTab = htmlForCrsTab.concat("</div>");
+
+					// set the html in the tab
+					divCrs.prepend(htmlForCrsTab);
+
+			    },
+
+			    /**
+				 * Get the crs selected in wizard tab 'formats'
+				 */
+			    "_fnGetSelectedCRS" : function ()
+			    {
+			    	return this.__fnGetSelectedCRS();
+			    },
+
+			    /**
+				 * Get the crs selected in wizard tab 'formats'
+				 */
+				"__fnGetSelectedCRS" : function ()
+			    {
+					var st = this._state;
+					var value = jQuery("#".concat(st.sId).concat("_selectCrsLayer"),"#".concat(st.containerId)).val();
+					if(!value){
+						return false;
+					}else{
+						return value;
+					}
+
+			    },
+
+				/**
+				 * Generate the code necessary to add the selected layers into the map
+				 * Return false if it hasn't layers selected or generates an error
+				 */
+				"_fnCreateLayersOptions" : function(layersSelected) {
+					var st = this._state;
+					var keysLayersSel = [];
+
+    				if(!(jQuery(layersSelected).not(st.oldSelectedLayers).length === 0 &&
+    						jQuery(st.oldSelectedLayers).not(layersSelected).length === 0)){
+    					// set oldSelectedLayers
+    					st.oldSelectedLayers = layersSelected;
+    					//	draw the form to select crs of the layers
+    					this._fnDrawFormCrsLayer(layersSelected);
+    					// If layers have changed, the values of the step 3
+    					// will have changed also and therefore the user must inspect and
+    					// select new values in this tab.
+    					st.wizard.steps("goToStep",4);
+    					// show message to user
+    					this._fnSetErrorMessage("#".concat(st.sId).concat("_crs_error"),st.msgCrsRequired);
+						return false;
+	    			}
+
+					// get crs selected
+					var crsSelected = this._fnGetSelectedCRS();
+
+					if(crsSelected === false){
+						// show error message and go to step select formats
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_crs_error"),st.msgCrsRequired);
+						st.wizard.steps("goToStep",4);
+						return false;
+					}else{
+						// get the tile matrix selected if is necessary
+						var tileMatSelectedId = st.oWMTSInfo.tileMatrixSelectedId;
+						if(!st.oWMTSInfo.tileMatrixSelectedId){
+							var tileSelected = [];
+							for(key in st.oWMTSInfo.tileMatrixCrsSupported){
+								var value = st.oWMTSInfo.tileMatrixCrsSupported[key];
+								for(i in crsSelected){
+									if(value === crsSelected[i]){
+										tileSelected.push(key);
+									}
+								}
+							}
+							tileMatSelectedId = tileSelected.join();
+							crsSelected = crsSelected.join();
+						}
+						// generate root layer options and put selected layers
+						// into layers parameter
+						var layerOptions = {
+								"layer_type": st.typeLayer,
+								"layer": layersSelected[0].key,
+								"span": (st.oWMTSInfo.id.toString()).concat("_span"),
+						        "url": st.oWMTSInfo.serviceUrl,
+						        "version":st.oWMTSInfo.version,
+						        "opacity": "1",
+						        "allow_disable": true,
+						        "service" : st.oWMTSInfo.serviceType,
+						        "tilematrix_set" : tileMatSelectedId,
+						        "crs_selected" :  crsSelected,
+						        "node_icon": ".whhg icon-layerorderup",
+								"title": layersSelected[0].title,
+						};
+						return layerOptions;
+					}
+				},
+
+				/**
+				 *  Get layer id
+				 */
+				"_fnGetLayerId" : function(layerOptions) {
+					var st = this._state;
+					return (st.oWMTSInfo.id.toString()).concat("_").concat(layerOptions.layer);
+
+				},
+
+				/**
+				 * Clean and restore the objects of the tab
+				 */
+				"_fnCleanUserLayerTab" : function() {
+					var st = this._state;
+					st.oWMTSInfo = null;
+					st.oTree = null;
+				}
+
+	});
+
+/**
+   * Register class to management tab of SHAPE layer
+   */
+
+  GvNIX_Map_Leaflet.USERLAYERTAB.shape = function(sId, dialogId, aCrs, options) {
+    // Sanity check that we are a new instance
+    if (!this instanceof GvNIX_Map_Leaflet.USERLAYERTAB.shape) {
+      alert("Warning: GvNIX_Map_Leaflet USERLAYERTAB shape layer must be initialised with the keyword 'new'");
+    }
+    this._default_options = jQuery.extend({},
+        GvNIX_Map_Leaflet.USERLAYERTAB.Base.default_options);
+
+    this.s = jQuery.extend({}, this._default_options, options);
+
+    // Set this group _state attributes to those passed by the parameters
+    this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
+      "sId" : sId,
+      "title" : "",
+      "dialogId": dialogId,
+      "aCrs" : aCrs,
+      "typeLayer" : "",
+      "idLayer" : "",
+      "nameLayer": "",
+      "oUtil" : null,
+      "oMap" : null,
+      "file" : null,
+    });
+
+    this.fnSettings = function() {
+      return this.s;
+    };
+
+    // Constructor
+    this._fnConstructor();
+  };
+
+  /**
+   * Layer type to group layers. Class method declaration
+   */
+  GvNIX_Map_Leaflet.USERLAYERTAB.shape.prototype = jQuery.extend({},
+      GvNIX_Map_Leaflet.USERLAYERTAB.Base._prototype, {
+        "_debug" : function(message) {
+          var st = this._state;
+          console.log("[UserLayerTab SHAPE:" + st.sId + "] " + message);
+        },
+
+        // overwrite constructor to create leaflet layerGroup instance
+        "_fnConstructor" : function() {
+          // Call to super
+          this.__fnConstructor();
+        },
+
+        /**
+         * Get layers from file input
+         */
+        "_fnGetSelectedLayers" : function() {
+        	var st = this._state;
+            return st.file;
+        },
+
+        /**
+         * Add change event for input file
+         * TODO eliminar parámetro mapa y variable oMap después de testear
+         */
+        "_fnAddChangeEventToFileInput" : function(map){
+        	var st = this._state;
+        	var fileInput = jQuery("#"+st.sId+"_file_input", "#"+st.dialogId);
+        	fileInput.change(jQuery.proxy(this._fnCheckAndLoadFile, this));
+            this._state.oMap = map;
+        },
+
+        /**
+         * Check loaded file in input file if any
+         */
+        "_fnCheckAndLoadFile" : function(){
+        	// Check for the various File API support.
+        	if (window.File && window.FileReader && window.FileList && window.Blob) {
+        	  // Great success! All the File APIs are supported.
+        	} else {
+        	  alert('The File APIs are not fully supported in this browser.');
+        	}
+
+        	var st = this._state;
+        	var fileInput = jQuery("#"+st.sId+"_file_input", "#"+st.dialogId);
+        	var file = fileInput.prop("files")[0];
+        	st.file = file;
+        	st.idLayer = st.oUtil.getHashCode(file.name).concat("_").concat(new Date().getTime());
+              st.nameLayer = file.name;
+        },
+
+        /**
+         * TODO
+         */
+        "_fnCreateLayersToAddToMap" : function(file) {
+          var st = this._state;
+          var layerOptionsSel = [];
+          var title = st.nameLayer;
+
+          // Get the title form title input
+          if (jQuery("#"+st.sId+"_name_id", "#"+st.dialogId).val() != ""){
+        	  title = jQuery("#"+st.sId+"_name_id", "#"+st.dialogId).val();
+          }
+          var layerOptions = {
+            "layer_type": "shape",
+            "span": st.idLayer.concat("_span"),
+            "opacity": "1",
+            "allow_disable": true,
+            "node_icon": ".glyphicon glyphicon-floppy-open",
+            "title": title,
+            "file" : st.file,
+            "layerId" : st.idLayer
+          };
+          layerOptionsSel.push(layerOptions);
+
+          return layerOptionsSel;
+        },
+
+        /**
+         * TODO
+         */
+        "_fnGetLayerId" : function(layerOptions) {
+          var st = this._state;
+          return (st.idLayer);
+
+        },
+
+  });
+
+})(jQuery, window, document);
+

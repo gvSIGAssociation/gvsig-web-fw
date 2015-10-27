@@ -1,0 +1,45 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+  xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+  xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+  xmlns:form="http://www.springframework.org/tags/form"
+  xmlns:jsp="http://java.sun.com/JSP/Page"
+  xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="title" type="java.lang.String" required="false" rtexprvalue="true" description="Specify the title of the tab. Default 'SHAPEFILE'" />
+
+  <c:if test="${empty title}">
+    <c:set var="title" value="SHAPEFILE" />
+  </c:if>
+
+  <spring:message code="wait_label" var="waitLabel" htmlEscape="false"/>
+
+  <div id="${fn:escapeXml(id)}_shape"
+       data-layer_type="shape"
+       data-title="${fn:escapeXml(title)}"
+       data-user_layer_tab="true" data-type="shape"
+       data-wait_label="${waitLabel}">
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        Layer Name:
+        <input class="form-control input-sm"
+          id="${fn:escapeXml(id)}_shape_name_id" name="${fn:escapeXml(id)}_shape_name" type="text" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 input_file">
+        <input id="${fn:escapeXml(id)}_shape_file_input" type="file"
+          value="FILE"/>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <div id="shape_progress_bar"><div class="percent">0%</div></div>
+      </div>
+      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+        <button onclick="abortRead();">Cancel read</button>
+      </div>
+    </div>
+  </div>
+</jsp:root>

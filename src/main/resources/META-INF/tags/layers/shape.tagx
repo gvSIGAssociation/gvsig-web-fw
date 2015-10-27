@@ -1,0 +1,62 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="label" type="java.lang.String" required="false" description="Label to display the layer name" />
+  <jsp:directive.attribute name="labelCode" type="java.lang.String" required="false" description="Label code to display the layer name" />
+  <jsp:directive.attribute name="url" type="java.lang.String" required="true" description="URL to shapefile" />
+  <jsp:directive.attribute name="opacity" type="java.lang.Float" required="false" description="Layer opacity (between 0 and 1)" />
+  <jsp:directive.attribute name="allowDisable" type="java.lang.Boolean" required="false" description="Use this to set current layer as allowDisable or not. DEFAULT true." />
+  <jsp:directive.attribute name="maxZoom" type="java.lang.Integer" required="false" description="Maximun zoom which layer is shown" />
+  <jsp:directive.attribute name="minZoom" type="java.lang.Integer" required="false" description="Minimun zoom wich layer is shown" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  <jsp:directive.attribute name="layerIcon" type="java.lang.String" required="false" description="Layer icon for showing in map's TOC." />
+
+    <c:choose>
+      <c:when test="${empty mapview_in_overview or not mapview_in_overview}">
+        <c:if test="${empty label}">
+          <c:if test="${empty labelCode }">
+            <c:set var="labelCode" value="label_${fn:toLowerCase(fn:substringAfter(id,'_'))}"/>
+          </c:if>
+          <spring:message code="${labelCode}" var="label" htmlEscape="false" />
+        </c:if>
+
+        <c:if test="${empty opacity}">
+    	    <c:set var="opacity" value="1" />
+        </c:if>
+
+         <c:if test="${empty allowDisable}">
+    	    <c:set var="allowDisable" value="true" />
+        </c:if>
+
+        <c:set var="spanId" value="${id}_span"/>
+
+        <c:if test="${empty layerIcon}">
+          <c:set var="layerIcon" value=".glyphicon glyphicon-floppy-open" />
+        </c:if>
+      </c:when>
+      <c:otherwise>
+        <!-- configuration for overview layer -->
+        <c:set var="allowDisable" value="false" />
+        <c:set var="id" value="${id}_overview"/>
+      </c:otherwise>
+    </c:choose>
+
+    <!-- TODO group -->
+    <div class="mapviewer_layers_layer" data-layer_type="shape"
+            id="${id}"
+            data-group="${mapview_group_stack.peek()}"
+            data-span="${spanId}" data-url="${url}"
+            data-opacity="${opacity}"
+            data-min_zoom="${minZoom}" data-max_zoom="${maxZoom}"
+            data-allow_disable="${allowDisable}"
+            data-node_icon="${layerIcon}"
+            data-title="${fn:escapeXml(label)}"
+            >
+      <div id="layer-components" class="layer_components">
+        <c:set scope="request" value="${id}" var="current_layer"/>
+           <jsp:doBody />
+        <c:set scope="request" value="" var="current_layer"/>
+      </div>
+    </div>
+</jsp:root>

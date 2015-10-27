@@ -1,0 +1,142 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+  xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+  xmlns:util="urn:jsptagdir:/WEB-INF/tags/util"
+  xmlns:form="http://www.springframework.org/tags/form"
+  xmlns:jsp="http://java.sun.com/JSP/Page"
+  xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (include at final substring '_wmts_wizard')" />
+  <jsp:directive.attribute name="path" type="java.lang.String" required="true" rtexprvalue="true" description="Specify the relative URL path of the controller where do the conexion with server WMTS" />
+  <jsp:directive.attribute name="title" type="java.lang.String" required="false" rtexprvalue="true" description="The label code to get text from I18N properties that will be used as title of the tab. Default 'WMTS'" />
+
+  <spring:url value="${path}" var="controllerUrl" />
+
+  <c:choose>
+    <c:when test="${empty title}">
+      <c:set var="tabTitle" value="WMTS" />
+    </c:when>
+    <c:otherwise>
+      <spring:message code="${title}" var="tabTitle"/>
+    </c:otherwise>
+  </c:choose>
+
+  <!-- error messages -->
+  <spring:message code="layers_not_found" var="layersNotFoundMsg"/>
+  <spring:message code="error_server_required" var="msgServerRequired"/>
+  <spring:message code="error_layers_required" var="msgLayersRequired"/>
+  <spring:message code="error_crs_required" var="msgCrsRequired"/>
+  <spring:message code="error_connect_required" var="msgConnectRequired"/>
+
+  <!-- titles of tabs -->
+  <spring:message code="wmts_wizard_connect_title" var="titleConnect"/>
+  <spring:message code="wmts_wizard_server_info_title" var="titleServerInfo"/>
+  <spring:message code="wmts_wizard_layers_title" var="titleSelectLayers"/>
+  <spring:message code="wmts_wizard_crs_title" var="titleSelectCrs"/>
+
+  <!-- labels -->
+  <spring:message code="wmts_wizard_select_crs_title" var="selectCRSTitle" />
+  <spring:message code="wmts_wizard_server_crs_supported_label" var="serverCrsSupportedLabel"/>
+  <spring:message code="wmts_wizard_server_description_label" var="serverDescriptionLabel"/>
+  <spring:message code="wmts_wizard_server_format_supported_label" var="serverFormatSupportedLabel"/>
+  <spring:message code="wmts_wizard_server_label" var="serverLabel" />
+  <spring:message code="wmts_wizard_server_title_label" var="serverTitleLabel"/>
+  <spring:message code="wmts_wizard_server_version_label" var="serverVersionLabel"/>
+  <spring:message code="wmts_wizard_tree_select_layers_label" var="treeLabel" />
+  <spring:message code="map_crs_label" var="mapCrsLabel" htmlEscape="false"/>
+  <spring:message code="wizard_next_label" var="nextLabel" htmlEscape="false"/>
+  <spring:message code="wizard_previous_label" var="prevLabel" htmlEscape="false"/>
+  <spring:message code="wait_label" var="waitLabel" htmlEscape="false"/>
+  <spring:message code="button_change_server" var="changeServerButton" />
+  <!-- <spring:message code="tooltip_button_change_server" var="change_server_tooltip" /> -->
+
+  <div class="wizard_dialog" id="${fn:escapeXml(id)}_wmts_wizard"
+       data-layer_type="wmts"
+       data-msg_connect_required="${msgConnectRequired}"
+       data-msg_crs_required="${msgCrsRequired}"
+       data-msg_layers_not_found="${layersNotFoundMsg}"
+       data-msg_layers_required="${msgLayersRequired}"
+       data-msg_server_required="${msgServerRequired}"
+       data-path="${controllerUrl}" data-title="${tabTitle}"
+       data-title_crs="${selectCRSTitle}"
+       data-tree_div_id="${fn:escapeXml(id)}_wmts_wizard_tree"
+       data-type="wmts_wizard" data-user_layer_tab="true"
+       data-wait_label="${waitLabel}"
+       data-wizard_next_label="${nextLabel}"
+       data-wizard_previous_label="${prevLabel}">
+
+    <h3>${titleConnect}</h3>
+    <section>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+          <h5>${serverLabel}</h5>
+          <input class="form-control input-sm"
+            id="${fn:escapeXml(id)}_wmts_wizard_server_id" name="${fn:escapeXml(id)}_wmts_wizard_server" type="text" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="${fn:escapeXml(id)}_wmts_wizard_map_crs" style="display:none">
+          <h5><c:out value="${mapCrsLabel}" /></h5>
+          <input class="form-control input-sm" id="${fn:escapeXml(id)}_wmts_wizard_map_crs_input" disabled="disabled" type="text" />
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-xs-12 col-sm-4 col-sm-offset-8 col-md-4 col-md-offset-8 col-lg-4 col-lg-offset-8">
+          <input id="${fn:escapeXml(id)}_wmts_wizard_changeserver_button" type="button" style="display:none"
+            class="btn btn-primary btn-block btn-proceed"
+            value="${changeServerButton}" />
+        </div>
+      </div>
+      <div class="row">
+          <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_connection_error">&amp;nbsp;</div>
+      </div>
+    </section>
+    <h3>${titleServerInfo}</h3>
+    <section>
+      <div class="row" id="${fn:escapeXml(id)}_wmts_wizard_server_info" style="display:none">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_version_div">
+          <h4>${serverVersionLabel}</h4>
+          <p id="${fn:escapeXml(id)}_wmts_wizard_version_p" />
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_title_div">
+          <h4>${serverTitleLabel}</h4>
+          <p id="${fn:escapeXml(id)}_wmts_wizard_title_p" />
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_description_div">
+          <h4>${serverDescriptionLabel}</h4>
+          <p id="${fn:escapeXml(id)}_wmts_wizard_description_p" />
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_crs_supported_div">
+          <h4>${serverCrsSupportedLabel}</h4>
+          <p id="${fn:escapeXml(id)}_wmts_wizard_crs_supported_p" />
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_format_supported_div">
+          <h4>${serverFormatSupportedLabel}</h4>
+          <p id="${fn:escapeXml(id)}_wmts_wizard_format_supported_p" />
+        </div>
+      </div>
+    </section>
+    <h3>${titleSelectLayers}</h3>
+    <section>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_tree_label" style="display:none">
+        <h5>${treeLabel}</h5>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_tree">&amp;nbsp;</div>
+      </div>
+      <div class="row">
+          <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_tree_error">&amp;nbsp;</div>
+      </div>
+   </section>
+   <h3>${titleSelectCrs}</h3>
+   <section>
+     <div class="row" >
+       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_crs">
+       </div>
+     </div>
+     <div class="row">
+          <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_crs_error">&amp;nbsp;</div>
+      </div>
+   </section>
+</div>
+</jsp:root>

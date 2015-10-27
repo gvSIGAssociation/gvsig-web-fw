@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+
+  <jsp:output omit-xml-declaration="yes"/>
+
+  <!-- Get the user local from the page context (it was set by Spring MVC's locale resolver) -->
+  <c:set var="userLocale">
+    <c:set var="plocale">${pageContext.response.locale}</c:set>
+    <c:out default="en" value="${fn:replace(plocale, '_', '-')}"/>
+  </c:set>
+
+
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.userlayers.tool.js" var="js_leaflet_ext_gvnix_userlayers_tool"/>
+    <script src="${js_leaflet_ext_gvnix_userlayers_tool}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/jquery.dialogextend.min.js" var="jquery_dialog_extend_js_url"/>
+    <script src="${jquery_dialog_extend_js_url}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.userlayers.tabs.js" var="js_leaflet_ext_gvnix_userlayers_tabs"/>
+    <script src="${js_leaflet_ext_gvnix_userlayers_tabs}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.userlayers.tabscontainer.js" var="js_leaflet_ext_gvnix_userlayers_tabcontainer"/>
+    <script src="${js_leaflet_ext_gvnix_userlayers_tabcontainer}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/waitMe.min.js" var="js_jquery_waitme"/>
+    <script src="${js_jquery_waitme}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/jquery.steps.js" var="js_jquery_steps"/>
+    <script src="${js_jquery_steps}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.predefinedlayers.tool.js" var="js_leaflet_ext_gvnix_predefinedlayers_tool"/>
+    <script src="${js_leaflet_ext_gvnix_predefinedlayers_tool}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+  <!-- leaflet.shapefile scripts and CSS -->
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.shpfile.js" var="js_leaflet_shpfile"/>
+    <script src="${js_leaflet_shpfile}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/shp.js" var="js_shp"/>
+    <script src="${js_shp}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+
+<spring:url value="/resources/gvsig-web-fw/styles/waitMe.min.css" var="styles_jquery_waitme"/>
+    <link href="${styles_jquery_waitme}" media="screen,print" rel="stylesheet" type="text/css"/>
+<spring:url value="/resources/gvsig-web-fw/styles/jquery.steps.css" var="styles_jquery_steps"/>
+    <link href="${styles_jquery_steps}" media="screen,print" rel="stylesheet" type="text/css"/>
+
+</jsp:root>

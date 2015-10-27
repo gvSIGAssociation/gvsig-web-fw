@@ -1,0 +1,16 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure clean (include at final substring '_user_layers_tabs')" />
+  <jsp:directive.attribute name="display" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Set if container tabs is shown, default 'false'" />
+
+  <c:set var="styleDisplay" value="display:none"/>
+  <c:if test="${!empty display &amp;&amp; display == true}">
+    <c:set var="styleDisplay" value=""/>
+  </c:if>
+
+  <div id="${fn:escapeXml(id)}_user_layers_tabs" style="${styleDisplay}">
+    <jsp:doBody/>
+  </div>
+
+</jsp:root>

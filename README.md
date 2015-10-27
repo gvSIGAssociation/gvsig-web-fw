@@ -79,12 +79,18 @@ Geospatial web framework that includes many geographical tools for Spring MVC ba
 
 - include web resources on `load-scripts.tagx`:
 
-      <jsp:root xlns... xmlns:gvsig="http://gvsig.org/web-framework/TLD/util" version="2.0">
+```
+      <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
+           xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+           xmlns:jsp="http://java.sun.com/JSP/Page"
+           xmlns:spring="http://www.springframework.org/tags"
+           xmlns:gvsig="http://gvsig.org/web-framework/TLD/util"
+           version="2.0">
          ....
          ....
          ....
          <gvsig:load-scripts/>
       </jsp:root>
-
+```
 
 Now you are able to use tools on your map view

@@ -1,9 +1,3 @@
-/*
- * Copyright 2015 DiSiD Technologies S.L.L. All rights reserved.
- *
- * Project  : DiSiD gvgeoportal
- * SVN Id   : $Id$
- */
 package org.gvsig.framework.web.service;
 
 import java.util.List;

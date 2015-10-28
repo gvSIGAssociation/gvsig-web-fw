@@ -27,6 +27,7 @@
   <spring:message code="error_layers_required" var="msgLayersRequired"/>
   <spring:message code="error_crs_required" var="msgCrsRequired"/>
   <spring:message code="error_connect_required" var="msgConnectRequired"/>
+  <spring:message code="error_support_crs_format" var="msgSupportError"/>
 
   <!-- titles of tabs -->
   <spring:message code="wmts_wizard_connect_title" var="titleConnect"/>
@@ -35,10 +36,12 @@
   <spring:message code="wmts_wizard_crs_title" var="titleSelectCrs"/>
 
   <!-- labels -->
+  <spring:message code="wmts_wizard_server_crs_label" var="serverCrsLabel"/>
+  <spring:message code="wmts_wizard_server_format_label" var="serverFormatLabel"/>
   <spring:message code="wmts_wizard_select_crs_title" var="selectCRSTitle" />
-  <spring:message code="wmts_wizard_server_crs_supported_label" var="serverCrsSupportedLabel"/>
+  <spring:message code="wmts_wizard_server_crs_supported_label" var="crsSupportedLabel"/>
   <spring:message code="wmts_wizard_server_description_label" var="serverDescriptionLabel"/>
-  <spring:message code="wmts_wizard_server_format_supported_label" var="serverFormatSupportedLabel"/>
+  <spring:message code="wmts_wizard_server_format_supported_label" var="formatsSupportedLabel"/>
   <spring:message code="wmts_wizard_server_label" var="serverLabel" />
   <spring:message code="wmts_wizard_server_title_label" var="serverTitleLabel"/>
   <spring:message code="wmts_wizard_server_version_label" var="serverVersionLabel"/>
@@ -53,10 +56,13 @@
   <div class="wizard_dialog" id="${fn:escapeXml(id)}_wmts_wizard"
        data-layer_type="wmts"
        data-msg_connect_required="${msgConnectRequired}"
+       data-msg_crs_supported="${crsSupportedLabel}"
        data-msg_crs_required="${msgCrsRequired}"
+       data-msg_formats_supported="${formatsSupportedLabel}"
        data-msg_layers_not_found="${layersNotFoundMsg}"
        data-msg_layers_required="${msgLayersRequired}"
        data-msg_server_required="${msgServerRequired}"
+       data-msg_support_error="${msgSupportError}"
        data-path="${controllerUrl}" data-title="${tabTitle}"
        data-title_crs="${selectCRSTitle}"
        data-tree_div_id="${fn:escapeXml(id)}_wmts_wizard_tree"
@@ -107,12 +113,15 @@
           <p id="${fn:escapeXml(id)}_wmts_wizard_description_p" />
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_crs_supported_div">
-          <h4>${serverCrsSupportedLabel}</h4>
+          <h4>${serverCrsLabel}</h4>
           <p id="${fn:escapeXml(id)}_wmts_wizard_crs_supported_p" />
         </div>
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_format_supported_div">
-          <h4>${serverFormatSupportedLabel}</h4>
+          <h4>${serverFormatLabel}</h4>
           <p id="${fn:escapeXml(id)}_wmts_wizard_format_supported_p" />
+        </div>
+        <div class="row">
+          <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_info_error">&amp;nbsp;</div>
         </div>
       </div>
     </section>
@@ -126,16 +135,6 @@
       </div>
       <div class="row">
           <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_tree_error">&amp;nbsp;</div>
-      </div>
-   </section>
-   <h3>${titleSelectCrs}</h3>
-   <section>
-     <div class="row" >
-       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_crs">
-       </div>
-     </div>
-     <div class="row">
-          <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_crs_error">&amp;nbsp;</div>
       </div>
    </section>
 </div>

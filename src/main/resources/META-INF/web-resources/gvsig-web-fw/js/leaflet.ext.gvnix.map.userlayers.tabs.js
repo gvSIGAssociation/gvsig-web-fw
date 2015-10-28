@@ -1042,6 +1042,7 @@
 			"msgSupportError" : "The server doesn't support CRS or formats established",
 			"msgCrsSupported" : "Supported CRS: ",
 			"msgFormatsSupported" : "Supported Formats: ",
+			"msgIncompatibleLayers" : "The layers selected are incompatible, please select layers with common crs",
 			"titleFormat" : "Select Format",
 			"titleCRS" : "Select CRS",
 			"format" : null,
@@ -1092,6 +1093,7 @@
 					st.msgSupportError = s.msg_support_error;
 					st.msgCrsSupported = s.msg_crs_supported;
 					st.msgFormatsSupported = s.msg_formats_supported;
+					st.msgIncompatibleLayers = s.msg_incompatible_layers;
 					st.titleFormat = s.title_format;
 					st.titleCRS = s.title_crs;
 					st.wizardNextLabel = s.wizard_next_label;
@@ -1349,7 +1351,7 @@
 			    	// check if formats and crs are supported by the server
 			    	if(newIndex > 1){
 			    		if((st.aCrs != null &&
-			    				(!st.oWMSInfo.crsSelected || (st.oWMSInfo.crsSelected && st.oWMSInfo.crsSelected == 0))
+			    				(!st.oWMSInfo.crsSelected || (st.oWMSInfo.crsSelected && st.oWMSInfo.crsSelected.length == 0))
 			    		    ) || !st.oWMSInfo.formatSelected){
 			    			var errorMsg = st.msgSupportError.concat("</BR>");
 			    			if(st.aCrs != null){
@@ -1381,8 +1383,6 @@
 			    				st.oldSelectedLayers = selectedLayers;
 			    				// draw the form to select styles of the layers
 		    					this._fnDrawFormStylesLayer(selectedLayers);
-		    					//	draw the form to select styles of the layers
-		    					this._fnDrawFormFormatsLayer(selectedLayers);
 			    			}else{
 			    				// check if selected layers have changed
 			    				if(!(jQuery(selectedLayers).not(st.oldSelectedLayers).length === 0 &&
@@ -1391,21 +1391,13 @@
 			    					st.oldSelectedLayers = selectedLayers;
 			    					// draw the form to select styles of the layers
 			    					this._fnDrawFormStylesLayer(selectedLayers);
-			    					//	draw the form to select styles of the layers
-			    					this._fnDrawFormFormatsLayer(selectedLayers);
 			    				}
 			    			}
 			    		}
 			    	}
-
 			    	if(currentIndex == 3){
 			    		// clean error message of step 3 (styles)
 			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_styles_error"));
-			    	}
-
-			    	if(currentIndex == 4 && newIndex != 4){
-				    	// clean error message of step 4 (formats)
-			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_format_error"));
 			    	}
 
 			    	return true;
@@ -1464,96 +1456,6 @@
 					divStyles.prepend(htmlForStylesTab);
 			    },
 
-
-			    /**
-				 * Draw a form into wizard tab 'formats' that depends of
-				 * selected layers in wizard tab 'select layers'
-				 */
-			    "_fnDrawFormFormatsLayer" : function (aSelectedLayers)
-			    {
-			    	return this.__fnDrawFormFormatsLayer(aSelectedLayers);
-			    },
-
-			    /**
-				 * Draw a form into wizard tab 'formats' that depends of
-				 * selected layers in wizard tab 'select layers'
-				 */
-				"__fnDrawFormFormatsLayer" : function (aSelectedLayers)
-			    {
-					var st = this._state;
-					var divFormats = jQuery("#".concat(st.sId).concat("_formats"),"#".concat(st.containerId));
-					// Clear the content of the div
-					divFormats.html("");
-					// set select format
-					var htmlForFormatsTab = "<div>";
-					htmlForFormatsTab = htmlForFormatsTab.concat("<h5>");
-					// Title multilanguage for formats
-					htmlForFormatsTab = htmlForFormatsTab.concat(st.titleFormat);
-					htmlForFormatsTab = htmlForFormatsTab.concat("</h5>");
-
-					htmlForFormatsTab = htmlForFormatsTab.concat("<select id='").concat(st.sId).concat("_selectFormatLayer'");
-					htmlForFormatsTab = htmlForFormatsTab.concat(" class='form-control form-control '>");
-					var aFormats = st.oWMSInfo.formatsSupported;
-					htmlForFormatsTab = htmlForFormatsTab.concat("<option value=''/>");
-					for(i = 0; i < aFormats.length; i++){
-						htmlForFormatsTab = htmlForFormatsTab.concat("<option value='");
-						htmlForFormatsTab = htmlForFormatsTab.concat(aFormats[i]).concat("'");
-						htmlForFormatsTab = htmlForFormatsTab.concat(">").concat(aFormats[i]);
-						htmlForFormatsTab = htmlForFormatsTab.concat("</option>");
-					}
-					htmlForFormatsTab = htmlForFormatsTab.concat("</select>");
-					htmlForFormatsTab = htmlForFormatsTab.concat("</div>");
-
-
-					// set select crs
-					htmlForFormatsTab = htmlForFormatsTab.concat("<div>");
-					htmlForFormatsTab = htmlForFormatsTab.concat("<h5>");
-					// Title multilanguage for formats
-					htmlForFormatsTab = htmlForFormatsTab.concat(st.titleCRS);
-					htmlForFormatsTab = htmlForFormatsTab.concat("</h5>");
-
-					// if crs is set by the map
-					if(st.aCrs){
-						htmlForFormatsTab = htmlForFormatsTab.concat("<input id='").concat(st.sId).concat("_selectCrsLayer'");
-						htmlForFormatsTab = htmlForFormatsTab.concat(" class='form-control form-control' readonly ");
-						htmlForFormatsTab = htmlForFormatsTab.concat(" value='").concat(st.aCrs).concat("' />");
-					}else{
-						// get the common crs for layers selected
-						var aCommonCRS = [];
-						for(i in aSelectedLayers){
-							var layerSel = aSelectedLayers[i];
-							// check if the layer is root
-							if(layerSel.key.indexOf("rootLayer_") !== 0){
-								var layer = st.oWMSInfo.layers[layerSel.key]
-								if(layer){
-									if(aCommonCRS.length != 0 ){
-										aCommonCRS = aCommonCRS.filter(function(el) {
-										    return layer.crs.indexOf(el) != -1
-										  });
-									}else{
-										aCommonCRS = layer.crs;
-									}
-								}
-							}
-						}
-
-						htmlForFormatsTab = htmlForFormatsTab.concat("<select id='").concat(st.sId).concat("_selectCrsLayer'");
-						htmlForFormatsTab = htmlForFormatsTab.concat(" multiple class='form-control form-control '>");
-						for(i = 0; i < aCommonCRS.length; i++){
-							htmlForFormatsTab = htmlForFormatsTab.concat("<option value='");
-							htmlForFormatsTab = htmlForFormatsTab.concat(aCommonCRS[i]).concat("'");
-							htmlForFormatsTab = htmlForFormatsTab.concat(">").concat(aCommonCRS[i]);
-							htmlForFormatsTab = htmlForFormatsTab.concat("</option>");
-						}
-						htmlForFormatsTab = htmlForFormatsTab.concat("</select>");
-					}
-					htmlForFormatsTab = htmlForFormatsTab.concat("</div>");
-
-					// set the html in the tab
-					divFormats.prepend(htmlForFormatsTab);
-
-			    },
-
 			    /**
 				 * Get the styles selected in wizard tab 'styles'
 				 */
@@ -1588,50 +1490,28 @@
 			    },
 
 			    /**
-				 * Get the crs selected in wizard tab 'formats'
-				 */
-			    "_fnGetSelectedCRS" : function ()
-			    {
-			    	return this.__fnGetSelectedCRS();
-			    },
-
-			    /**
-				 * Get the crs selected in wizard tab 'formats'
-				 */
-				"__fnGetSelectedCRS" : function ()
-			    {
-					var st = this._state;
-					var value = jQuery("#".concat(st.sId).concat("_selectCrsLayer"),"#".concat(st.containerId)).val();
-					if(!value){
-						return false;
-					}else{
-						return value;
+			     * Get common CRS from selected layers
+			     */
+			    "_fnGetCommonCRS" : function (aSelectedLayers){
+			    	// get the common crs for layers selected
+			    	var st = this._state;
+					var aCommonCRS = [];
+					for(i in aSelectedLayers){
+						var layer = st.oWMSInfo.layers[aSelectedLayers[i]]
+						if(layer){
+							if(aCommonCRS.length != 0 ){
+								// add only different
+								aCommonCRS = aCommonCRS.filter(function(el) {
+								    return layer.crs.indexOf(el) != -1
+								});
+							}else{
+								aCommonCRS = layer.crs;
+							}
+						}
 					}
-
+					return aCommonCRS;
 			    },
 
-			    /**
-				 * Get the image format selected in wizard tab 'formats'
-				 */
-			    "_fnGetSelectedFormat" : function ()
-			    {
-			    	return this.__fnGetSelectedFormat();
-			    },
-
-			    /**
-				 * Get the image format selected in wizard tab 'formats'
-				 */
-				"__fnGetSelectedFormat" : function ()
-			    {
-					var st = this._state;
-					var value = jQuery("#".concat(st.sId).concat("_selectFormatLayer"),"#".concat(st.containerId)).val();
-					if(!value){
-						return false;
-					}else{
-						return value;
-					}
-
-			    },
 
 				/**
 				 * Generate the code necessary to add the selected layers into the map
@@ -1647,11 +1527,9 @@
     					st.oldSelectedLayers = layersSelected;
     					// draw the form to select styles of the layers
     					this._fnDrawFormStylesLayer(layersSelected);
-    					//	draw the form to select styles of the layers
-    					this._fnDrawFormFormatsLayer(layersSelected);
-    					// If layers have changed, the values of steps 2 and 3
+    					// If layers have changed, the values of the step 3
     					// will have changed also and therefore the user must inspect and
-    					// select new values in these tabs.
+    					// select new values in this tab.
     					st.wizard.steps("goToStep",3);
     					// show message to user
     					this._fnSetErrorMessage("#".concat(st.sId).concat("_styles_error"),st.msgReviseStyles);
@@ -1670,41 +1548,53 @@
 						}
 					}
 
-					// clean error message for step 3 (formats)
-					this._fnClearErrorMessage("#".concat(st.sId).concat("_format_error"));
-
 					// get styles selected
 					var stylesSelected = this._fnGetSelectedStylesLayer(keysLayersSel);
-					// get format selected
-					var formatSelected =  this._fnGetSelectedFormat();
-					// get crs selected
-					var crsSelected = this._fnGetSelectedCRS();
 
-					if(formatSelected === false || crsSelected === false){
-						// show error message and go to step select formats
-						this._fnSetErrorMessage("#".concat(st.sId).concat("_format_error"),st.msgFormatsRequired);
-						st.wizard.steps("goToStep",4);
+					var crsCommonSelected = this._fnGetCommonCRS(keysLayersSel);
+					if(crsCommonSelected.length <= 0){
+						// show error and go to step 2 (select layers)
+						st.wizard.steps("goToStep",2);
+    					// show message to user because he has selected
+						// incompatible layers
+    					this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgIncompatibleLayers);
 						return false;
 					}else{
-						// generate root layer options and put selected layers
-						// into layers parameter
-						var layerOptions = {
+						// get the common crs between selected layers and
+						// selected crs by the server
+						var serverCRS = st.oWMSInfo.crsSelected;
+						crsSelected = serverCRS.filter(function(el) {
+						    return crsCommonSelected.indexOf(el) != -1
+						});
+
+						if(crsSelected.length <= 0){
+							// show error and go to step 2 (select layers)
+							st.wizard.steps("goToStep",2);
+							// show message to user because he has selected
+							// incompatible layers
+	    					this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgIncompatibleLayers);
+							return false;
+						}else{
+							// generate root layer options and put selected layers
+							// into layers parameter
+							var layerOptions = {
 								"layer_type": st.typeLayer,
 							    "span": (st.oWMSInfo.id.toString()).concat("_span"),
 						        "url": st.oWMSInfo.serviceUrl,
 						        "layers":keysLayersSel.join(),
-						        "format": formatSelected,
+						        "format": st.oWMSInfo.formatSelected,
 						        "transparent":"true",
 						        "version":st.oWMSInfo.version,
-						        "crs": crsSelected,
-						        "opacity": "1.0",
+						        "crs": crsSelected.join(),
+							    "opacity": "1.0",
 						        "styles" : stylesSelected.values,
 						        "styles_with_id" : stylesSelected.values_with_id,
 						        "allow_disable": true,
 						        "node_icon": ".whhg icon-layerorderdown",
 						        "title": st.oWMSInfo.serviceTitle,
-						        };
-						return layerOptions;
+					        };
+							return layerOptions;
+						}
 					}
 				},
 
@@ -1791,6 +1681,9 @@
 			"msgLayersRequired" : "Select at least one layer",
 			"msgCrsRequired" : "Select a CRS",
 			"msgConnectRequired" : "Establish the connexion to the server first to get the information and layers of this one",
+			"msgSupportError" : "The server doesn't support CRS or formats established",
+			"msgCrsSupported" : "Supported CRS: ",
+			"msgFormatsSupported" : "Supported Formats: ",
 			"titleCRS" : "Select CRS",
 			"format" : null,
 			"wizard" : null,
@@ -1833,6 +1726,9 @@
 					st.msgServerRequired = s.msg_server_required;
 					st.msgCrsRequired = s.msg_crs_required;
 					st.msgConnectRequired = s.msg_connect_required;
+					st.msgSupportError = s.msg_support_error;
+					st.msgCrsSupported = s.msg_crs_supported;
+					st.msgFormatsSupported = s.msg_formats_supported;
 					st.titleCRS = s.title_crs;
 					st.wizardNextLabel = s.wizard_next_label;
 					st.wizardPreviousLabel = s.wizard_previous_label;
@@ -1929,6 +1825,20 @@
 									jQuery("#".concat(st.sId).concat("_description_div"), "#".concat(st.containerId)).hide();
 								}
 
+								if(st.oWMTSInfo.crsSupported){
+									jQuery("#".concat(st.sId).concat("_crs_supported_p"), "#".concat(st.containerId)).html(st.oWMTSInfo.crsSupported.join("</BR>"));
+									jQuery("#".concat(st.sId).concat("_crs_supported_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_crs_supported_div"), "#".concat(st.containerId)).hide();
+								}
+
+								if(st.oWMTSInfo.formatsSupported){
+									jQuery("#".concat(st.sId).concat("_format_supported_p"), "#".concat(st.containerId)).html(st.oWMTSInfo.formatsSupported.join("</BR>"));
+									jQuery("#".concat(st.sId).concat("_format_supported_div"), "#".concat(st.containerId)).show();
+								}else{
+									jQuery("#".concat(st.sId).concat("_format_supported_div"), "#".concat(st.containerId)).hide();
+								}
+
 								if(st.treeDivId)
 								{
 									// clean tree and label
@@ -1939,7 +1849,7 @@
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
 									}
 									// Check if have any result and create the tree
-									if(element.layersTree){
+									if(element.layersTree != null && element.layersTree.length > 0){
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
 											source: element.layersTree,
 											checkbox: true,
@@ -2055,8 +1965,29 @@
 							return st.fnOnSearchLayers();
 						}else{
 							this._fnGetDataFromServer();
+							this._fnClearErrorMessage("#".concat(st.sId).concat("_info_error"));
 							return false;
 						}
+			    	}
+			    	// check if formats and crs are supported by the server
+			    	if(newIndex > 1){
+			    		if((st.aCrs != null &&
+			    				(!st.oWMTSInfo.tileMatrixSelectedId ||
+			    				(st.oWMTSInfo.tileMatrixSelectedId && st.oWMTSInfo.tileMatrixSelectedId.length == 0))
+			    		    ) || !st.oWMTSInfo.isFormatsSupported){
+			    			var errorMsg = st.msgSupportError.concat("</BR>");
+			    			if(st.aCrs != null){
+			    				errorMsg = errorMsg.concat(st.msgCrsSupported).concat(" ").concat(st.aCrs);
+			    				errorMsg = errorMsg.concat("</BR>");
+			    			}
+			    			var supportedFormat = "image/png*, image/jpeg*";
+			    			errorMsg = errorMsg.concat(st.msgFormatsSupported).concat(" ").concat(supportedFormat);
+			    			this._fnSetErrorMessage("#".concat(st.sId).concat("_info_error"),errorMsg);
+			    			st.wizard.steps("goToStep",1);
+			    			return false;
+			    		}else{
+			    			this._fnClearErrorMessage("#".concat(st.sId).concat("_info_error"));
+			    		}
 			    	}
 
 
@@ -2070,119 +2001,18 @@
 			    			if(!st.oldSelectedLayers){
 			    				// set oldSelectedLayers
 			    				st.oldSelectedLayers = selectedLayers;
-		    					//	draw the form to select styles of the layers
-		    					this._fnDrawFormCrsLayer(selectedLayers);
 			    			}else{
 			    				// check if selected layers have changed
 			    				if(!(jQuery(selectedLayers).not(st.oldSelectedLayers).length === 0 &&
 			    						jQuery(st.oldSelectedLayers).not(selectedLayers).length === 0)){
 			    					// set oldSelectedLayers
 			    					st.oldSelectedLayers = selectedLayers;
-			    					//	draw the form to select styles of the layers
-			    					this._fnDrawFormCrsLayer(selectedLayers);
 			    				}
 			    			}
 			    		}
 			    	}
 
-			    	if(currentIndex == 3 && newIndex != 3){
-			    		// clean error message of step 3 (crs)
-			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_crs_error"));
-			    	}
-
 			    	return true;
-			    },
-
-			    /**
-				 * Draw a form into wizard tab 'formats' that depends of
-				 * selected layers in wizard tab 'select layers'
-				 */
-			    "_fnDrawFormCrsLayer" : function (aSelectedLayers)
-			    {
-			    	return this.__fnDrawFormCrsLayer(aSelectedLayers);
-			    },
-
-			    /**
-				 * Draw a form into wizard tab 'crs' that depends of
-				 * selected layers in wizard tab 'select layers'
-				 */
-				"__fnDrawFormCrsLayer" : function (aSelectedLayers)
-			    {
-					var st = this._state;
-					var divCrs = jQuery("#".concat(st.sId).concat("_crs"),"#".concat(st.containerId));
-					// Clear the content of the div
-					divCrs.html("");
-
-					// set select crs
-					var htmlForCrsTab  = "<div>";
-					htmlForCrsTab = htmlForCrsTab.concat("<h5>");
-					// Title multilanguage for formats
-					htmlForCrsTab = htmlForCrsTab.concat(st.titleCRS);
-					htmlForCrsTab = htmlForCrsTab.concat("</h5>");
-
-					// if crs is set by the map
-					if(st.aCrs){
-						htmlForCrsTab = htmlForCrsTab.concat("<input id='").concat(st.sId).concat("_selectCrsLayer'");
-						htmlForCrsTab = htmlForCrsTab.concat(" class='form-control form-control' readonly ");
-						htmlForCrsTab = htmlForCrsTab.concat(" value='").concat(st.aCrs).concat("' />");
-					}else{
-						// get the common crs for layers selected
-						var aCommonCRS = [];
-						for(i in aSelectedLayers){
-							var layerSel = aSelectedLayers[i];
-							// check if the layer is root
-							if(layerSel.key.indexOf("rootLayer_") !== 0){
-								var layer = st.oWMTSInfo.layers[layerSel.key]
-								if(layer){
-									if(aCommonCRS.length != 0 ){
-										aCommonCRS = aCommonCRS.filter(function(el) {
-										    return layer.crs.indexOf(el) != -1
-										  });
-									}else{
-										aCommonCRS = layer.crs;
-									}
-								}
-							}
-						}
-
-						htmlForCrsTab = htmlForCrsTab.concat("<select id='").concat(st.sId).concat("_selectCrsLayer'");
-						htmlForCrsTab = htmlForCrsTab.concat(" multiple class='form-control form-control '>");
-						for(i = 0; i < aCommonCRS.length; i++){
-							htmlForCrsTab = htmlForCrsTab.concat("<option value='");
-							htmlForCrsTab = htmlForCrsTab.concat(aCommonCRS[i]).concat("'");
-							htmlForCrsTab = htmlForCrsTab.concat(">").concat(aCommonCRS[i]);
-							htmlForCrsTab = htmlForCrsTab.concat("</option>");
-						}
-						htmlForCrsTab = htmlForCrsTab.concat("</select>");
-					}
-					htmlForCrsTab = htmlForCrsTab.concat("</div>");
-
-					// set the html in the tab
-					divCrs.prepend(htmlForCrsTab);
-
-			    },
-
-			    /**
-				 * Get the crs selected in wizard tab 'formats'
-				 */
-			    "_fnGetSelectedCRS" : function ()
-			    {
-			    	return this.__fnGetSelectedCRS();
-			    },
-
-			    /**
-				 * Get the crs selected in wizard tab 'formats'
-				 */
-				"__fnGetSelectedCRS" : function ()
-			    {
-					var st = this._state;
-					var value = jQuery("#".concat(st.sId).concat("_selectCrsLayer"),"#".concat(st.containerId)).val();
-					if(!value){
-						return false;
-					}else{
-						return value;
-					}
-
 			    },
 
 				/**
@@ -2191,65 +2021,33 @@
 				 */
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
-					var keysLayersSel = [];
-
-    				if(!(jQuery(layersSelected).not(st.oldSelectedLayers).length === 0 &&
-    						jQuery(st.oldSelectedLayers).not(layersSelected).length === 0)){
-    					// set oldSelectedLayers
-    					st.oldSelectedLayers = layersSelected;
-    					//	draw the form to select crs of the layers
-    					this._fnDrawFormCrsLayer(layersSelected);
-    					// If layers have changed, the values of the step 3
-    					// will have changed also and therefore the user must inspect and
-    					// select new values in this tab.
-    					st.wizard.steps("goToStep",4);
-    					// show message to user
-    					this._fnSetErrorMessage("#".concat(st.sId).concat("_crs_error"),st.msgCrsRequired);
-						return false;
-	    			}
-
-					// get crs selected
-					var crsSelected = this._fnGetSelectedCRS();
-
-					if(crsSelected === false){
-						// show error message and go to step select formats
-						this._fnSetErrorMessage("#".concat(st.sId).concat("_crs_error"),st.msgCrsRequired);
-						st.wizard.steps("goToStep",4);
-						return false;
-					}else{
-						// get the tile matrix selected if is necessary
-						var tileMatSelectedId = st.oWMTSInfo.tileMatrixSelectedId;
-						if(!st.oWMTSInfo.tileMatrixSelectedId){
-							var tileSelected = [];
-							for(key in st.oWMTSInfo.tileMatrixCrsSupported){
-								var value = st.oWMTSInfo.tileMatrixCrsSupported[key];
-								for(i in crsSelected){
-									if(value === crsSelected[i]){
-										tileSelected.push(key);
-									}
-								}
-							}
-							tileMatSelectedId = tileSelected.join();
-							crsSelected = crsSelected.join();
-						}
-						// generate root layer options and put selected layers
-						// into layers parameter
-						var layerOptions = {
-								"layer_type": st.typeLayer,
-								"layer": layersSelected[0].key,
-								"span": (st.oWMTSInfo.id.toString()).concat("_span"),
-						        "url": st.oWMTSInfo.serviceUrl,
-						        "version":st.oWMTSInfo.version,
-						        "opacity": "1",
-						        "allow_disable": true,
-						        "service" : st.oWMTSInfo.serviceType,
-						        "tilematrix_set" : tileMatSelectedId,
-						        "crs_selected" :  crsSelected,
-						        "node_icon": ".whhg icon-layerorderup",
-								"title": layersSelected[0].title,
-						};
-						return layerOptions;
+					var crsSelected = [];
+					// get layer selected and calculate its crs
+					var layerSel = st.oWMTSInfo.layers[layersSelected[0].key];
+					for(i in layerSel.tileMatrixSelected){
+						var tileMatrixId = layerSel.tileMatrixSelected[i];
+						crsSelected.push(st.oWMTSInfo.tileMatrixCrsSupported[tileMatrixId]);
 					}
+					// generate root layer options and put selected layers
+					// into layers parameter
+					var layerOptions = {
+							"layer_type": st.typeLayer,
+							"layer": layerSel.name,
+							"span": (st.oWMTSInfo.id.toString()).concat("_span"),
+					        "url": st.oWMTSInfo.serviceUrl,
+					        "version":st.oWMTSInfo.version,
+					        "opacity": "1",
+					        "allow_disable": true,
+					        "service" : st.oWMTSInfo.serviceType,
+					        "mapTileMatrixCrs" : st.oWMTSInfo.tileMatrixCrsSupported,
+					        "all_tilematrix_selected" : layerSel.tileMatrixSelected,
+					        "tilematrix_set" : layerSel.tileMatrixSelected[0],
+					        "format" : layerSel.formatSelected,
+					        "all_crs_selected" :  crsSelected.join(),
+					        "node_icon": ".whhg icon-layerorderup",
+							"title": layersSelected[0].title,
+					};
+					return layerOptions;
 				},
 
 				/**
@@ -2363,11 +2161,10 @@
         },
 
         /**
-         * TODO
+         * Generate the code necessary to add the selected layers into the map
          */
-        "_fnCreateLayersToAddToMap" : function(file) {
+        "_fnCreateLayersOptions" : function(file) {
           var st = this._state;
-          var layerOptionsSel = [];
           var title = st.nameLayer;
 
           // Get the title form title input
@@ -2384,13 +2181,12 @@
             "file" : st.file,
             "layerId" : st.idLayer
           };
-          layerOptionsSel.push(layerOptions);
 
-          return layerOptionsSel;
+          return layerOptions;
         },
 
         /**
-         * TODO
+         * Get layer id
          */
         "_fnGetLayerId" : function(layerOptions) {
           var st = this._state;

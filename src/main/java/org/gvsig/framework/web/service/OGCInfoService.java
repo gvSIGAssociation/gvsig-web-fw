@@ -35,7 +35,7 @@ public interface OGCInfoService {
    *          has been set by map.
    * @return object with information of server WMTS
    */
-  public WMTSInfo getCapabilitiesFromWMTS(String urlServerWMTS, List<String> crs,
+  public WMTSInfo getCapabilitiesFromWMTS(String urlServerWMTS, TreeSet<String> crs,
                                           boolean useCrsSelected);
 
 

@@ -7,6 +7,7 @@ import org.gvsig.framework.web.ogc.WMTSInfo;
 import org.gvsig.framework.web.ogc.WMTSLayer;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 import org.gvnix.util.fancytree.TreeNode;
 
 privileged aspect WMTSInfo_Roo_JavaBean {
@@ -75,11 +76,11 @@ privileged aspect WMTSInfo_Roo_JavaBean {
         this.id = id;
     }
     
-    public String WMTSInfo.getTileMatrixSelectedId() {
+    public TreeSet<String> WMTSInfo.getTileMatrixSelectedId() {
         return this.tileMatrixSelectedId;
     }
     
-    public void WMTSInfo.setTileMatrixSelectedId(String tileMatrixSelectedId) {
+    public void WMTSInfo.setTileMatrixSelectedId(TreeSet<String> tileMatrixSelectedId) {
         this.tileMatrixSelectedId = tileMatrixSelectedId;
     }
     
@@ -97,6 +98,30 @@ privileged aspect WMTSInfo_Roo_JavaBean {
     
     public void WMTSInfo.setTileMatrixCrsSupported(Map<String, String> tileMatrixCrsSupported) {
         this.tileMatrixCrsSupported = tileMatrixCrsSupported;
+    }
+    
+    public TreeSet<String> WMTSInfo.getFormatsSupported() {
+        return this.formatsSupported;
+    }
+    
+    public void WMTSInfo.setFormatsSupported(TreeSet<String> formatsSupported) {
+        this.formatsSupported = formatsSupported;
+    }
+    
+    public TreeSet<String> WMTSInfo.getCrsSupported() {
+        return this.crsSupported;
+    }
+    
+    public void WMTSInfo.setCrsSupported(TreeSet<String> crsSupported) {
+        this.crsSupported = crsSupported;
+    }
+    
+    public boolean WMTSInfo.isIsFormatsSupported() {
+        return this.isFormatsSupported;
+    }
+    
+    public void WMTSInfo.setIsFormatsSupported(boolean isFormatsSupported) {
+        this.isFormatsSupported = isFormatsSupported;
     }
     
 }

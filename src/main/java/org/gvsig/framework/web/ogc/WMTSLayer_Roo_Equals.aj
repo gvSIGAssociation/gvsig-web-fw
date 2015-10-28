@@ -17,11 +17,11 @@ privileged aspect WMTSLayer_Roo_Equals {
             return true;
         }
         WMTSLayer rhs = (WMTSLayer) obj;
-        return new EqualsBuilder().append(crs, rhs.crs).append(name, rhs.name).append(title, rhs.title).isEquals();
+        return new EqualsBuilder().append(crs, rhs.crs).append(formatSelected, rhs.formatSelected).append(formatsSupported, rhs.formatsSupported).append(name, rhs.name).append(tileMatrixSelected, rhs.tileMatrixSelected).append(title, rhs.title).isEquals();
     }
     
     public int WMTSLayer.hashCode() {
-        return new HashCodeBuilder().append(crs).append(name).append(title).toHashCode();
+        return new HashCodeBuilder().append(crs).append(formatSelected).append(formatsSupported).append(name).append(tileMatrixSelected).append(title).toHashCode();
     }
     
 }

@@ -29,6 +29,7 @@
   <spring:message code="error_revise_styles" var="msgReviseStyles"/>
   <spring:message code="error_connect_required" var="msgConnectRequired"/>
   <spring:message code="error_support_crs_format" var="msgSupportError"/>
+  <spring:message code="error_incompatible_layers" var="msgIncompatibleLayers"/>
 
   <!-- titles of tabs -->
   <spring:message code="wms_wizard_connect_title" var="titleConnect"/>
@@ -66,6 +67,7 @@
        data-msg_crs_supported="${crsSupportedLabel}"
        data-msg_formats_required="${msgFormatsRequired}"
        data-msg_formats_supported="${formatsSupportedLabel}"
+       data-msg_incompatible_layers="${msgIncompatibleLayers}"
        data-msg_layers_not_found="${layersNotFoundMsg}"
        data-msg_layers_required="${msgLayersRequired}"
        data-msg_revise_styles="${msgReviseStyles}"
@@ -153,16 +155,6 @@
      </div>
       <div class="row">
           <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wms_wizard_styles_error">&amp;nbsp;</div>
-      </div>
-   </section>
-   <h3>${titleSelectFormats}</h3>
-   <section>
-     <div class="row" >
-       <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wms_wizard_formats">
-       </div>
-     </div>
-     <div class="row">
-          <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wms_wizard_format_error">&amp;nbsp;</div>
       </div>
    </section>
 </div>

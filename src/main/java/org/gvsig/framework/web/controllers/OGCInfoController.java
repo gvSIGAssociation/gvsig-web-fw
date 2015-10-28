@@ -1,6 +1,5 @@
 package org.gvsig.framework.web.controllers;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
@@ -82,11 +81,11 @@ public class OGCInfoController {
 
         String crsParam = request.getParameter("crs");
 
-        List<String> listCrs = new ArrayList<String>();
+        TreeSet<String> listCrs = new TreeSet<String>();
         if(StringUtils.isNotEmpty(crsParam)){
             Collections.addAll(listCrs, crsParam.split(","));
         }
-        
+
         WMTSInfo wmtsInfo = null;
         if (StringUtils.isNotEmpty(urlServer)) {
             wmtsInfo = ogcInfoServ.getCapabilitiesFromWMTS(urlServer, listCrs,

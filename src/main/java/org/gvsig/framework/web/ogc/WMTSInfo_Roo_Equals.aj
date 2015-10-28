@@ -17,11 +17,11 @@ privileged aspect WMTSInfo_Roo_Equals {
             return true;
         }
         WMTSInfo rhs = (WMTSInfo) obj;
-        return new EqualsBuilder().append(id, rhs.id).append(serviceAbstract, rhs.serviceAbstract).append(serviceName, rhs.serviceName).append(serviceTitle, rhs.serviceTitle).append(serviceType, rhs.serviceType).append(serviceUrl, rhs.serviceUrl).append(tileMatrixSelectedId, rhs.tileMatrixSelectedId).append(version, rhs.version).isEquals();
+        return new EqualsBuilder().append(crsSupported, rhs.crsSupported).append(formatsSupported, rhs.formatsSupported).append(id, rhs.id).append(isFormatsSupported, rhs.isFormatsSupported).append(serviceAbstract, rhs.serviceAbstract).append(serviceName, rhs.serviceName).append(serviceTitle, rhs.serviceTitle).append(serviceType, rhs.serviceType).append(serviceUrl, rhs.serviceUrl).append(tileMatrixSelectedId, rhs.tileMatrixSelectedId).append(version, rhs.version).isEquals();
     }
     
     public int WMTSInfo.hashCode() {
-        return new HashCodeBuilder().append(id).append(serviceAbstract).append(serviceName).append(serviceTitle).append(serviceType).append(serviceUrl).append(tileMatrixSelectedId).append(version).toHashCode();
+        return new HashCodeBuilder().append(crsSupported).append(formatsSupported).append(id).append(isFormatsSupported).append(serviceAbstract).append(serviceName).append(serviceTitle).append(serviceType).append(serviceUrl).append(tileMatrixSelectedId).append(version).toHashCode();
     }
     
 }

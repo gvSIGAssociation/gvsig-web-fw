@@ -9,13 +9,13 @@
 	</licenses>
 
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.gvsig</groupId>
-	<artifactId>org.gvsig.framework.web</artifactId>
 	<packaging>jar</packaging>
 
+	<groupId>org.gvsig</groupId>
+	<artifactId>org.gvsig.web.framework</artifactId>
 	<version>0.1.0.BUILD-SNAPSHOT</version>
-	<name>gvSIG Web Framework</name>
 
+	<name>gvSIG Web Framework</name>
 	<description>
   Geospatial web framework that includes many geographical tools for Spring MVC based applications.
   </description>
@@ -37,14 +37,18 @@
 	</scm>
 
 	<distributionManagement>
-		<snapshotRepository>
-			<id>gvsig-repository</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
 		<repository>
 			<id>gvsig-repository</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			<name>gvSIG maven repository</name>
+			<url>dav:https://devel.gvsig.org/m2repo/j2se</url>
+			<uniqueVersion>false</uniqueVersion>
 		</repository>
+		<snapshotRepository>
+			<id>gvsig-repository</id>
+			<name>gvSIG maven repository</name>
+			<url>dav:https://devel.gvsig.org/m2repo/j2se</url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
 	</distributionManagement>
 
 	<repositories>
@@ -231,6 +235,13 @@
 		</dependency>
 	</dependencies>
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-webdav-jackrabbit</artifactId>
+				<version>2.4</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

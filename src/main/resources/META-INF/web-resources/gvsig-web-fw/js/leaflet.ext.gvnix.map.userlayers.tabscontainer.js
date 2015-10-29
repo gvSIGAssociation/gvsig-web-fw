@@ -1,18 +1,24 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvSIG Web Framework is sponsored by the General Directorate for Information
+ * Technologies (DGTI) of the Regional Ministry of Finance and Public
+ * Administration of the Generalitat Valenciana (Valencian Community,
+ * Spain), managed by gvSIG Association and led by DISID.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (C) 2015 DGTI - Generalitat Valenciana
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
 (function(jQuery, window, document) {
@@ -31,7 +37,9 @@
 			"containerId": containerId, // id of the container where tabs container will be drawn. Can be null
 			"oMap" : oMap, // map object. Can be null
 			"aCrs" : aCrs,
-			"aUserLayerTabs" : {} // Array of user layer tabs registered
+			"oTabs" : null,
+			"aUserLayerTabs" : {}, // Array of user layer tabs registered
+			"aTabsRegistered" : [] // Array of type tabs registered
 
 		};
 
@@ -123,6 +131,7 @@
 					}
 					// store into the tool
 					this._state.aUserLayerTabs[sId] = newUserLayerTab;
+					this._state.aTabsRegistered.push(options.type);
 				},
 
 				/**
@@ -144,24 +153,43 @@
 				},
 
 				/**
-				 * TODO
+				 * Set data into the tab indicated
 				 */
-				"fnSetDataToTab" : function(layerType, oDataToSet){
-					this._fnSetDataToTab(layerType, oDataToSet);
+				"fnSetDataToTab" : function(tabType, oDataToSet){
+					this._fnSetDataToTab(tabType, oDataToSet);
 				},
 
 				/**
-				 * TODO
+				 * Set data into the tab indicated
 				 */
-				"_fnSetDataToTab" : function(layerType, oDataToSet){
+				"_fnSetDataToTab" : function(tabType, oDataToSet){
 					var st = this._state;
 					// search and set the data to the tab indicated by layerType
 					for(userTabs in st.aUserLayerTabs){
 						var tab = st.aUserLayerTabs[userTabs];
-						if(tab.fnGetLayerType() === layerType){
+						if(tab.fnGetTabType() === tabType){
 							tab.fnSetData(oDataToSet);
+							this.fnSetFocusTab(tabType);
+							break;
 						}
 					}
+				},
+
+				/**
+				 * Set focus in tab indicated
+				 */
+				"fnSetFocusTab" : function(tabType){
+					this._fnSetFocusTab(tabType);
+				},
+
+				/**
+				 * Set focus in tab indicated
+				 */
+				"_fnSetFocusTab" : function(tabType){
+					var st = this._state;
+					st.oTabs.tabs({
+						  active: st.aTabsRegistered.indexOf(tabType)
+					});
 				},
 
 				/**
@@ -198,7 +226,7 @@
 					if(st.containerId){
 						jQueryContainerId = "#".concat(st.containerId);
 					}
-					jQuery("#".concat(st.sId), jQueryContainerId).tabs();
+					st.oTabs = jQuery("#".concat(st.sId), jQueryContainerId).tabs();
 
 					// Register events to buttons connect and create and
 					// register wizard for each tab if is necessary

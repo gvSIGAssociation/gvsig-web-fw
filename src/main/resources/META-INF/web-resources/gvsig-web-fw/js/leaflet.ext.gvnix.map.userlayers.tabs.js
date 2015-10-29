@@ -1,18 +1,24 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvSIG Web Framework is sponsored by the General Directorate for Information
+ * Technologies (DGTI) of the Regional Ministry of Finance and Public
+ * Administration of the Generalitat Valenciana (Valencian Community,
+ * Spain), managed by gvSIG Association and led by DISID.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (C) 2015 DGTI - Generalitat Valenciana
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
 (function(jQuery, window, document) {
@@ -289,6 +295,20 @@
 			 */
 			"_fnGetLayerType" : function() {
 				return this._state.typeLayer;
+			},
+
+			/**
+			 * Get tab type
+			 */
+			"fnGetTabType" : function() {
+				return this._fnGetTabType();
+			},
+
+			/**
+			 * Get tab type
+			 */
+			"_fnGetTabType" : function() {
+				return this._state.typeTab;
 			}
 		}
 	};
@@ -1033,18 +1053,20 @@
 			"oTree" : null,
 			"fnOnSearchLayers" : null,
 			"oUtil" : null,
+			"tableStylesTitleLayer" : "Layer",
+			"tableStylesTitleStyles" : "Styles",
 			"msgLayersNotFound" : "Layers not found",
 			"msgServerRequired" : "Server value is required",
 			"msgLayersRequired" : "Select at least one layer",
-			"msgFormatsRequired" : "Select an image format and CRS",
-			"msgReviseStyles" : "Styles and formats values have changed, please check the selected values",
+			"msgReviseStyles" : "Styles values have changed, please check the selected values",
 			"msgConnectRequired" : "Establish the connexion to the server first to get the information and layers of this one",
 			"msgSupportError" : "The server doesn't support CRS or formats established",
 			"msgCrsSupported" : "Supported CRS: ",
 			"msgFormatsSupported" : "Supported Formats: ",
 			"msgIncompatibleLayers" : "The layers selected are incompatible, please select layers with common crs",
 			"titleFormat" : "Select Format",
-			"titleCRS" : "Select CRS",
+			"textDefaultStyle" : "Default Style",
+			"textWithoutStyles" : "Without styles",
 			"format" : null,
 			"wizard" : null,
 			"oldSelectedLayers" : null, // set temp layers selected to refresh styles
@@ -1087,15 +1109,17 @@
 					st.msgLayersNotFound = s.msg_layers_not_found;
 					st.msgLayersRequired = s.msg_layers_required;
 					st.msgServerRequired = s.msg_server_required;
-					st.msgFormatsRequired = s.msg_formats_required;
 					st.msgReviseStyles = s.msg_revise_styles;
 					st.msgConnectRequired = s.msg_connect_required;
 					st.msgSupportError = s.msg_support_error;
 					st.msgCrsSupported = s.msg_crs_supported;
 					st.msgFormatsSupported = s.msg_formats_supported;
 					st.msgIncompatibleLayers = s.msg_incompatible_layers;
+					st.tableStylesTitleLayer = s.table_styles_title_layer;
+					st.tableStylesTitleStyles = s.table_styles_title_styles;
+					st.textDefaultStyle = s.text_default_style;
+					st.textWithoutStyles = s.text_without_style;
 					st.titleFormat = s.title_format;
-					st.titleCRS = s.title_crs;
 					st.wizardNextLabel = s.wizard_next_label;
 					st.wizardPreviousLabel = s.wizard_previous_label;
 
@@ -1160,17 +1184,17 @@
 				/**
 				 * Get data from WMS server indicated into server input
 				 */
-				"_fnGetDataFromServer" : function() {
-					this.__fnGetDataFromServer();
+				"_fnGetDataFromServer" : function(isLoadingData, oData) {
+					return this.__fnGetDataFromServer(isLoadingData, oData);
 				},
 
 				/**
 				 * Get data from WMS server indicated into server input
 				 * Return false in case of error
 				 */
-				"__fnGetDataFromServer" : function() {
+				"__fnGetDataFromServer" : function(isLoadingData, oData) {
 					var st = this._state;
-
+					var jqDeferred;
 					//Clean elements of styles and format
 					var divStyles = jQuery("#".concat(st.sId).concat("_styles"),"#".concat(st.containerId));
 					// Clear the content of the div
@@ -1182,18 +1206,20 @@
 					// clean div that contains error messages
 					this._fnClearErrorMessage("#".concat(st.sId).concat("_connection_error"));
 
+					if(isLoadingData !== true){
+						isLoadingData = false;
+					}
+
 					var urlServ = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
 					if(urlServ){
 						st.oUtil.startWaitMeAnimation(st.waitLabel);
 						var params = { url: urlServ, wizard: "true", crs: st.aCrs };
-						jQuery.ajax({
+						jqDeferred = jQuery.ajax({
 							url : st.path + "?findWmsCapabilities",
 							data: params,
 							cache: false,
 							success : function(element) {
-								st.oUtil.stopWaitMeAnimation();
 								st.oWMSInfo = element;
-
 								// Show server info
 								jQuery("#".concat(st.sId).concat("_server_info"), "#".concat(st.containerId)).show();
 
@@ -1262,6 +1288,41 @@
 								jQuery("#".concat(st.sId).concat("_changeserver_button"), "#".concat(st.containerId)).show();
 								jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).prop('disabled', true);
 								st.wizard.steps("goToStep",1);
+
+								// if loading data is true, continue with next steps and set
+								// the elements of the forms
+								if(isLoadingData){
+									// get array of layers selected and set them
+									var aLayersSel =  oData.layerSelected.split(",");
+									for(i = 0; i < aLayersSel.length; i++){
+										var node = st.oTree.getNodeByKey(aLayersSel[i]);
+										if(node){
+											node.setSelected();
+										}
+									}
+									// go to step 2 for activate it
+									st.wizard.steps("goToStep",2);
+
+									// go to step 3 for draw the form and activate it
+									st.wizard.steps("goToStep",3);
+									// get array of styles selected and set them
+									var aStylesSel =  oData.styles.split(",");
+									for(j = 0; j < aLayersSel.length; j++){
+										var nameLayer = aLayersSel[j];
+										for(i = 0; i < aStylesSel.length; i++){
+											var checkName = "^".concat(nameLayer).concat("_");
+											if(aStylesSel[i].match(checkName)){
+												var valueStyleSelected = aStylesSel[i].substring(nameLayer.length+1,aStylesSel[i].length);
+												jQuery(("input[name='").concat(st.sId).concat("_").concat(nameLayer).concat("']").concat("[value='").concat(valueStyleSelected).concat("']"),
+														"#".concat(st.containerId)).prop("checked", true);
+											}
+										}
+									}
+									// return to initial step
+									st.wizard.steps("goToStep",0);
+								}
+								// stop message loading...
+								st.oUtil.stopWaitMeAnimation();
 							},
 							error : function(object) {
 								jQuery("#".concat(st.sId).concat("_server_info"), "#".concat(st.containerId)).hide();
@@ -1286,6 +1347,7 @@
 						// with error return false
 						this._fnSetErrorMessage("#".concat(st.sId).concat("_connection_error"),st.msgServerRequired);
 					}
+					return jqDeferred;
 
 				},
 
@@ -1422,7 +1484,10 @@
 					var divStyles = jQuery("#".concat(st.sId).concat("_styles"),"#".concat(st.containerId));
 					// Clear the content of the div
 					divStyles.html("");
-					var htmlForStylesTab = "";
+					var htmlForStylesTab = "<table class='table'><thead>";
+					htmlForStylesTab = htmlForStylesTab.concat("<th>").concat(st.tableStylesTitleLayer).concat("</th>");
+					htmlForStylesTab = htmlForStylesTab.concat("<th>").concat(st.tableStylesTitleStyles).concat("</th>");
+					htmlForStylesTab = htmlForStylesTab.concat("</thead><tbody>");
 					for(i in aSelectedLayers){
 						var layerSel = aSelectedLayers[i];
 						// Check the first style of every layer
@@ -1431,28 +1496,47 @@
 						if(layerSel.key.indexOf("rootLayer_") !== 0){
 							var layer = st.oWMSInfo.layers[layerSel.key]
 							if(layer){
+								htmlForStylesTab = htmlForStylesTab.concat("<tr>");
 								// Create text and radio buttons for each layer
-								htmlForStylesTab = htmlForStylesTab.concat("<div>");
 								// Create h5 for title
+								htmlForStylesTab = htmlForStylesTab.concat("<td>");
 								htmlForStylesTab = htmlForStylesTab.concat("<h5>");
 								htmlForStylesTab = htmlForStylesTab.concat(layer.title);
 								htmlForStylesTab = htmlForStylesTab.concat("</h5>");
+								htmlForStylesTab = htmlForStylesTab.concat("</td>");
 								// Create raddion button for each style
-								for(j in layer.styles){
-									var style = layer.styles[j];
-									htmlForStylesTab = htmlForStylesTab.concat("<input class='wizard_radio' type='radio' name='").concat(st.sId).concat("_").concat(layer.name).concat("'");
-									htmlForStylesTab = htmlForStylesTab.concat(" value='").concat(style.name).concat("'");
-									if(checkStyle){
-										htmlForStylesTab = htmlForStylesTab.concat(" checked ");
-										checkStyle = false;
+								htmlForStylesTab = htmlForStylesTab.concat("<td>");
+								if(layer.styles.length > 0){
+									for(j in layer.styles){
+										var style = layer.styles[j];
+										htmlForStylesTab = htmlForStylesTab.concat("<div class='radio'>");
+										htmlForStylesTab = htmlForStylesTab.concat("<label>");
+										htmlForStylesTab = htmlForStylesTab.concat("<input type='radio' name='").concat(st.sId).concat("_").concat(layer.name).concat("'");
+										htmlForStylesTab = htmlForStylesTab.concat(" value='").concat(style.name).concat("'");
+										if(checkStyle){
+											htmlForStylesTab = htmlForStylesTab.concat(" checked ");
+											checkStyle = false;
+										}
+										var title = style.title;
+										if(title == "Default"){
+											title = st.textDefaultStyle;
+										}
+										htmlForStylesTab = htmlForStylesTab.concat(">").concat(title);
+										htmlForStylesTab = htmlForStylesTab.concat("</label>");
+										htmlForStylesTab = htmlForStylesTab.concat("</div>");
+
 									}
-									htmlForStylesTab = htmlForStylesTab.concat(">").concat(style.title);
-									htmlForStylesTab = htmlForStylesTab.concat("</BR>");
+								}else{
+									htmlForStylesTab = htmlForStylesTab.concat("<em>");
+									htmlForStylesTab = htmlForStylesTab.concat(st.textWithoutStyles);
+									htmlForStylesTab = htmlForStylesTab.concat("</em>");
 								}
-								htmlForStylesTab = htmlForStylesTab.concat("</div>");
+								htmlForStylesTab = htmlForStylesTab.concat("</td>");
+								htmlForStylesTab = htmlForStylesTab.concat("</tr>");
 							}
 						}
 					}
+					htmlForStylesTab = htmlForStylesTab.concat("</tbody></table>");
 					divStyles.prepend(htmlForStylesTab);
 			    },
 
@@ -1620,31 +1704,9 @@
 				 * Set layers, styles, crs, etc. from object oDataToSet
 				 */
 				"_fnSetData" : function(oData) {
-					// get url and simulate connect
 					var st = this._state;
 					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val(oData.url);
-					this._fnGetDataFromServer();
-
-					// get array of layers selected and set them
-					st.wizard.next();
-					//this._fnChangeStepControl(null, 0, 1);
-					// Get the tree and check the layers
-					var tree  = st.oTree;
-					var aLayersSel =  oData.layerSelected.split(",");
-					for(i = 0; i < aLayersSel.length; i++){
-						var node = tree.getNodeByKey(aLayersSel[i]);
-						node.setSelected();
-					}
-
-					var aux = tree.getSelectedNodes();
-					var length = aux.length;
-
-					// get array of styles selected and set them
-					st.wizard.next();
-					//st.wizard.steps("goToStep",2);
-					//this._fnChangeStepControl(null, 1, 2);
-
-					// get format and crs and selected and them
+					this._fnGetDataFromServer(true, oData);
 				}
 
 	});
@@ -1679,15 +1741,12 @@
 			"msgLayersNotFound" : "Layers not found",
 			"msgServerRequired" : "Server value is required",
 			"msgLayersRequired" : "Select at least one layer",
-			"msgCrsRequired" : "Select a CRS",
 			"msgConnectRequired" : "Establish the connexion to the server first to get the information and layers of this one",
 			"msgSupportError" : "The server doesn't support CRS or formats established",
 			"msgCrsSupported" : "Supported CRS: ",
 			"msgFormatsSupported" : "Supported Formats: ",
-			"titleCRS" : "Select CRS",
 			"format" : null,
-			"wizard" : null,
-			"oldSelectedLayers" : null // set temp layers selected to refresh styles
+			"wizard" : null
 
 		});
 
@@ -1724,12 +1783,10 @@
 					st.msgLayersNotFound = s.msg_layers_not_found;
 					st.msgLayersRequired = s.msg_layers_required;
 					st.msgServerRequired = s.msg_server_required;
-					st.msgCrsRequired = s.msg_crs_required;
 					st.msgConnectRequired = s.msg_connect_required;
 					st.msgSupportError = s.msg_support_error;
 					st.msgCrsSupported = s.msg_crs_supported;
 					st.msgFormatsSupported = s.msg_formats_supported;
-					st.titleCRS = s.title_crs;
 					st.wizardNextLabel = s.wizard_next_label;
 					st.wizardPreviousLabel = s.wizard_previous_label;
 					//set format
@@ -1772,15 +1829,15 @@
 				/**
 				 * Get data from WMTS server indicated into server input
 				 */
-				"_fnGetDataFromServer" : function() {
-					this.__fnGetDataFromServer();
+				"_fnGetDataFromServer" : function(isLoadingData, oData) {
+					this.__fnGetDataFromServer(isLoadingData, oData);
 				},
 
 				/**
 				 * Get data from WMTS server indicated into server input
 				 * Return false in case of error
 				 */
-				"__fnGetDataFromServer" : function() {
+				"__fnGetDataFromServer" : function(isLoadingData, oData) {
 					var st = this._state;
 
 					var divCrs = jQuery("#".concat(st.sId).concat("_crs"),"#".concat(st.containerId));
@@ -1788,6 +1845,11 @@
 					divCrs.html("");
 					// clean div that contains error messages
 					this._fnClearErrorMessage("#".concat(st.sId).concat("_connection_error"));
+
+					if(isLoadingData !== true){
+						isLoadingData = false;
+					}
+
 					var urlServ = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
 
 					if(urlServ){
@@ -1798,7 +1860,6 @@
 							data: params,
 							cache: false,
 							success : function(element) {
-								st.oUtil.stopWaitMeAnimation();
 								st.oWMTSInfo = element;
 
 								// Show server info
@@ -1867,6 +1928,23 @@
 								jQuery("#".concat(st.sId).concat("_changeserver_button"), "#".concat(st.containerId)).show();
 								jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).prop('disabled', true);
 								st.wizard.steps("goToStep",1);
+
+								// if loading data is true, continue with next steps and set
+								// the elements of the forms
+								if(isLoadingData){
+									// get array of layers selected and set them
+									var layersSel =  oData.layerSelected;
+									var node = st.oTree.getNodeByKey(layersSel);
+									if(node){
+										node.setSelected();
+									}
+									// go to step 2 for activate it
+									st.wizard.steps("goToStep",2);
+									// return to initial step
+									st.wizard.steps("goToStep",0);
+								}
+								// stop message loading...
+								st.oUtil.stopWaitMeAnimation();
 							},
 							error : function(object) {
 								jQuery("#".concat(st.sId).concat("_server_info"), "#".concat(st.containerId)).hide();
@@ -1989,29 +2067,6 @@
 			    			this._fnClearErrorMessage("#".concat(st.sId).concat("_info_error"));
 			    		}
 			    	}
-
-
-			    	// if we are in the step select layers push 'next'
-			    	if(currentIndex == 2 && newIndex > currentIndex){
-			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_tree_error"));
-			    		var selectedLayers = this._fnGetSelectedLayers();
-			    		if(selectedLayers === false){
-			    			return false;
-			    		}else{
-			    			if(!st.oldSelectedLayers){
-			    				// set oldSelectedLayers
-			    				st.oldSelectedLayers = selectedLayers;
-			    			}else{
-			    				// check if selected layers have changed
-			    				if(!(jQuery(selectedLayers).not(st.oldSelectedLayers).length === 0 &&
-			    						jQuery(st.oldSelectedLayers).not(selectedLayers).length === 0)){
-			    					// set oldSelectedLayers
-			    					st.oldSelectedLayers = selectedLayers;
-			    				}
-			    			}
-			    		}
-			    	}
-
 			    	return true;
 			    },
 
@@ -2066,8 +2121,16 @@
 					var st = this._state;
 					st.oWMTSInfo = null;
 					st.oTree = null;
-				}
+				},
 
+				/**
+				 * Set layers, styles, crs, etc. from object oDataToSet
+				 */
+				"_fnSetData" : function(oData) {
+					var st = this._state;
+					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val(oData.url);
+					this._fnGetDataFromServer(true, oData);
+				}
 	});
 
 /**

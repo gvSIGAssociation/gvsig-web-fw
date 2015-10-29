@@ -4,6 +4,29 @@
   xmlns:form="http://www.springframework.org/tags/form"
   xmlns:jsp="http://java.sun.com/JSP/Page"
   xmlns:spring="http://www.springframework.org/tags" version="2.0">
+<!--
+
+ gvSIG Web Framework is sponsored by the General Directorate for Information
+ Technologies (DGTI) of the Regional Ministry of Finance and Public
+ Administration of the Generalitat Valenciana (Valencian Community,
+ Spain), managed by gvSIG Association and led by DISID.
+
+ Copyright (C) 2015 DGTI - Generalitat Valenciana
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
+
+-->
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (include at final substring '_wmts_wizard')" />
@@ -25,7 +48,6 @@
   <spring:message code="layers_not_found" var="layersNotFoundMsg"/>
   <spring:message code="error_server_required" var="msgServerRequired"/>
   <spring:message code="error_layers_required" var="msgLayersRequired"/>
-  <spring:message code="error_crs_required" var="msgCrsRequired"/>
   <spring:message code="error_connect_required" var="msgConnectRequired"/>
   <spring:message code="error_support_crs_format" var="msgSupportError"/>
 
@@ -33,7 +55,6 @@
   <spring:message code="wmts_wizard_connect_title" var="titleConnect"/>
   <spring:message code="wmts_wizard_server_info_title" var="titleServerInfo"/>
   <spring:message code="wmts_wizard_layers_title" var="titleSelectLayers"/>
-  <spring:message code="wmts_wizard_crs_title" var="titleSelectCrs"/>
 
   <!-- labels -->
   <spring:message code="wmts_wizard_server_crs_label" var="serverCrsLabel"/>
@@ -57,14 +78,12 @@
        data-layer_type="wmts"
        data-msg_connect_required="${msgConnectRequired}"
        data-msg_crs_supported="${crsSupportedLabel}"
-       data-msg_crs_required="${msgCrsRequired}"
        data-msg_formats_supported="${formatsSupportedLabel}"
        data-msg_layers_not_found="${layersNotFoundMsg}"
        data-msg_layers_required="${msgLayersRequired}"
        data-msg_server_required="${msgServerRequired}"
        data-msg_support_error="${msgSupportError}"
        data-path="${controllerUrl}" data-title="${tabTitle}"
-       data-title_crs="${selectCRSTitle}"
        data-tree_div_id="${fn:escapeXml(id)}_wmts_wizard_tree"
        data-type="wmts_wizard" data-user_layer_tab="true"
        data-wait_label="${waitLabel}"

@@ -153,14 +153,16 @@
 				},
 
 				/**
-				 * Set data into the tab indicated
+				 * Set data into the tab indicated and put the focus in
+				 * this tab
 				 */
 				"fnSetDataToTab" : function(tabType, oDataToSet){
 					this._fnSetDataToTab(tabType, oDataToSet);
 				},
 
 				/**
-				 * Set data into the tab indicated
+				 * Set data into the tab indicated and put the focus in
+				 * this tab
 				 */
 				"_fnSetDataToTab" : function(tabType, oDataToSet){
 					var st = this._state;
@@ -239,8 +241,7 @@
 						// the wizard or will be deleted
 						tab.fnRegisterButtonsAction();
 						if(tab._fnAddChangeEventToFileInput){
-							//TODO eliminar parámetro después de testear
-							tab._fnAddChangeEventToFileInput(st.oMap);
+							tab._fnAddChangeEventToFileInput();
 						}
 
 					}

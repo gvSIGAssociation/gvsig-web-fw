@@ -269,6 +269,20 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                     crsSupported.addAll(layerChild.getAllSrs());
                     wmsInfo.setCrsSupported(crsSupported);
 
+                    //create one child for each crs of the layer
+                    if(listCrs.isEmpty() || listCrs.size() > 1){
+                        for (String crs : crsSet) {
+                            if(StringUtils.isNotEmpty(crs) &&
+                                    (listCrs.isEmpty() ||
+                                            listCrs.contains(crs))){
+                                TreeNode crsNode = new TreeNode(crs);
+                                crsNode.setHideCheckbox(true);
+                                crsNode.setUnselectable(true);
+                                crsNode.setIconclass(" ");
+                                layerChildNode.addChild(crsNode);
+                            }
+                        }
+                    }
                 }
                 else {
                     layerChildNode.setFolder(true);

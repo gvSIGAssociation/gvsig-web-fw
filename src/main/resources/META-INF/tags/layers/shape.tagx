@@ -65,7 +65,7 @@
       </c:otherwise>
     </c:choose>
 
-    <!-- TODO group -->
+    <!-- group -->
     <div class="mapviewer_layers_layer" data-layer_type="shape"
             id="${id}"
             data-group="${mapview_group_stack.peek()}"

@@ -452,7 +452,7 @@
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
 									}
 									// Check if have any result and create the tree
-									if(element.layersTree){
+									if(element.layersTree != null && element.layersTree.length > 0){
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
 											source: element.layersTree,
 											checkbox: true,
@@ -715,7 +715,7 @@
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
 									}
 									// Check if have any result
-									if(element.layersTree){
+									if(element.layersTree != null && element.layersTree.length > 0){
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
 											source: element.layersTree,
 											checkbox: true,
@@ -1194,7 +1194,6 @@
 				 */
 				"__fnGetDataFromServer" : function(isLoadingData, oData) {
 					var st = this._state;
-					var jqDeferred;
 					//Clean elements of styles and format
 					var divStyles = jQuery("#".concat(st.sId).concat("_styles"),"#".concat(st.containerId));
 					// Clear the content of the div
@@ -1214,7 +1213,7 @@
 					if(urlServ){
 						st.oUtil.startWaitMeAnimation(st.waitLabel);
 						var params = { url: urlServ, wizard: "true", crs: st.aCrs };
-						jqDeferred = jQuery.ajax({
+						jQuery.ajax({
 							url : st.path + "?findWmsCapabilities",
 							data: params,
 							cache: false,
@@ -1269,7 +1268,7 @@
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).empty();
 									}
 									// Check if have any result and create the tree
-									if(element.layersTree){
+									if(element.layersTree != null && element.layersTree.length > 0){
 										jQuery("#".concat(st.treeDivId), "#".concat(st.containerId)).fancytree({
 											source: element.layersTree,
 											checkbox: true,
@@ -1347,8 +1346,6 @@
 						// with error return false
 						this._fnSetErrorMessage("#".concat(st.sId).concat("_connection_error"),st.msgServerRequired);
 					}
-					return jqDeferred;
-
 				},
 
 
@@ -1457,9 +1454,23 @@
 			    			}
 			    		}
 			    	}
-			    	if(currentIndex == 3){
+			    	if(currentIndex == 3 || newIndex == 3){
 			    		// clean error message of step 3 (styles)
 			    		this._fnClearErrorMessage("#".concat(st.sId).concat("_styles_error"));
+			    		var selectedLayers = this._fnGetSelectedLayers();
+			    		if(selectedLayers === false){
+			    			return false;
+			    		}else{
+			    			// check if selected layers have changed
+			    			if(!(jQuery(selectedLayers).not(st.oldSelectedLayers).length === 0 &&
+	    						jQuery(st.oldSelectedLayers).not(selectedLayers).length === 0)){
+			    				this._fnDrawFormStylesLayer(selectedLayers);
+			    				// set oldSelectedLayers
+		    					st.oldSelectedLayers = selectedLayers;
+			    				// show error message to user
+		    					this._fnSetErrorMessage("#".concat(st.sId).concat("_styles_error"),st.msgReviseStyles);
+			    			}
+			    		}
 			    	}
 
 			    	return true;
@@ -1517,8 +1528,8 @@
 											htmlForStylesTab = htmlForStylesTab.concat(" checked ");
 											checkStyle = false;
 										}
-										var title = style.title;
-										if(title == "Default"){
+										var title = style.title.toLowerCase();
+										if(title == "default"){
 											title = st.textDefaultStyle;
 										}
 										htmlForStylesTab = htmlForStylesTab.concat(">").concat(title);
@@ -1604,81 +1615,87 @@
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
 					var keysLayersSel = [];
+					// check if layersSeleced is false because
+					// _fnGetSelectedLayers is false if it had an error
+					if(layersSelected !== false){
+	    				if(!(jQuery(layersSelected).not(st.oldSelectedLayers).length === 0 &&
+	    						jQuery(st.oldSelectedLayers).not(layersSelected).length === 0)){
+	    					// set oldSelectedLayers
+	    					st.oldSelectedLayers = layersSelected;
+	    					// draw the form to select styles of the layers
+	    					this._fnDrawFormStylesLayer(layersSelected);
+	    					// If layers have changed, the values of the step 3
+	    					// will have changed also and therefore the user must inspect and
+	    					// select new values in this tab.
+	    					st.wizard.steps("goToStep",3);
+	    					// show message to user
+	    					this._fnSetErrorMessage("#".concat(st.sId).concat("_styles_error"),st.msgReviseStyles);
+							return false;
+		    			}
 
-    				if(!(jQuery(layersSelected).not(st.oldSelectedLayers).length === 0 &&
-    						jQuery(st.oldSelectedLayers).not(layersSelected).length === 0)){
-    					// set oldSelectedLayers
-    					st.oldSelectedLayers = layersSelected;
-    					// draw the form to select styles of the layers
-    					this._fnDrawFormStylesLayer(layersSelected);
-    					// If layers have changed, the values of the step 3
-    					// will have changed also and therefore the user must inspect and
-    					// select new values in this tab.
-    					st.wizard.steps("goToStep",3);
-    					// show message to user
-    					this._fnSetErrorMessage("#".concat(st.sId).concat("_styles_error"),st.msgReviseStyles);
-						return false;
-	    			}
-
-					// get the selected layers
-					for(i in layersSelected){
-						var layerSel = layersSelected[i];
-						// check if the layer is root
-						if(layerSel.key.indexOf("rootLayer_") !== 0){
-							var layer = st.oWMSInfo.layers[layerSel.key]
-							if(layer){
-								keysLayersSel.push(layerSel.key);
+						// get the selected layers
+						for(i in layersSelected){
+							var layerSel = layersSelected[i];
+							// check if the layer is root
+							if(layerSel.key.indexOf("rootLayer_") !== 0){
+								var layer = st.oWMSInfo.layers[layerSel.key]
+								if(layer){
+									keysLayersSel.push(layerSel.key);
+								}
 							}
 						}
-					}
 
-					// get styles selected
-					var stylesSelected = this._fnGetSelectedStylesLayer(keysLayersSel);
 
-					var crsCommonSelected = this._fnGetCommonCRS(keysLayersSel);
-					if(crsCommonSelected.length <= 0){
-						// show error and go to step 2 (select layers)
-						st.wizard.steps("goToStep",2);
-    					// show message to user because he has selected
-						// incompatible layers
-    					this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgIncompatibleLayers);
-						return false;
-					}else{
-						// get the common crs between selected layers and
-						// selected crs by the server
-						var serverCRS = st.oWMSInfo.crsSelected;
-						crsSelected = serverCRS.filter(function(el) {
-						    return crsCommonSelected.indexOf(el) != -1
-						});
+						// get styles selected
+						var stylesSelected = this._fnGetSelectedStylesLayer(keysLayersSel);
 
-						if(crsSelected.length <= 0){
+						var crsCommonSelected = this._fnGetCommonCRS(keysLayersSel);
+						if(crsCommonSelected.length <= 0){
 							// show error and go to step 2 (select layers)
 							st.wizard.steps("goToStep",2);
-							// show message to user because he has selected
+	    					// show message to user because he has selected
 							// incompatible layers
 	    					this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgIncompatibleLayers);
 							return false;
 						}else{
-							// generate root layer options and put selected layers
-							// into layers parameter
-							var layerOptions = {
-								"layer_type": st.typeLayer,
-							    "span": (st.oWMSInfo.id.toString()).concat("_span"),
-						        "url": st.oWMSInfo.serviceUrl,
-						        "layers":keysLayersSel.join(),
-						        "format": st.oWMSInfo.formatSelected,
-						        "transparent":"true",
-						        "version":st.oWMSInfo.version,
-						        "crs": crsSelected.join(),
-							    "opacity": "1.0",
-						        "styles" : stylesSelected.values,
-						        "styles_with_id" : stylesSelected.values_with_id,
-						        "allow_disable": true,
-						        "node_icon": ".whhg icon-layerorderdown",
-						        "title": st.oWMSInfo.serviceTitle,
-					        };
-							return layerOptions;
+							// get the common crs between selected layers and
+							// selected crs by the server
+							var serverCRS = st.oWMSInfo.crsSelected;
+							crsSelected = serverCRS.filter(function(el) {
+							    return crsCommonSelected.indexOf(el) != -1
+							});
+
+							if(crsSelected.length <= 0){
+								// show error and go to step 2 (select layers)
+								st.wizard.steps("goToStep",2);
+								// show message to user because he has selected
+								// incompatible layers
+		    					this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgIncompatibleLayers);
+								return false;
+							}else{
+								// generate root layer options and put selected layers
+								// into layers parameter
+								var layerOptions = {
+									"layer_type": st.typeLayer,
+								    "span": (st.oWMSInfo.id.toString()).concat("_span"),
+							        "url": st.oWMSInfo.serviceUrl,
+							        "layers":keysLayersSel.join(),
+							        "format": st.oWMSInfo.formatSelected,
+							        "transparent":"true",
+							        "version":st.oWMSInfo.version,
+							        "crs": crsSelected.join(),
+								    "opacity": "1.0",
+							        "styles" : stylesSelected.values,
+							        "styles_with_id" : stylesSelected.values_with_id,
+							        "allow_disable": true,
+							        "node_icon": ".whhg icon-layerorderdown",
+							        "title": st.oWMSInfo.serviceTitle,
+						        };
+								return layerOptions;
+							}
 						}
+					}else{
+						return false;
 					}
 				},
 
@@ -2157,7 +2174,6 @@
       "idLayer" : "",
       "nameLayer": "",
       "oUtil" : null,
-      "oMap" : null,
       "file" : null,
     });
 
@@ -2195,13 +2211,11 @@
 
         /**
          * Add change event for input file
-         * TODO eliminar parámetro mapa y variable oMap después de testear
          */
-        "_fnAddChangeEventToFileInput" : function(map){
+        "_fnAddChangeEventToFileInput" : function(){
         	var st = this._state;
         	var fileInput = jQuery("#"+st.sId+"_file_input", "#"+st.dialogId);
         	fileInput.change(jQuery.proxy(this._fnCheckAndLoadFile, this));
-            this._state.oMap = map;
         },
 
         /**

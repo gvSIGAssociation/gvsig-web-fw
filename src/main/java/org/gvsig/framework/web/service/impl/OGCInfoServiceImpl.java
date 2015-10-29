@@ -1,3 +1,25 @@
+/*
+ * gvSIG Web Framework is sponsored by the General Directorate for Information
+ * Technologies (DGTI) of the Regional Ministry of Finance and Public
+ * Administration of the Generalitat Valenciana (Valencian Community,
+ * Spain), managed by gvSIG Association and led by DISID.
+ *
+ * Copyright (C) 2015 DGTI - Generalitat Valenciana
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
+ *
+ */
 package org.gvsig.framework.web.service.impl;
 
 import java.net.URI;
@@ -146,10 +168,12 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                 }
 
                 TreeSet<String> selCrs = new TreeSet<String>();
-                if(listCrs.isEmpty()){
-                  selCrs.addAll(wmsInfo.getCrsSupported());
-                }else{
-                  selCrs.addAll(CollectionUtils.intersection(listCrs, wmsInfo.getCrsSupported()));
+                if (listCrs.isEmpty()) {
+                    selCrs.addAll(wmsInfo.getCrsSupported());
+                }
+                else {
+                    selCrs.addAll(CollectionUtils.intersection(listCrs,
+                            wmsInfo.getCrsSupported()));
 
                 }
                 wmsInfo.setCrsSelected(selCrs);
@@ -217,8 +241,7 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             // get crs (srs) (belong to layer)
             Vector crsVector = layerChild.getAllSrs();
             // Only get the layers with have crs parameter or if crs is null
-            if (listCrs.isEmpty() ||
-                !Collections.disjoint(crsVector, listCrs)) {
+            if (listCrs.isEmpty() || !Collections.disjoint(crsVector, listCrs)) {
 
                 ArrayList<WMSLayer> layerChildChildren = layerChild
                         .getChildren();
@@ -230,8 +253,7 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                     layerChildNode.setFolder(false);
 
                     // Add layer to layer map
-                    org.gvsig.framework.web.ogc.WMSLayer wmsLayer =
-                        new org.gvsig.framework.web.ogc.WMSLayer();
+                    org.gvsig.framework.web.ogc.WMSLayer wmsLayer = new org.gvsig.framework.web.ogc.WMSLayer();
                     TreeSet<String> crsSet = new TreeSet<String>();
                     crsSet.addAll(layerChild.getAllSrs());
                     wmsLayer.setCrs(crsSet);
@@ -288,8 +310,8 @@ public class OGCInfoServiceImpl implements OGCInfoService {
      * @see es.gva.dgti.gvgeoportal.service.ogc.OGCInfoService
      * #getCapabilitiesFromWMTS(String, String, boolean)
      */
-    public WMTSInfo getCapabilitiesFromWMTS(String urlServerWMTS, TreeSet<String> listCrs,
-                                          boolean useCrsSelected)
+    public WMTSInfo getCapabilitiesFromWMTS(String urlServerWMTS,
+            TreeSet<String> listCrs, boolean useCrsSelected)
             throws ServerGeoException {
 
         TreeSet<String> formatsSupported = new TreeSet<String>();
@@ -301,8 +323,7 @@ public class OGCInfoServiceImpl implements OGCInfoService {
         wmtsInfo.setServiceUrl(urlServerWMTS);
 
         // Create hashmap to add the layers getted to the WMTSInfo object
-        Map<String, org.gvsig.framework.web.ogc.WMTSLayer> layersMap =
-            new HashMap<String, org.gvsig.framework.web.ogc.WMTSLayer>();
+        Map<String, org.gvsig.framework.web.ogc.WMTSLayer> layersMap = new HashMap<String, org.gvsig.framework.web.ogc.WMTSLayer>();
 
         // get WMTS manager
         WMTSOGCManager wmtsMan = WMTSOGCLocator.getManager();
@@ -340,7 +361,8 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             // hashmap with: identifier of tile matrix, supported crs
             Map<String, String> tileMatrixCrsSupported = new HashMap<String, String>();
             TreeSet<String> tileMatrixSelectedId = new TreeSet<String>();
-            List<WMTSTileMatrixSet> tileMatrixSet = wmtsClient.getTileMatrixSet();
+            List<WMTSTileMatrixSet> tileMatrixSet = wmtsClient
+                    .getTileMatrixSet();
             for (int i = 0; i < tileMatrixSet.size(); i++) {
                 WMTSTileMatrixSet tileMatrix = tileMatrixSet.get(i);
                 String identifier = tileMatrix.getIdentifier();
@@ -353,12 +375,14 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                         if (listCrs.contains(supportedCRS)) {
                             tileMatrixSelectedId.add(identifier);
                         }
-                    }else{
-                        // check supportedCrs with the expReg generated by the list of
+                    }
+                    else {
+                        // check supportedCrs with the expReg generated by the
+                        // list of
                         // crs passed
                         for (String expReg : patternList) {
                             if (supportedCRS.matches(expReg)) {
-                              tileMatrixSelectedId.add(identifier);
+                                tileMatrixSelectedId.add(identifier);
                             }
                         }
                     }
@@ -383,43 +407,46 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                 TreeSet<String> wmtsLinkSelected = new TreeSet<String>();
                 TreeSet<String> wmtsLinkSupported = new TreeSet<String>();
                 // check crs
-                List<WMTSTileMatrixSetLink> tileMatrixSetLink = layer.getTileMatrixSetLink();
+                List<WMTSTileMatrixSetLink> tileMatrixSetLink = layer
+                        .getTileMatrixSetLink();
                 for (int j = 0; j < tileMatrixSetLink.size(); j++) {
-                  WMTSTileMatrixSetLink wmtsLink = tileMatrixSetLink.get(j);
-                  wmtsLinkSupported.add(wmtsLink.getTileMatrixSetId());
-                  if(!tileMatrixSelectedId.isEmpty() &&
-                      tileMatrixSelectedId.contains(wmtsLink.getTileMatrixSetId())){
-                    wmtsLinkSelected.add(wmtsLink.getTileMatrixSetId());
-                  }
+                    WMTSTileMatrixSetLink wmtsLink = tileMatrixSetLink.get(j);
+                    wmtsLinkSupported.add(wmtsLink.getTileMatrixSetId());
+                    if (!tileMatrixSelectedId.isEmpty()
+                            && tileMatrixSelectedId.contains(wmtsLink
+                                    .getTileMatrixSetId())) {
+                        wmtsLinkSelected.add(wmtsLink.getTileMatrixSetId());
+                    }
                 }
                 // check format
                 TreeSet<String> setFormats = new TreeSet<String>();
                 setFormats.addAll(layer.getFormat());
                 String format = getFirstFormatSupported(setFormats);
                 formatsSupported.addAll(setFormats);
-                if((!wmtsLinkSelected.isEmpty() || listCrs.isEmpty()) && format != null){
-                  isFormatsSupported = true;
-                  TreeNode node = new TreeNode(layer.getIdentifier());
-                  node.setTitle(layer.getTitle());
-                  node.setFolder(false);
-                  tree.add(node);
+                if ((!wmtsLinkSelected.isEmpty() || listCrs.isEmpty())
+                        && format != null) {
+                    isFormatsSupported = true;
+                    TreeNode node = new TreeNode(layer.getIdentifier());
+                    node.setTitle(layer.getTitle());
+                    node.setFolder(false);
+                    tree.add(node);
 
-                  // Add layer to layer map
-                  org.gvsig.framework.web.ogc.WMTSLayer wmtsLayer =
-                      new org.gvsig.framework.web.ogc.WMTSLayer();
-                  TreeSet<String> crsSet = new TreeSet<String>();
-                  crsSet.addAll(layer.getSrsList());
-                  wmtsLayer.setCrs(crsSet);
-                  wmtsLayer.setName(layer.getIdentifier());
-                  wmtsLayer.setTitle(layer.getTitle());
-                  wmtsLayer.setFormatSelected(format);
-                  wmtsLayer.setFormatsSupported(setFormats);
-                  if(listCrs.isEmpty()){
-                    wmtsLayer.setTileMatrixSelected(wmtsLinkSupported);
-                  }else{
-                    wmtsLayer.setTileMatrixSelected(wmtsLinkSelected);
-                  }
-                  layersMap.put(layer.getIdentifier(), wmtsLayer);
+                    // Add layer to layer map
+                    org.gvsig.framework.web.ogc.WMTSLayer wmtsLayer = new org.gvsig.framework.web.ogc.WMTSLayer();
+                    TreeSet<String> crsSet = new TreeSet<String>();
+                    crsSet.addAll(layer.getSrsList());
+                    wmtsLayer.setCrs(crsSet);
+                    wmtsLayer.setName(layer.getIdentifier());
+                    wmtsLayer.setTitle(layer.getTitle());
+                    wmtsLayer.setFormatSelected(format);
+                    wmtsLayer.setFormatsSupported(setFormats);
+                    if (listCrs.isEmpty()) {
+                        wmtsLayer.setTileMatrixSelected(wmtsLinkSupported);
+                    }
+                    else {
+                        wmtsLayer.setTileMatrixSelected(wmtsLinkSelected);
+                    }
+                    layersMap.put(layer.getIdentifier(), wmtsLayer);
                 }
             }
             wmtsInfo.setFormatsSupported(formatsSupported);

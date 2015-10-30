@@ -81,11 +81,7 @@
   <spring:message code="wms_wizard_table_styles_title_styles" var="tableTitleStyles" />
   <spring:message code="wms_wizard_text_default_style" var="textDefaultStyle" />
   <spring:message code="wms_wizard_text_without_styles" var="textWithoutStyles" />
-
-<!--
-  TODO tooltip
-  <spring:message code="tooltip_button_change_server" var="change_server_tooltip" /> -->
-
+  <spring:message code="tooltip_button_change_server" var="change_server_tooltip" />
 
   <div class="wizard_dialog" id="${fn:escapeXml(id)}_wms_wizard"
        data-layer_type="wms"
@@ -129,7 +125,7 @@
       <div class="row">
         <div class="col-xs-12 col-sm-4 col-sm-offset-8 col-md-4 col-md-offset-8 col-lg-4 col-lg-offset-8">
           <input id="${fn:escapeXml(id)}_wms_wizard_changeserver_button" type="button" style="display:none"
-            class="btn btn-primary btn-block btn-proceed" value="${changeServerButton}" />
+            class="btn btn-primary btn-block btn-proceed" value="${changeServerButton}" data-original-title="${change_server_tooltip}" />
         </div>
       </div>
       <div class="row">

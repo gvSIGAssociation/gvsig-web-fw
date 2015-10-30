@@ -343,6 +343,7 @@
 			"msgLayersNotFound" : "Layers not found",
 			"msgServerRequired" : "Server value is required",
 			"msgLayersRequired" : "Select at least one layer",
+			"msgIncompatibleLayers" : "The layers selected are incompatible, please select layers with common crs",
 			"format" : null,
 
 		});
@@ -379,6 +380,7 @@
 					st.msgLayersNotFound = s.msg_layers_not_found;
 					st.msgLayersRequired = s.msg_layers_required;
 					st.msgServerRequired = s.msg_server_required;
+					st.msgIncompatibleLayers = s.msg_incompatible_layers;
 					//set format
 					st.format = s.format;
 
@@ -507,28 +509,74 @@
 					for(i in layersSelected){
 						var layerSel = layersSelected[i];
 						// check if the layer is root
-						if(layerSel.key.indexOf("rootLayer_") !== 0){
+						if(layerSel.key.indexOf("rootLayer_") !== 0 &&
+								layerSel.unselectable !== true){
 							keysLayersSel.push(layerSel.key);
 						}
 					}
 
-					// generate root layer options and put selected layers
-					// into layers parameter
-					var layerOptions = {
-							"layer_type": st.typeLayer,
-						    "span": (st.oWMSInfo.id.toString()).concat("_span"),
-					        "url": st.oWMSInfo.serviceUrl,
-					        "layers":keysLayersSel.join(),
-					        "format": st.oWMSInfo.formatSelected,
-					        "transparent":"true",
-					        "version":st.oWMSInfo.version,
-					        "crs": st.oWMSInfo.crsSelected,
-					        "opacity": "1.0",
-					        "allow_disable": true,
-					        "node_icon": ".whhg icon-layerorderdown",
-					        "title": st.oWMSInfo.serviceTitle,
-					        };
-					return layerOptions;
+					var crsCommonSelected = this._fnGetCommonCRS(keysLayersSel);
+					if(crsCommonSelected.length == 0){
+						// show message to user because he has selected
+						// incompatible layers
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgIncompatibleLayers);
+						return false;
+					}else{
+						// get the common crs between selected layers and
+						// selected crs by the server
+						var serverCRS = st.oWMSInfo.crsSelected;
+						crsSelected = serverCRS.filter(function(el) {
+						    return crsCommonSelected.indexOf(el) != -1
+						});
+
+						if(crsSelected.length == 0){
+							// show message to user because he has selected
+							// incompatible layers
+						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgIncompatibleLayers);
+							return false;
+						}else{
+							// generate root layer options and put selected layers
+							// into layers parameter
+							var layerOptions = {
+								"layer_type": st.typeLayer,
+								"span": (st.oWMSInfo.id.toString()).concat("_span"),
+								"url": st.oWMSInfo.serviceUrl,
+								"layers":keysLayersSel.join(),
+								"format": st.oWMSInfo.formatSelected,
+								"transparent":"true",
+								"version":st.oWMSInfo.version,
+								"crs": crsSelected.join(),
+								"opacity": "1.0",
+								"allow_disable": true,
+								"node_icon": ".whhg icon-layerorderdown",
+								"title": st.oWMSInfo.serviceTitle
+							};
+							return layerOptions;
+						}
+					}
+				},
+
+				/**
+				* Get common CRS from selected layers
+				*/
+				"_fnGetCommonCRS" : function (aSelectedLayers){
+				// get the common crs for layers selected
+				var st = this._state;
+					var aCommonCRS = [];
+					for(i in aSelectedLayers){
+						var layer = st.oWMSInfo.layers[aSelectedLayers[i]]
+						if(layer){
+							if(aCommonCRS.length != 0 ){
+								// add only different
+								aCommonCRS = aCommonCRS.filter(function(el) {
+								    return layer.crs.indexOf(el) != -1
+								});
+							}else{
+								aCommonCRS = layer.crs;
+							}
+						}
+					}
+					return aCommonCRS;
 				},
 
 				/**
@@ -869,25 +917,33 @@
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
 					var layerOptions = false;
-					// create layer option for each of the selected layers
-					for(i in layersSelected){
-						var layerSel = layersSelected[i];
-						// if starts with rootLayer, doesn't push it.
-						if(layerSel.key.indexOf("rootLayer_") !== 0){
-							layerOptions = {
-								"layer_type": st.typeLayer,
-								"layer" : layerSel.key,
-							    "span": (st.oWMTSInfo.id.toString()).concat("_span"),
-						        "url": st.oWMTSInfo.serviceUrl,
-						        "version":st.oWMTSInfo.version,
-						        "opacity": "1",
-						        "allow_disable": true,
-						        "service" : st.oWMTSInfo.serviceType,
-						        "tilematrix_set" : st.oWMTSInfo.tileMatrixSelectedId,
-						        "node_icon": ".whhg icon-layerorderup",
-						        "title": layerSel.title,
-						        };
+					var crsSelected = [];
+					if(layersSelected !== null && layersSelected.length > 0){
+						// get layer selected and calculate its crs
+						var layerSel = st.oWMTSInfo.layers[layersSelected[0].key];
+						for(i in layerSel.tileMatrixSelected){
+							var tileMatrixId = layerSel.tileMatrixSelected[i];
+							crsSelected.push(st.oWMTSInfo.tileMatrixCrsSupported[tileMatrixId]);
 						}
+						// create layer option for selected layer
+						// if starts with rootLayer, doesn't push it.
+						layerOptions = {
+							"layer_type": st.typeLayer,
+							"layer" : layerSel.name,
+						    "span": (st.oWMTSInfo.id.toString()).concat("_span"),
+					        "url": st.oWMTSInfo.serviceUrl,
+					        "version":st.oWMTSInfo.version,
+					        "opacity": "1",
+					        "allow_disable": true,
+					        "service" : st.oWMTSInfo.serviceType,
+					        "tilematrix_set" : layerSel.tileMatrixSelected[0],
+					        "node_icon": ".whhg icon-layerorderup",
+					        "format" : layerSel.formatSelected,
+					        "title": layersSelected[0].title,
+					        "mapTileMatrixCrs" : st.oWMTSInfo.tileMatrixCrsSupported,
+					        "all_tilematrix_selected" : layerSel.tileMatrixSelected,
+					        "all_crs_selected" :  crsSelected.join()
+				        };
 					}
 
 					return layerOptions;
@@ -1637,7 +1693,8 @@
 						for(i in layersSelected){
 							var layerSel = layersSelected[i];
 							// check if the layer is root
-							if(layerSel.key.indexOf("rootLayer_") !== 0){
+							if(layerSel.key.indexOf("rootLayer_") !== 0 &&
+									layerSel.unselectable !== true){
 								var layer = st.oWMSInfo.layers[layerSel.key]
 								if(layer){
 									keysLayersSel.push(layerSel.key);
@@ -1650,7 +1707,7 @@
 						var stylesSelected = this._fnGetSelectedStylesLayer(keysLayersSel);
 
 						var crsCommonSelected = this._fnGetCommonCRS(keysLayersSel);
-						if(crsCommonSelected.length <= 0){
+						if(crsCommonSelected.length == 0){
 							// show error and go to step 2 (select layers)
 							st.wizard.steps("goToStep",2);
 	    					// show message to user because he has selected
@@ -1665,7 +1722,7 @@
 							    return crsCommonSelected.indexOf(el) != -1
 							});
 
-							if(crsSelected.length <= 0){
+							if(crsSelected.length == 0){
 								// show error and go to step 2 (select layers)
 								st.wizard.steps("goToStep",2);
 								// show message to user because he has selected
@@ -1689,7 +1746,7 @@
 							        "styles_with_id" : stylesSelected.values_with_id,
 							        "allow_disable": true,
 							        "node_icon": ".whhg icon-layerorderdown",
-							        "title": st.oWMSInfo.serviceTitle,
+							        "title": st.oWMSInfo.serviceTitle
 						        };
 								return layerOptions;
 							}

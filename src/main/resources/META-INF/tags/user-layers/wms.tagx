@@ -51,12 +51,14 @@
   <spring:message code="layers_not_found" var="layersNotFoundMsg"/>
   <spring:message code="error_server_required" var="msgServerRequired"/>
   <spring:message code="error_layers_required" var="msgLayersRequired"/>
+  <spring:message code="error_incompatible_layers" var="msgIncompatibleLayers"/>
   <spring:message code="wait_label" var="waitLabel" htmlEscape="false"/>
   <spring:message code="button_connect" var="connect_button" />
 
 
   <div id="${fn:escapeXml(id)}_wms" data-format="${format}"
        data-layer_type="wms"
+       data-msg_incompatible_layers="${msgIncompatibleLayers}"
        data-msg_layers_not_found="${layersNotFoundMsg}"
        data-msg_layers_required="${msgLayersRequired}"
        data-msg_server_required="${msgServerRequired}"

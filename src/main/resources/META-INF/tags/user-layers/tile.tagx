@@ -31,6 +31,7 @@
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (include at final substring '_tile')" />
   <jsp:directive.attribute name="title" type="java.lang.String" required="false" rtexprvalue="true" description="The label code to get text from I18N properties that will be used as title of the tab. Default 'TILE'" />
+  <jsp:directive.attribute name="showInputTitle" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Specify if input title is shown. Default true" />
 
   <spring:message code="error_server_required" var="msgServerRequired"/>
   <spring:message code="error_title_layer_required" var="msgTitleRequired"/>
@@ -43,6 +44,13 @@
       <spring:message code="${title}" var="tabTitle"/>
     </c:otherwise>
   </c:choose>
+
+  <c:if test="${empty showInputTitle}">
+    <c:set var="showInputTitle" value="true" />
+  </c:if>
+
+
+
 
   <spring:message code="server_label" var="serverLabel" htmlEscape="false"/>
   <spring:message code="title_layer_label" var="titleLayerLabel" htmlEscape="false"/>
@@ -60,13 +68,15 @@
           id="${fn:escapeXml(id)}_tile_server_id" name="${fn:escapeXml(id)}_tile_server" type="text" />
       </div>
     </div>
-    <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-        <h5><c:out value="${titleLayerLabel}" /></h5>
-        <input class="form-control input-sm"
-          id="${fn:escapeXml(id)}_tile_name" name="${fn:escapeXml(id)}_tile_name" type="text" />
-      </div>
-    </div>
+    <c:if test="${showInputTitle}">
+	    <div class="row">
+	      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	        <h5><c:out value="${titleLayerLabel}" /></h5>
+	        <input class="form-control input-sm"
+	          id="${fn:escapeXml(id)}_tile_name" name="${fn:escapeXml(id)}_tile_name" type="text" />
+	      </div>
+	    </div>
+	  </c:if>
     <div class="row">
         <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_tile_error_message">&amp;nbsp;</div>
     </div>

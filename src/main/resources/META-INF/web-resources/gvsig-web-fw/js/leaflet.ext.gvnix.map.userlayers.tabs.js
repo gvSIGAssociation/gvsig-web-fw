@@ -1028,6 +1028,7 @@
 
 				/**
 				 * Get the layer introduced into server input
+				 * Return false if it hasn't layers selected or generates an error
 				 */
 				"_fnGetSelectedLayers" : function() {
 					var st = this._state;
@@ -1036,19 +1037,26 @@
 					this._fnClearErrorMessage("#".concat(st.sId).concat("_error_message"));
 					var urlSelected = jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val();
 					if(urlSelected){
-						st.nameLayer = jQuery("#".concat(st.sId).concat("_name"), "#".concat(st.containerId)).val();
-						if(st.nameLayer){
-							st.idLayer = st.oUtil.getHashCode(urlSelected.concat(today.toString()));
-						}else{
-							// set required title message
-							this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgTitleLayerRequired);
-							urlSelected = false;
+						// title can exist or not
+						oTitleTile = jQuery("#".concat(st.sId).concat("_name"), "#".concat(st.containerId)).val();
+						if(oTitleTile != undefined){
+							if(oTitleTile.trim() == ""){
+								// set required title message
+								this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgTitleLayerRequired);
+								return false;
+							}else{
+								st.nameLayer = oTitleTile;
+							}
 						}
+						else{
+							st.nameLayer = urlSelected;
+						}
+						st.idLayer = st.oUtil.getHashCode(urlSelected.concat(today.toString()));
 					}
 					else{
 						// set required server message
 						this._fnSetErrorMessage("#".concat(st.sId).concat("_error_message"),st.msgServerRequired);
-						urlSelected = false;
+						return false;
 					}
 					return urlSelected;
 				},
@@ -1079,6 +1087,14 @@
 					var st = this._state;
 					return (st.idLayer);
 				},
+
+				/**
+				 * Set url of server from object oDataToSet
+				 */
+				"_fnSetData" : function(oData) {
+					var st = this._state;
+					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val(oData.url);
+				}
 
 			});
 

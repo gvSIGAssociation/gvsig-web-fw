@@ -49,9 +49,6 @@
     <c:set var="showInputTitle" value="true" />
   </c:if>
 
-
-
-
   <spring:message code="server_label" var="serverLabel" htmlEscape="false"/>
   <spring:message code="title_layer_label" var="titleLayerLabel" htmlEscape="false"/>
 

@@ -127,7 +127,50 @@ var GvNIX_Map_User_Layers_Tool;
 						return;
 					}else{
 						var idLayerToInsert = st.oTabContainer.fnGetLayerId($focusedTab,layerOptions);
-						st.oMap.fnRegisterLayer(idLayerToInsert, layerOptions);
+						// if layer type is wms register each layer children of manner independent
+						if($focusedTab.fnGetLayerType() == "wms"){
+							aLayerIdSelected = layerOptions.layers.split(",");
+							layerOptions.layers = "";
+							// create pattern layer
+							var oWmsLayer = {"id" : idLayerToInsert,
+											 "options" : layerOptions
+											};
+							var aoChildLayers = [];
+							var childrenStyles = [];
+							// tab wms without wizard doesn't select styles
+							if(layerOptions.styles_with_id != undefined){
+								childrenStyles = layerOptions.styles_with_id.split(",");
+							}
+							// create children layers
+							for(i = 0; i < aLayerIdSelected.length; i++){
+								var oLayer = layerOptions.aLayers[aLayerIdSelected[i]];
+								var nameLayerAux = oLayer.name.concat("_");
+								var style = "";
+								// get the style for the layer that starts with oLayer.name
+								for(j = 0; j < childrenStyles.length; j++){
+									if(childrenStyles[j].startsWith(nameLayerAux)){
+										style = childrenStyles[j].substring(nameLayerAux.length,childrenStyles[j].length);
+										break;
+									}
+								}
+								var idChildLayer = GvNIX_Map_Leaflet.Util.getHashCode((oLayer.name).concat("_").concat(new Date().toString()));;
+								var oChildLayerOptions = { "layer_type" : "wms_child",
+											"title" : oLayer.title,
+											"visible" : "true",
+											"styles" : style,
+											"id_on_server" : oLayer.name,
+											"group" : idLayerToInsert
+								}
+								oLayerChild = {"id" : idChildLayer,
+										 	   "options" : oChildLayerOptions
+											  };
+								aoChildLayers.push(oLayerChild);
+							}
+							GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(st.oMap, oWmsLayer,
+									aoChildLayers);
+						}else{
+							st.oMap.fnRegisterLayer(idLayerToInsert, layerOptions);
+						}
 						// Move selected layer to first position of TOC
 						st.oMap.fnMoveLayer(idLayerToInsert, st.oMap
 								.fnGetTocLayersIds()[0], null, true);

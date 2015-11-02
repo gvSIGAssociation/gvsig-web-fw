@@ -1094,6 +1094,7 @@
 				"_fnSetData" : function(oData) {
 					var st = this._state;
 					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val(oData.url);
+					jQuery("#".concat(st.sId).concat("_name"), "#".concat(st.containerId)).val(oData.title);
 				}
 
 			});
@@ -1762,7 +1763,8 @@
 							        "styles_with_id" : stylesSelected.values_with_id,
 							        "allow_disable": true,
 							        "node_icon": ".whhg icon-layerorderdown",
-							        "title": st.oWMSInfo.serviceTitle
+							        "title": st.oWMSInfo.serviceTitle,
+							        "aLayers": st.oWMSInfo.layers
 						        };
 								return layerOptions;
 							}

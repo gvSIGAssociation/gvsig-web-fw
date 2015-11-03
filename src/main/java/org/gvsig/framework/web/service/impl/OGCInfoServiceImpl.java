@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -57,12 +58,14 @@ import org.gvsig.framework.web.service.OGCInfoService;
 import org.gvsig.raster.wmts.ogc.WMTSClient;
 import org.gvsig.raster.wmts.ogc.WMTSOGCLocator;
 import org.gvsig.raster.wmts.ogc.WMTSOGCManager;
+import org.gvsig.raster.wmts.ogc.struct.WMTSBoundingBox;
 import org.gvsig.raster.wmts.ogc.struct.WMTSLayer;
 import org.gvsig.raster.wmts.ogc.struct.WMTSServiceIdentification;
 import org.gvsig.raster.wmts.ogc.struct.WMTSTheme;
 import org.gvsig.raster.wmts.ogc.struct.WMTSThemes;
 import org.gvsig.raster.wmts.ogc.struct.WMTSTileMatrixSet;
 import org.gvsig.raster.wmts.ogc.struct.WMTSTileMatrixSetLink;
+import org.gvsig.remoteclient.utils.BoundaryBox;
 import org.gvsig.remoteclient.wms.WMSClient;
 import org.gvsig.remoteclient.wms.WMSLayer;
 import org.gvsig.remoteclient.wms.WMSServiceInformation;
@@ -301,8 +304,9 @@ public class OGCInfoServiceImpl implements OGCInfoService {
      * that contains important information of these styles inside our object
      * WMSStyle
      *
-     * @param serviceWMSStyles
-     * @return
+     * @param serviceWMSStyles List of styles id
+     * @return List of objects WMSSTyle, one by each style id of the parameter
+     *         serviceWMSStyles
      */
     private List<WMSStyle> createListWMSStyles(ArrayList serviceWMSStyles) {
         List<WMSStyle> styles = new ArrayList<WMSStyle>();
@@ -514,6 +518,182 @@ public class OGCInfoServiceImpl implements OGCInfoService {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * @see es.gva.dgti.gvgeoportal.service.ogc.OGCInfoService
+     * #getLayersBoundingBox(String, String, TreeSet<String>)
+     */
+    public List<String> getLayersBoundingBox(String urlServer, String typeLayer,
+            String crs, TreeSet<String> layers) {
+        List<String> boundingBox = null;
+        if("wms".equalsIgnoreCase(typeLayer)){
+            boundingBox = getWMSLayersBoundingBox(urlServer, crs, layers);
+        }else{
+            if("wmts".equalsIgnoreCase(typeLayer)){
+                // in wmts only have one layer
+                boundingBox = getWMTSLayersBoundingBox(urlServer, crs, layers.first());
+            }
+        }
+        return boundingBox;
+    }
+
+
+    /**
+     * Get the four coordinates that represent the bounding box
+     * which includes all the layers indicated for a WMS Server
+     *
+     * @param urlServer Url of the WMS server to connect and get the data
+     * @param crs CRS of the bounding box
+     * @param layers List of layers to include in the bounding box calculated
+     * @return A list of coordinates that represents the bounding box calculated
+     *         (minX, minY, maxX, maxY). null if haven't valid bounding box
+     */
+    private List<String> getWMSLayersBoundingBox(String urlServer,
+            String crs, TreeSet<String> layers) {
+        List<String> boundingBox = new ArrayList<String>();
+        double xMax = 0;
+        double xMin = 0;
+        double yMin = 0;
+        double yMax = 0;
+        BoundaryBox bbox = null;
+        try {
+            WMSClient wms = new WMSClient(urlServer);
+            wms.connect(null);
+            if(layers != null){
+                Iterator<String> iterLayers = layers.iterator();
+                // get the first element
+                WMSLayer layer = wms.getLayer(iterLayers.next());
+                if(layer != null){
+                    bbox = layer.getBbox(crs);
+                    if(bbox != null){
+                        xMax = bbox.getXmax();
+                        yMax = bbox.getYmax();
+                        xMin = bbox.getXmin();
+                        yMin = bbox.getYmin();
+                    }
+                }
+                while(iterLayers.hasNext()){
+                    layer = wms.getLayer(iterLayers.next());
+                    bbox = layer.getBbox(crs);
+                    if(bbox != null){
+                        // if getXmax is greater than xMax
+                        if (Double.compare(xMax, bbox.getXmax()) < 0){
+                            xMax = bbox.getXmax();
+                        }
+                        // if getYmax is greater than yMax
+                        if (Double.compare(yMax, bbox.getYmax()) < 0){
+                            yMax = bbox.getYmax();
+                        }
+                        // if getXmin is less than xMin
+                        if (Double.compare(xMin, bbox.getXmin()) > 0){
+                            xMin = bbox.getXmin();
+                        }
+                        // if getYmin is less than yMin
+                        if (Double.compare(yMin, bbox.getYmin()) > 0){
+                            yMin = bbox.getYmin();
+                        }
+                    }
+                }
+                if(bbox != null){
+                    boundingBox.add(String.valueOf(xMin));
+                    boundingBox.add(String.valueOf(yMin));
+                    boundingBox.add(String.valueOf(xMax));
+                    boundingBox.add(String.valueOf(yMax));
+                }
+            }
+        }
+        catch (Exception exc) {
+            // Show exception in log and create ServerGeoException which is
+            // captured on controller and puts message to ajax response
+            logger.error("Exception on getWMSLayersBoundingBox", exc);
+            throw new ServerGeoException();
+        }
+        return boundingBox;
+
+    }
+
+    /**
+     * Get the four coordinates that represent the bounding box
+     * which includes all the layers indicated for a WMTS Server
+     *
+     * @param urlServer Url of the WMTS server to connect and get the data
+     * @param crs CRS of the bounding box
+     * @param layers List of layers to include in the bounding box calculated
+     * @return A list of coordinates that represents the bounding box calculated
+     *         (minX, minY, maxX, maxY). null if haven't valid bounding box
+     */
+    private List<String> getWMTSLayersBoundingBox(String urlServer,
+            String crs, String layerId) {
+        List<String> boundingBox = new ArrayList<String>();
+        WMTSBoundingBox bBox = null;
+        try {
+            // get WMTS manager
+            WMTSOGCManager wmtsMan = WMTSOGCLocator.getManager();
+            WMTSClient wmtsClient = wmtsMan.createWMTSClient(urlServer);
+            wmtsClient.connect(true, null);
+            if(StringUtils.isNotEmpty(layerId)){
+                WMTSLayer layer = getLayerWMTSById(wmtsClient, layerId);
+                if(layer != null){
+                    // TODO
+                    // Need a list of bounding box of the layer
+                    // to calculate which is the most appropiate
+                    // WMTSBoundingBox bBox = layer.getBBox();
+                    List<WMTSTileMatrixSetLink> tileMatrixSetLink =
+                            layer.getTileMatrixSetLink();
+                    Iterator<WMTSTileMatrixSetLink> itTileMatrix =
+                            tileMatrixSetLink.iterator();
+                    while(itTileMatrix.hasNext()){
+                        WMTSTileMatrixSetLink wmtsTileMatrixSetLink =
+                                itTileMatrix.next();
+                        WMTSTileMatrixSet tileMatrixSet =
+                                wmtsTileMatrixSetLink.getTileMatrixSet();
+                        if(tileMatrixSet.getSupportedCRS().equals(crs)){
+                            bBox = tileMatrixSet.getBoundingBox();
+                            break;
+                        }
+
+                    }
+                    if(bBox != null){
+                        double[] lowerCorner = bBox.getLowerCorner();
+                        double[] upperCorner = bBox.getUpperCorner();
+
+                        boundingBox.add(String.valueOf(lowerCorner[0]));
+                        boundingBox.add(String.valueOf(lowerCorner[1]));
+                        boundingBox.add(String.valueOf(upperCorner[0]));
+                        boundingBox.add(String.valueOf(upperCorner[1]));
+                    }
+                }
+            }
+        }
+        catch (Exception exc) {
+            logger.error("Exception on getWMTSLayersBoundingBox", exc);
+            throw new ServerGeoException();
+        }
+        return boundingBox;
+
+    }
+
+    /**
+     * Get WMTSLayer by id
+     *
+     * @param wmtsClient Client that represents the server to search the layer
+     * @param layerId Id of the layer
+     * @return Object WMTSLayer that represents the layer with the id of the
+     *         parameter layerId. null if doesn't find the layer.
+     */
+    private WMTSLayer getLayerWMTSById(WMTSClient wmtsClient, String layerId){
+        // Get list of layers and check them by identifier
+        WMTSThemes layerListAsThemes = wmtsClient.getLayerListAsThemes();
+        for (int i = 0; i < layerListAsThemes.getChildCount(); i++) {
+            WMTSTheme wmtsTheme = layerListAsThemes.getChildren(i);
+            WMTSLayer layerAux = wmtsTheme.getLayer();
+            if(layerAux.getIdentifier().equals(layerId)){
+                return layerAux;
+            }
+        }
+        return null;
+    }
+
     /*******
      * CSW *
      *******/
@@ -721,4 +901,5 @@ public class OGCInfoServiceImpl implements OGCInfoService {
         }
         return cswResults;
     }
+
 }

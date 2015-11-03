@@ -81,9 +81,10 @@
 
 			/**
 			 * Default debug message function.
+			 * @param messsage String to show on console
 			 */
 			"debug" : function(message) {
-				this._debug();
+				this._debug(message);
 			},
 
 			/**

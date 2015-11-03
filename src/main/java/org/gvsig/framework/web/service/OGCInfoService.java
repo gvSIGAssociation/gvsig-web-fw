@@ -63,6 +63,20 @@ public interface OGCInfoService {
             TreeSet<String> crs, boolean useCrsSelected);
 
     /**
+     * Get the four coordinates that represent the bounding box which includes
+     * all the layers indicated
+     *
+     * @param urlServer Url of the server to connect and get the data
+     * @param typeLayer Type of the layer (wms / wmts)
+     * @param crs CRS of the bounding box
+     * @param layers List of layers to include in the bounding box calculated
+     * @return A list of coordinates that represents the bounding box calculated
+     *        (minX, minY, maxX, maxY). null if haven't valid bounding box
+     */
+    public List<String> getLayersBoundingBox(String urlServer, String typeLayer,
+            String crs, TreeSet<String> layers);
+
+    /**
      * Get supported crs of the server wmts indicated by urlServerWMTS parameter
      *
      * @param urlServerWMTS URL to access to WMTS server
@@ -138,5 +152,4 @@ public interface OGCInfoService {
      * @return the result of the indicated position.
      */
     public CSWSingleResult getCswSingleRecord(CSWResult cswResults, int position);
-
 }

@@ -120,7 +120,7 @@ public class OGCInfoController {
      * Get supported crs of WMTS server indicated by url parameter
      *
      * @param request the {@code HttpServletRequest}.
-     * @return ResponseEntity with wmtsInfo
+     * @return List of crs supported
      */
     @RequestMapping(params = "findSupportedCrsWmts",
             headers = "Accept=application/json",
@@ -135,6 +135,42 @@ public class OGCInfoController {
             listCrs = ogcInfoServ.getCRSSupportedByWMTS(urlServer);
         }
         return new ResponseEntity<List<String>>(listCrs, HttpStatus.OK);
+    }
+
+
+    /**
+     * Get bounding box for a layers specified.
+     * The result can be null if the service haven't defined the values
+     * of bounding box.
+     *
+     * @param request the {@code HttpServletRequest}.
+     * @return ResponseEntity with wmtsInfo
+     */
+    @RequestMapping(value = "/getLayerBoundingBox",
+            headers = "Accept=application/json",
+            produces = { "application/json; charset=UTF-8" })
+    @ResponseBody
+    public ResponseEntity<List<String>> getLayersBoundingBoxByAjax(
+            WebRequest request) {
+
+        List<String> boundingBox = null;
+
+        String urlServer = request.getParameter("url");
+        String typeLayer = request.getParameter("type");
+        String crs = request.getParameter("crs");
+        String layers = request.getParameter("layers");
+
+        if (StringUtils.isNotEmpty(crs) && StringUtils.isNotEmpty(urlServer)
+                && StringUtils.isNotEmpty(typeLayer)
+                && StringUtils.isNotEmpty(layers)) {
+
+            TreeSet<String> listLayers = new TreeSet<String>();
+            Collections.addAll(listLayers, layers.split(","));
+            boundingBox = ogcInfoServ.getLayersBoundingBox(urlServer,
+                    typeLayer, crs, listLayers);
+        }
+
+        return new ResponseEntity<List<String>>(boundingBox, HttpStatus.OK);
     }
 
     /**

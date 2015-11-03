@@ -549,7 +549,8 @@
 								"opacity": "1.0",
 								"allow_disable": true,
 								"node_icon": ".whhg icon-layerorderdown",
-								"title": st.oWMSInfo.serviceTitle
+								"title": st.oWMSInfo.serviceTitle,
+								"aLayers": st.oWMSInfo.layers
 							};
 							return layerOptions;
 						}

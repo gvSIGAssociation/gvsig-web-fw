@@ -22,9 +22,11 @@
  */
 package org.gvsig.framework.web.service;
 
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.TreeSet;
 
+import org.gvsig.catalog.exceptions.NotSupportedVersionException;
 import org.gvsig.framework.web.ogc.CSWCriteria;
 import org.gvsig.framework.web.ogc.CSWResult;
 import org.gvsig.framework.web.ogc.CSWSingleResult;
@@ -74,7 +76,8 @@ public interface OGCInfoService {
 
     /**
      * Obtains the results of the search performed in the catalog indicated by
-     * "cswUrl", using the filter criteria of "cswCriteria".
+     * "cswUrl", using the filter criteria of "cswCriteria". Only supports 2.0.2
+     * version.
      * <p/>
      * Criterias:
      * <p/>
@@ -118,12 +121,17 @@ public interface OGCInfoService {
      *
      * @param cswUrl url of csw server.
      * @param cswCriteria criterias of search.
-     * @return results in CSWResult object.
+     * @return results in CSWResult object. * @throws
+     *         NotSupportedVersionException
+     * @throws URISyntaxException
+     * @throws NullPointerException
      */
-    public CSWResult getCswRecords(String cswUrl, CSWCriteria cswCriteria);
+    public CSWResult getCswRecords(String cswUrl, CSWCriteria cswCriteria)
+            throws NotSupportedVersionException, URISyntaxException,
+            NullPointerException;
 
     /**
-     * Obtains the result of the indicated positionO
+     * Obtains the result of the indicated position.
      *
      * @param cswResults the results.
      * @param position the index.

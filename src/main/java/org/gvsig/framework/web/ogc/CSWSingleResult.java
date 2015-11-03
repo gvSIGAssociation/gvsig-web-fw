@@ -38,12 +38,15 @@ public class CSWSingleResult {
 
     private String image;
 
-    private String wmsUrl;
+    private String serviceUrl;
+
+    private String serviceType;
 
     @Override
     public String toString() {
         return "title=" + title + ", abstract=" + abstract_ + ", image="
-                + image + ", wmsUrl=" + wmsUrl;
+                + image + ", serviceUrl=" + serviceUrl + ", serviceType="
+                + serviceType;
     }
 
 }

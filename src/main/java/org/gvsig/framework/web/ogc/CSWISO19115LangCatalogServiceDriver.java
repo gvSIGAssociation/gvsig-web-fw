@@ -52,7 +52,7 @@ public class CSWISO19115LangCatalogServiceDriver extends
      * @param uri Server URI
      * @param language. Can be null. By default english.
      * @return Node with the server answer.
-     * @throws NotSupportedVersionException
+     * @throws NotSupportedVersionException only supports 2.0.2 version.
      */
     public DiscoveryServiceCapabilities getCapabilities(URI uri, String language)
             throws NotSupportedVersionException {
@@ -96,6 +96,10 @@ public class CSWISO19115LangCatalogServiceDriver extends
                         CSWAbstractMessages.getHTTPGETCapabilitiesLower(), 0);
                 capabilities = parser.parse((XMLNode) nodes.toArray()[0]);
             }
+        }
+        String version = capabilities.getVersion();
+        if (version != null && !version.equalsIgnoreCase("2.0.2")) {
+            throw new NotSupportedVersionException();
         }
         // If the version can be retrieved the CSWAbstractMessages object
         // cant be created

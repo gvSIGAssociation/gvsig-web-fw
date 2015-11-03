@@ -536,7 +536,9 @@ public class OGCInfoServiceImpl implements OGCInfoService {
      * @see es.gva.dgti.gvgeoportal.service.ogc.OGCInfoService
      * #getCswRecords(String, CSWCriteria)
      */
-    public CSWResult getCswRecords(String cswUrl, CSWCriteria cswCriteria) {
+    public CSWResult getCswRecords(String cswUrl, CSWCriteria cswCriteria)
+            throws NotSupportedVersionException, URISyntaxException,
+            NullPointerException {
         // Check if services gvSIG are initialized
         if (!librariesInitialized) {
             LibrariesInitializer libs = new DefaultLibrariesInitializer();
@@ -546,166 +548,176 @@ public class OGCInfoServiceImpl implements OGCInfoService {
 
         URI uri = null;
         CSWResult cswResults = new CSWResult();
-        try {
-            uri = new URI(cswUrl);
-            // Creates driver "CSW/ISO 19115"
-            CSWISO19115LangCatalogServiceDriver iCatalogServiceDriver = new CSWISO19115LangCatalogServiceDriver();
-            @SuppressWarnings("unused")
-            DiscoveryServiceCapabilities getCapabilities = iCatalogServiceDriver
-                    .getCapabilities(uri, "spa");
+        uri = new URI(cswUrl);
+        // Creates driver "CSW/ISO 19115"
+        CSWISO19115LangCatalogServiceDriver iCatalogServiceDriver = new CSWISO19115LangCatalogServiceDriver();
+        @SuppressWarnings("unused")
+        DiscoveryServiceCapabilities getCapabilities = iCatalogServiceDriver
+                .getCapabilities(uri, "spa");
 
-            CatalogClient catalogClient = new CatalogClient(cswUrl, null,
-                    iCatalogServiceDriver);
+        CatalogClient catalogClient = new CatalogClient(cswUrl, null,
+                iCatalogServiceDriver);
 
-            // Query
-            CatalogQuery query = catalogClient.createNewQuery();
-            String title = cswCriteria.getTitle();
-            if (title != null && !title.isEmpty()) {
-                query.setTitle(title);
-            }
-            String abstract_ = cswCriteria.getAbstract_();
-            if (abstract_ != null && !abstract_.isEmpty()) {
-                query.setAbstract(abstract_);
-            }
-            // The dates must have the following format: "yyyy-MM-dd"
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        // Query
+        CatalogQuery query = catalogClient.createNewQuery();
+        String title = cswCriteria.getTitle();
+        if (title != null && !title.isEmpty()) {
+            query.setTitle(title);
+        }
+        String abstract_ = cswCriteria.getAbstract_();
+        if (abstract_ != null && !abstract_.isEmpty()) {
+            query.setAbstract(abstract_);
+        }
+        // The dates must have the following format: "yyyy-MM-dd"
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-            Calendar dateFrom = cswCriteria.getDateFrom();
-            if (dateFrom != null) {
-                String dateFromString = sdf.format(dateFrom.getTime());
-                query.setDateFrom(dateFromString);
-            }
-            Calendar dateTo = cswCriteria.getDateTo();
-            if (dateTo != null) {
-                String dateToString = sdf.format(dateTo.getTime());
-                query.setDateTo(dateToString);
-            }
+        Calendar dateFrom = cswCriteria.getDateFrom();
+        if (dateFrom != null) {
+            String dateFromString = sdf.format(dateFrom.getTime());
+            query.setDateFrom(dateFromString);
+        }
+        Calendar dateTo = cswCriteria.getDateTo();
+        if (dateTo != null) {
+            String dateToString = sdf.format(dateTo.getTime());
+            query.setDateTo(dateToString);
+        }
 
-            // Executed query
-            int startAt;
-            if (cswCriteria.getStartAt() <= 0) {
-                startAt = 1;
-            }
-            else {
-                startAt = cswCriteria.getStartAt();
-            }
-            GetRecordsReply records = iCatalogServiceDriver.getRecords(uri,
-                    query, startAt);
+        // Executed query
+        int startAt;
+        if (cswCriteria.getStartAt() <= 0) {
+            startAt = 1;
+        }
+        else {
+            startAt = cswCriteria.getStartAt();
+        }
+        GetRecordsReply records = iCatalogServiceDriver.getRecords(uri, query,
+                startAt);
 
-            // Returned results.
-            // Returned records. Maximum 10.
-            int retrievedRecords = records.getRetrievedRecordsNumber();
-            cswResults.setRetrievedRecords(retrievedRecords);
-            // Total found records.
-            cswResults.setTotalRecords(records.getRecordsNumber());
-            logger.debug(cswResults.toString());
+        // Returned results.
+        // Returned records. Maximum 10.
+        int retrievedRecords = records.getRetrievedRecordsNumber();
+        cswResults.setRetrievedRecords(retrievedRecords);
+        // Total found records.
+        cswResults.setTotalRecords(records.getRecordsNumber());
+        logger.debug(cswResults.toString());
 
-            // For every result returns title, abstract, image and first wms url
-            // in
-            // UTF-8.
-            int index = 0;
-            if (retrievedRecords != 0) {
-                List<CSWSingleResult> cswSingleRecordList = cswResults
-                        .getResults();
-                while (index < retrievedRecords) {
-                    Record record = records.getRecordAt(index);
-                    CSWSingleResult cswSingleResult = new CSWSingleResult();
+        // For every result returns title, abstract, image and first wms url in
+        // UTF-8.
+        int index = 0;
+        if (retrievedRecords != 0) {
+            List<CSWSingleResult> cswSingleRecordList = cswResults.getResults();
+            while (index < retrievedRecords) {
+                Record record = records.getRecordAt(index);
+                CSWSingleResult cswSingleResult = new CSWSingleResult();
 
-                    // Returned title
-                    String returnedTitle = record.getTitle();
-                    if (returnedTitle != null) {
-                        String titleUtf8 = new String(
-                                returnedTitle.getBytes(Charsets.ISO_8859_1),
-                                Charsets.UTF_8);
-                        cswSingleResult.setTitle(titleUtf8);
-                    }
+                // Returned title
+                String returnedTitle = record.getTitle();
+                if (returnedTitle != null) {
+                    String titleUtf8 = new String(
+                            returnedTitle.getBytes(Charsets.ISO_8859_1),
+                            Charsets.UTF_8);
+                    cswSingleResult.setTitle(titleUtf8);
+                }
 
-                    // Returned abstract
-                    String returnedAbstract = record.getAbstract_();
-                    if (returnedAbstract != null) {
-                        String abstract_Utf8 = new String(
-                                returnedAbstract.getBytes(Charsets.ISO_8859_1),
-                                Charsets.UTF_8);
-                        cswSingleResult.setAbstract_(abstract_Utf8);
-                    }
+                // Returned abstract
+                String returnedAbstract = record.getAbstract_();
+                if (returnedAbstract != null) {
+                    String abstract_Utf8 = new String(
+                            returnedAbstract.getBytes(Charsets.ISO_8859_1),
+                            Charsets.UTF_8);
+                    cswSingleResult.setAbstract_(abstract_Utf8);
+                }
 
-                    XMLNode node = record.getNode();
+                XMLNode node = record.getNode();
 
-                    // Returned file identifier
-                    XMLNode fileIdentifierNode = node
-                            .searchNode("fileIdentifier->CharacterString");
-                    if (fileIdentifierNode != null
-                            && fileIdentifierNode.getText() != null) {
-                        String fileIdentifierUtf8 = new String(
-                                fileIdentifierNode.getText().getBytes(
-                                        Charsets.ISO_8859_1), Charsets.UTF_8);
-                        cswSingleResult.setFileIdentifier(fileIdentifierUtf8);
-                    }
+                // Returned file identifier
+                XMLNode fileIdentifierNode = node
+                        .searchNode("fileIdentifier->CharacterString");
+                if (fileIdentifierNode != null
+                        && fileIdentifierNode.getText() != null) {
+                    String fileIdentifierUtf8 = new String(fileIdentifierNode
+                            .getText().getBytes(Charsets.ISO_8859_1),
+                            Charsets.UTF_8);
+                    cswSingleResult.setFileIdentifier(fileIdentifierUtf8);
+                }
 
-                    // Returned image
-                    XMLNode imageNode = node
-                            .searchNode("identificationInfo->SV_ServiceIdentification->graphicOverview->MD_BrowseGraphic->fileName->CharacterString");
+                // Returned image
+                XMLNode imageNode = node
+                        .searchNode("identificationInfo->SV_ServiceIdentification->graphicOverview->MD_BrowseGraphic->fileName->CharacterString");
+                if (imageNode != null && imageNode.getText() != null) {
+                    String imageUtf8 = new String(imageNode.getText().getBytes(
+                            Charsets.ISO_8859_1), Charsets.UTF_8);
+                    cswSingleResult.setImage(imageUtf8);
+                }
+                else {
+                    imageNode = node
+                            .searchNode("identificationInfo->MD_DataIdentification->graphicOverview->MD_BrowseGraphic->fileName->CharacterString");
                     if (imageNode != null && imageNode.getText() != null) {
                         String imageUtf8 = new String(imageNode.getText()
                                 .getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
                         cswSingleResult.setImage(imageUtf8);
                     }
-                    else {
-                        imageNode = node
-                                .searchNode("identificationInfo->MD_DataIdentification->graphicOverview->MD_BrowseGraphic->fileName->CharacterString");
-                        if (imageNode != null && imageNode.getText() != null) {
-                            String imageUtf8 = new String(imageNode.getText()
-                                    .getBytes(Charsets.ISO_8859_1),
-                                    Charsets.UTF_8);
-                            cswSingleResult.setImage(imageUtf8);
-                        }
-                    }
-
-                    // Returned first wms url
-                    XMLNode[] wmsUrlNodes = node
-                            .searchMultipleNode("distributionInfo->MD_Distribution->transferOptions->MD_DigitalTransferOptions->onLine->CI_OnlineResource");
-                    boolean containsWmsUrl = false;
-                    int i = 0;
-                    while (i < wmsUrlNodes.length && !containsWmsUrl) {
-                        XMLNode xmlNode = wmsUrlNodes[i];
-                        i = i + 1;
-                        XMLNode protocolNode = xmlNode
-                                .searchNode("protocol->CharacterString");
-                        if (protocolNode != null
-                                && protocolNode.getText() != null) {
-                            String protocolUtf8 = new String(protocolNode
-                                    .getText().getBytes(Charsets.ISO_8859_1),
-                                    Charsets.UTF_8);
-                            if ((protocolUtf8.toLowerCase())
-                                    .contains("ogc:wms")) {
-                                containsWmsUrl = true;
-                                XMLNode wmsUrlNode = xmlNode
-                                        .searchNode("linkage->URL");
-                                if (wmsUrlNode != null
-                                        && wmsUrlNode.getText() != null) {
-                                    String wmsUrlUtf8 = new String(wmsUrlNode
-                                            .getText().getBytes(
-                                                    Charsets.ISO_8859_1),
-                                            Charsets.UTF_8);
-                                    cswSingleResult.setWmsUrl(wmsUrlUtf8);
-                                }
-                            }
-                        }
-                    }
-
-                    cswSingleRecordList.add(cswSingleResult);
-                    logger.debug("Data " + index + ":: "
-                            + cswSingleResult.toString());
-
-                    index = index + 1;
                 }
+
+                // Returned first wms or wmts url
+                XMLNode[] urlNodes = node
+                        .searchMultipleNode("distributionInfo->MD_Distribution->transferOptions->MD_DigitalTransferOptions->onLine->CI_OnlineResource");
+                boolean containsServiceUrl = false;
+                int i = 0;
+                while (i < urlNodes.length && !containsServiceUrl) {
+                    XMLNode xmlNode = urlNodes[i];
+                    i = i + 1;
+                    XMLNode protocolNode = xmlNode
+                            .searchNode("protocol->CharacterString");
+                    XMLNode urlNode = xmlNode.searchNode("linkage->URL");
+                    String urlUtf8 = null;
+                    if (urlNode != null && urlNode.getText() != null) {
+                        urlUtf8 = new String(urlNode.getText().getBytes(
+                                Charsets.ISO_8859_1), Charsets.UTF_8);
+                    }
+                    if (protocolNode != null && protocolNode.getText() != null) {
+                        String protocolUtf8 = new String(protocolNode.getText()
+                                .getBytes(Charsets.ISO_8859_1), Charsets.UTF_8);
+                        if ((protocolUtf8.toLowerCase()).contains("ogc:wms")) {
+                            containsServiceUrl = true;
+                            cswSingleResult.setServiceUrl(urlUtf8);
+                            cswSingleResult.setServiceType("wms");
+                        }
+                    }
+                    else if (urlUtf8 != null
+                            && (urlUtf8.toLowerCase()).contains("service=wms")) {
+                        containsServiceUrl = true;
+                        String[] parts = urlUtf8.split("\\?");
+                        String part1 = parts[0];
+                        if (part1 != null && !part1.isEmpty()) {
+                            cswSingleResult.setServiceUrl(part1);
+                        }
+                        else {
+                            cswSingleResult.setServiceUrl(urlUtf8);
+                        }
+                        cswSingleResult.setServiceType("wms");
+                    }
+                    else if (urlUtf8 != null
+                            && (urlUtf8.toLowerCase()).contains("service=wmts")) {
+                        containsServiceUrl = true;
+                        String[] parts = urlUtf8.split("\\?");
+                        String part1 = parts[0];
+                        if (part1 != null && !part1.isEmpty()) {
+                            cswSingleResult.setServiceUrl(part1);
+                        }
+                        else {
+                            cswSingleResult.setServiceUrl(urlUtf8);
+                        }
+                        cswSingleResult.setServiceType("wmts");
+                    }
+                }
+
+                cswSingleRecordList.add(cswSingleResult);
+                logger.debug("Data " + index + ":: "
+                        + cswSingleResult.toString());
+
+                index = index + 1;
             }
-        }
-        catch (NotSupportedVersionException ex) {
-            logger.warn(ex.getLocalizedMessage(), ex);
-        }
-        catch (URISyntaxException ex) {
-            logger.warn(ex.getLocalizedMessage(), ex);
         }
         return cswResults;
     }

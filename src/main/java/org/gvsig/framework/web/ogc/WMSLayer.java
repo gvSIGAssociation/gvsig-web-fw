@@ -24,8 +24,14 @@ package org.gvsig.framework.web.ogc;
 
 import java.util.List;
 
+/**
+ * Class that represents a WMS Layer
+ */
 public class WMSLayer extends Layer {
 
+    /**
+     * List of {@link WMSStyle} of the layer
+     */
     private List<WMSStyle> styles;
 
 }

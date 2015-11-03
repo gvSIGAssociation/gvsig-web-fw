@@ -25,7 +25,7 @@
 var GvNIX_Map_User_Layers_Tool;
 
 (function(jQuery, window, document) {
-	GvNIX_Map_Leaflet.CONTROLS.user_layers =  function (oMap,sId,options) {
+	GvNIX_Map_Leaflet.CONTROLS.user_layers = function(oMap, sId, options) {
 		if (!this instanceof GvNIX_Map_Leaflet.CONTROLS.user_layers) {
 			alert("Warning: GvNIX_Map_Leaflet user_layers control must be initialised with the keyword 'new'");
 		}
@@ -69,7 +69,7 @@ var GvNIX_Map_User_Layers_Tool;
 			}
 
 			// Register user layer tab container
-			var dialogId =  st.sId.concat('_dialog');
+			var dialogId = st.sId.concat('_dialog');
 			// get tab container, first result of tool container
 			var tabContainer = jQuery("div","#".concat(st.sId).concat("_container")).get(0);
 			var oTabContainer = jQuery(tabContainer);

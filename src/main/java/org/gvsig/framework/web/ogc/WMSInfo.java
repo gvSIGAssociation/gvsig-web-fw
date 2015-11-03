@@ -28,30 +28,70 @@ import java.util.TreeSet;
 
 import org.gvnix.util.fancytree.TreeNode;
 
+/**
+ * Class with information of WMS service
+ */
 public class WMSInfo {
 
+    /**
+     * Tree that represent the layers of WMS service
+     */
     private List<TreeNode> layersTree;
 
+    /**
+     * List with selected crs
+     */
     private TreeSet<String> crsSelected;
 
+    /**
+     * Version of the service WMS
+     */
     private String version;
 
+    /**
+     * Represents the image format selected
+     */
     private String formatSelected;
 
+    /**
+     * List of supported formats
+     */
     private TreeSet<String> formatsSupported;
 
+    /**
+     * List of supported crs
+     */
     private TreeSet<String> crsSupported;
 
+    /**
+     * Service url
+     */
     private String serviceUrl;
 
+    /**
+     * Service name
+     */
     private String serviceName;
 
+    /**
+     * Service abstract
+     */
     private String serviceAbstract;
 
+    /**
+     * Service title
+     */
     private String serviceTitle;
 
+    /**
+     * Id used for set id to pattern layer selected
+     */
     private int id;
 
+    /**
+     * Map of the layers where the key represents the identifier of each layer
+     * and the value is {@link WMSLayer} object
+     */
     private Map<String, WMSLayer> layers;
 
 }

@@ -626,6 +626,10 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             String crs, String layerId) {
         List<String> boundingBox = new ArrayList<String>();
         WMTSBoundingBox bBox = null;
+        String[] crsSplit = crs.split(":");
+        String pattern = "(.*)(:?)".concat(crsSplit[0])
+                .concat("((:)(.*)(:)").concat(crsSplit[1])
+                .concat("|(:)").concat(crsSplit[1]).concat(")");
         try {
             // get WMTS manager
             WMTSOGCManager wmtsMan = WMTSOGCLocator.getManager();
@@ -647,7 +651,9 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                                 itTileMatrix.next();
                         WMTSTileMatrixSet tileMatrixSet =
                                 wmtsTileMatrixSetLink.getTileMatrixSet();
-                        if(tileMatrixSet.getSupportedCRS().equals(crs)){
+                        String supportedCRS = tileMatrixSet.getSupportedCRS();
+                        if(supportedCRS.equals(crs) ||
+                                supportedCRS.matches(pattern)){
                             bBox = tileMatrixSet.getBoundingBox();
                             break;
                         }

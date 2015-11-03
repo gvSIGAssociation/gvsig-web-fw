@@ -23,13 +23,24 @@
 package org.gvsig.framework.web.ogc;
 
 import java.util.TreeSet;
-
+/**
+ * Class that represents a Layer
+ */
 public class Layer {
 
+    /**
+     * Layer name
+     */
     private String name;
 
+    /**
+     * List of crs supported by layer
+     */
     private TreeSet<String> crs;
 
+    /**
+     * Layer title
+     */
     private String title;
 
 }

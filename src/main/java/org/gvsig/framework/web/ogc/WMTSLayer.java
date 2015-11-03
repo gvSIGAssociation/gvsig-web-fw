@@ -24,12 +24,26 @@ package org.gvsig.framework.web.ogc;
 
 import java.util.TreeSet;
 
+import org.gvsig.raster.wmts.ogc.struct.WMTSTileMatrixSet;
+
+/**
+ * Class that represents WMTS Layer
+ */
 public class WMTSLayer extends Layer {
 
+    /**
+     * List of supported formats
+     */
     private TreeSet<String> formatsSupported;
 
+    /**
+     * Represents the image format selected
+     */
     private String formatSelected;
 
+    /**
+     * List of {@link WMTSTileMatrixSet} id that supports the crs selected
+     */
     private TreeSet<String> tileMatrixSelected;
 
 }

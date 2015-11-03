@@ -23,13 +23,14 @@
 
 (function(jQuery, window, document) {
 
-	GvNIX_Map_Leaflet.userlayers_tabscontainer = function(sId, containerId, oMap, aCrs, options) {
+	GvNIX_Map_Leaflet.userlayers_tabscontainer = function(sId, containerId,
+			oMap, aCrs, options) {
 		// Check that we are a new instance
-		if (!this instanceof GvNIX_Map_Leaflet.userlayers_tabscontainer ) {
+		if (!this instanceof GvNIX_Map_Leaflet.userlayers_tabscontainer) {
 			alert("Warning: GvNIX_Map_Leaflet userlayers tabscontainer  must be initialised with the keyword 'new'");
 		}
 
-		this.s = options;//jQuery.extend({}, this._default_options, options);
+		this.s = options;
 
 		// Set this group _state attributes to those passed by the parameters
 		this._state = {
@@ -98,225 +99,290 @@
 					var divTabs = jQuery("#".concat(st.sId));
 					divTabs.prepend(headTabs);
 
+		},
 
-				},
+		/**
+		 * Create and register the tab into the tool
+		 *
+		 * @param sId
+		 *            Layer tab id
+		 * @param container
+		 *            Container id
+		 * @param aCrs
+		 *            Array of crs
+		 * @param options
+		 *            Layer tab options
+		 */
+		"_fnRegisterUserLayerTab" : function(sId, container, aCrs, options) {
+			this.__fnRegisterUserLayerTab(sId, container, aCrs, options);
+		},
 
-				/**
-				 * Create and register the tab into the tool
-				 */
-				"_fnRegisterUserLayerTab" : function(sId, container, aCrs, options) {
-					this.__fnRegisterUserLayerTab(sId, container, aCrs, options);
-				},
+		/**
+		 * Create and register the tab into the too
+		 *
+		 * @param sId
+		 *            Layer tab id
+		 * @param container
+		 *            Container id
+		 * @param aCrs
+		 *            Array of crs
+		 * @param options
+		 *            Layer tab options
+		 */
+		"__fnRegisterUserLayerTab" : function(sId, container, aCrs, options) {
+			var sUserLayerTabType = options.type;
 
-				/**
-				 * Create and register the tab into the too
-				 */
-				"__fnRegisterUserLayerTab" : function(sId, container, aCrs, options) {
-					var sUserLayerTabType = options.type;
+			if (sUserLayerTabType == "Base") {
+				this.debug("ERROR: 'Base' tool is not registrable");
+				return;
+			}
+			// Get class that represents the user layer tab
+			var oUserLayerTabClass = GvNIX_Map_Leaflet.USERLAYERTAB[sUserLayerTabType];
+			if (!oUserLayerTabClass) {
+				this.debug("ERROR: '" + oUserLayerTabClass + "' user layer tab type not found");
+				return;
+			}
+			var newUserLayerTab = new oUserLayerTabClass(sId, container, aCrs, options);
+			if (!newUserLayerTab) {
+				this.debug("ERROR: '" + sId + "': user layer tab not created");
+				return;
+			}
+			// store into the tool
+			this._state.aUserLayerTabs[sId] = newUserLayerTab;
+			this._state.aTabsRegistered.push(options.type);
+		},
 
-					if (sUserLayerTabType == "Base") {
-						this.debug("ERROR: 'Base' tool is not registrable");
-						return;
-					}
-					// Get class that represents the user layer tab
-					var oUserLayerTabClass = GvNIX_Map_Leaflet.USERLAYERTAB[sUserLayerTabType];
-					if (!oUserLayerTabClass) {
-						this.debug("ERROR: '" + oUserLayerTabClass + "' user layer tab type not found");
-						return;
-					}
-					var newUserLayerTab = new oUserLayerTabClass(sId, container, aCrs, options);
-					if (!newUserLayerTab) {
-						this.debug("ERROR: '" + sId + "': user layer tab not created");
-						return;
-					}
-					// store into the tool
-					this._state.aUserLayerTabs[sId] = newUserLayerTab;
-					this._state.aTabsRegistered.push(options.type);
-				},
+		/**
+		 * Call function clean of each tab
+		 */
+		"fnRestoreTabsElements" : function() {
+			this._fnRestoreTabsElements();
+		},
 
-				/**
-				 * Call function clean of each tab
-				 */
-				"fnRestoreTabsElements" : function(){
-					this._fnRestoreTabsElements();
-				},
+		/**
+		 * La función de extinción de cada ficha
+		 */
+		"_fnRestoreTabsElements" : function() {
+			var st = this._state;
+			for (userTabs in st.aUserLayerTabs) {
+				var tab = st.aUserLayerTabs[userTabs];
+				tab.fnCleanUserLayerTab();
+			}
+		},
 
-				/**
-				 * La función de extinción de cada ficha
-				 */
-				"_fnRestoreTabsElements" : function(){
-					var st = this._state;
-					for(userTabs in st.aUserLayerTabs){
-						var tab = st.aUserLayerTabs[userTabs];
-						tab.fnCleanUserLayerTab();
-					}
-				},
+		/**
+		 * Set data into the tab indicated and put the focus in this tab
+		 *
+		 * @param tabType
+		 *            Tab type that identify the tab where set the data
+		 * @param oDataToSet
+		 *            Object with data of the server and layers to set into tab
+		 */
+		"fnSetDataToTab" : function(tabType, oDataToSet) {
+			this._fnSetDataToTab(tabType, oDataToSet);
+		},
 
-				/**
-				 * Set data into the tab indicated and put the focus in
-				 * this tab
-				 */
-				"fnSetDataToTab" : function(tabType, oDataToSet){
-					this._fnSetDataToTab(tabType, oDataToSet);
-				},
-
-				/**
-				 * Set data into the tab indicated and put the focus in
-				 * this tab
-				 */
-				"_fnSetDataToTab" : function(tabType, oDataToSet){
-					var st = this._state;
-					// search and set the data to the tab indicated by layerType
-					for(userTabs in st.aUserLayerTabs){
-						var tab = st.aUserLayerTabs[userTabs];
-						if(tab.fnGetTabType() === tabType){
-							tab.fnSetData(oDataToSet);
-							this.fnSetFocusTab(tabType);
-							break;
-						}
-					}
-				},
-
-				/**
-				 * Set focus in tab indicated
-				 */
-				"fnSetFocusTab" : function(tabType){
-					this._fnSetFocusTab(tabType);
-				},
-
-				/**
-				 * Set focus in tab indicated
-				 */
-				"_fnSetFocusTab" : function(tabType){
-					var st = this._state;
-					st.oTabs.tabs({
-						  active: st.aTabsRegistered.indexOf(tabType)
-					});
-				},
-
-				/**
-				 * Get tab id
-				 */
-				"fnGetId" : function(){
-					return this._fnGetId();
-				},
-
-				/**
-				 * Get tab id
-				 */
-				"_fnGetId" : function(){
-					var st = this._state;
-					return st.sId;
-				},
-
-				/**
-				 * Create tab panel. Register the button connect of each tab
-				 * and create the wizard of tab wms if is necessary
-				 */
-				"fnCreateTabs" : function(){
-					this._fnCreateTabs();
-				},
-
-				/**
-				 * Create tab panel. Register the button connect of each tab
-				 * and create the wizard of tab wms if is necessary
-				 */
-				"_fnCreateTabs" : function(){
-					var st = this._state;
-					// Generate jQuery tabs
-					var jQueryContainerId = null;
-					if(st.containerId){
-						jQueryContainerId = "#".concat(st.containerId);
-					}
-					st.oTabs = jQuery("#".concat(st.sId), jQueryContainerId).tabs();
-
-					// Register events to buttons connect and create and
-					// register wizard for each tab if is necessary
-					for(userTabs in st.aUserLayerTabs){
-						var tab = st.aUserLayerTabs[userTabs];
-						if(tab.fnCreateWizard){
-							tab.fnCreateWizard();
-						}
-						// register events to buttons must register after create
-						// the wizard or will be deleted
-						tab.fnRegisterButtonsAction();
-						if(tab._fnAddChangeEventToFileInput){
-							tab._fnAddChangeEventToFileInput();
-						}
-
-					}
-				},
-
-				/**
-				 * Get the tab that has the focus
-				 */
-				"fnGetFocusedTab" : function(){
-					return this._fnGetFocusedTab();
-				},
-
-				/**
-				 * Get the tab that has the focus
-				 */
-				"_fnGetFocusedTab" : function(){
-					var st = this._state;
-					// Get id of the div which tab is selected
-					var jQueryContainerId = "#".concat(st.sId);
-					if(st.containerId){
-						jQueryContainerId = "#".concat(st.containerId);
-					}
-					var tabId = jQuery(".ui-tabs-active", jQueryContainerId).attr("aria-controls");
-					return st.aUserLayerTabs[tabId];
-				},
-
-				/**
-				 * Get selected layers of the tab specified by parameter
-				 * Return false if an error has occurred
-				 */
-				"fnGetSelectedLayers" : function(oUserLayerTabSel){
-					return this._fnGetSelectedLayers(oUserLayerTabSel);
-				},
-
-				/**
-				 * Get selected layers of the tab specified by parameter
-				 * Return false if an error has occurred
-				 */
-				"_fnGetSelectedLayers" : function(oUserLayerTabSel){
-					//Get selected layers
-					return oUserLayerTabSel.fnGetSelectedLayers();
-				},
-
-				/**
-				 * Create an array with the information of selected layers
-				 * necessary to add them to a map
-				 */
-				"fnCreateLayersOptions" : function(oUserLayerTabSel, layersSelected){
-					return this._fnCreateLayersOptions(oUserLayerTabSel, layersSelected);
-				},
-
-				/**
-				 * Create an array with the information of selected layers
-				 * necessary to add them to a map
-				 */
-				"_fnCreateLayersOptions" : function(oUserLayerTabSel, layersSelected){
-					return oUserLayerTabSel.fnCreateLayersOptions(layersSelected)
-
-				},
-
-				/**
-				 * Create or get layer id for each layer defined in layerOptions
-				 */
-				"fnGetLayerId" : function(oUserLayerTabSel, layerOptions){
-					return this._fnGetLayerId(oUserLayerTabSel, layerOptions);
-				},
-
-				/**
-				 * Create or get layer id for each layer defined in layerOptions
-				 */
-				"_fnGetLayerId" : function(oUserLayerTabSel, layerOptions){
-					return oUserLayerTabSel.fnGetLayerId(layerOptions)
-
+		/**
+		 * Set data into the tab indicated and put the focus in this tab
+		 *
+		 * @param tabType
+		 *            Tab type that identify the tab where set the data
+		 * @param oDataToSet
+		 *            Object with data of the server and layers to set into tab
+		 */
+		"_fnSetDataToTab" : function(tabType, oDataToSet) {
+			var st = this._state;
+			// search and set the data to the tab indicated by layerType
+			for (userTabs in st.aUserLayerTabs) {
+				var tab = st.aUserLayerTabs[userTabs];
+				if (tab.fnGetTabType() === tabType) {
+					tab.fnSetData(oDataToSet);
+					this.fnSetFocusTab(tabType);
+					break;
 				}
-	};
+			}
+		},
 
+		/**
+		 * Set focus in tab indicated
+		 *
+		 * @param tabType
+		 *            Tab type that identify the tab to set the focus
+		 */
+		"fnSetFocusTab" : function(tabType) {
+			this._fnSetFocusTab(tabType);
+		},
+
+		/**
+		 * Set focus in tab indicated
+		 *
+		 * @param tabType
+		 *            Tab type that identify the tab to set the focus
+		 */
+		"_fnSetFocusTab" : function(tabType) {
+			var st = this._state;
+			st.oTabs.tabs({
+				active : st.aTabsRegistered.indexOf(tabType)
+			});
+		},
+
+		/**
+		 * Get tab id
+		 */
+		"fnGetId" : function() {
+			return this._fnGetId();
+		},
+
+		/**
+		 * Get tab id
+		 */
+		"_fnGetId" : function() {
+			var st = this._state;
+			return st.sId;
+		},
+
+		/**
+		 * Create tab panel. Register the button connect of each tab and create
+		 * the wizard of tab wms if is necessary
+		 */
+		"fnCreateTabs" : function() {
+			this._fnCreateTabs();
+		},
+
+		/**
+		 * Create tab panel. Register the button connect of each tab and create
+		 * the wizard of tab wms if is necessary
+		 */
+		"_fnCreateTabs" : function() {
+			var st = this._state;
+			// Generate jQuery tabs
+			var jQueryContainerId = null;
+			if (st.containerId) {
+				jQueryContainerId = "#".concat(st.containerId);
+			}
+			st.oTabs = jQuery("#".concat(st.sId), jQueryContainerId).tabs();
+
+			// Register events to buttons connect and create and
+			// register wizard for each tab if is necessary
+			for (userTabs in st.aUserLayerTabs) {
+				var tab = st.aUserLayerTabs[userTabs];
+				if (tab.fnCreateWizard) {
+					tab.fnCreateWizard();
+				}
+				// register events to buttons must register after create
+				// the wizard or will be deleted
+				tab.fnRegisterButtonsAction();
+				if (tab._fnAddChangeEventToFileInput) {
+					tab._fnAddChangeEventToFileInput();
+				}
+
+			}
+		},
+
+		/**
+		 * Get the tab that has the focus
+		 */
+		"fnGetFocusedTab" : function() {
+			return this._fnGetFocusedTab();
+		},
+
+		/**
+		 * Get the tab that has the focus
+		 */
+		"_fnGetFocusedTab" : function() {
+			var st = this._state;
+			// Get id of the div which tab is selected
+			var jQueryContainerId = "#".concat(st.sId);
+			if (st.containerId) {
+				jQueryContainerId = "#".concat(st.containerId);
+			}
+			var tabId = jQuery(".ui-tabs-active", jQueryContainerId).attr(
+					"aria-controls");
+			return st.aUserLayerTabs[tabId];
+		},
+
+		/**
+		 * Get selected layers of the tab specified by parameter Return false if
+		 * an error has occurred
+		 *
+		 * @param oUserLayerTabSel
+		 *            Object that represents the tab selected
+		 */
+		"fnGetSelectedLayers" : function(oUserLayerTabSel) {
+			return this._fnGetSelectedLayers(oUserLayerTabSel);
+		},
+
+		/**
+		 * Get selected layers of the tab specified by parameter Return false if
+		 * an error has occurred
+		 *
+		 * @param oUserLayerTabSel
+		 *            Object that represents the tab selected
+		 */
+		"_fnGetSelectedLayers" : function(oUserLayerTabSel) {
+			// Get selected layers
+			return oUserLayerTabSel.fnGetSelectedLayers();
+		},
+
+		/**
+		 * Create an array with the information of selected layers necessary to
+		 * add them to a map
+		 *
+		 * @param oUserLayerTabSel
+		 *            Object that represents the tab selected
+		 * @param layersSelected
+		 *            Represent the object selected (for wms/wmts must be an
+		 *            array of objects FancyTree, use fnGetSelectedLayers for
+		 *            get them, for tile is a String that represents the url)
+		 */
+		"fnCreateLayersOptions" : function(oUserLayerTabSel, layersSelected) {
+			return this
+					._fnCreateLayersOptions(oUserLayerTabSel, layersSelected);
+		},
+
+		/**
+		 * Create an array with the information of selected layers necessary to
+		 * add them to a map
+		 *
+		 * @param oUserLayerTabSel
+		 *            Object that represents the tab selected
+		 * @param layersSelected
+		 *            Represent the object selected (for wms/wmts must be an
+		 *            array of objects FancyTree, use fnGetSelectedLayers for
+		 *            get them, for tile is a String that represents the url)
+		 */
+		"_fnCreateLayersOptions" : function(oUserLayerTabSel, layersSelected) {
+			return oUserLayerTabSel.fnCreateLayersOptions(layersSelected)
+
+		},
+
+		/**
+		 * Create or get layer id for each layer defined in layerOptions
+		 *
+		 * @param oUserLayerTabSel
+		 *            Object that represents the tab selected
+		 * @param layerOptions
+		 *            Parameter with information of the layer. If layer is WMTS,
+		 *            the function uses the value of 'layer', value that
+		 *            represents its name.
+		 */
+		"fnGetLayerId" : function(oUserLayerTabSel, layerOptions) {
+			return this._fnGetLayerId(oUserLayerTabSel, layerOptions);
+		},
+
+		/**
+		 * Create or get layer id for each layer defined in layerOptions
+		 *
+		 * @param oUserLayerTabSel
+		 *            Object that represents the tab selected
+		 * @param layerOptions
+		 *            Parameter with information of the layer. The function uses
+		 *            the value of 'layer', value that represents its name.
+		 */
+		"_fnGetLayerId" : function(oUserLayerTabSel, layerOptions) {
+			return oUserLayerTabSel.fnGetLayerId(layerOptions)
+
+		}
+	};
 
 })(jQuery, window, document);

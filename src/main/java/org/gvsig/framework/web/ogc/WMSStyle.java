@@ -22,12 +22,24 @@
  */
 package org.gvsig.framework.web.ogc;
 
+/**
+ * Class with information of WMS Styles
+ */
 public class WMSStyle {
 
+    /**
+     * Style name
+     */
     private String name;
 
+    /**
+     * Style title
+     */
     private String title;
 
+    /**
+     * Style abstract
+     */
     private String styleAbstract;
 
 }

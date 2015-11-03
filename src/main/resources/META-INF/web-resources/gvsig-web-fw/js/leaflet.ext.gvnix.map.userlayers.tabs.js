@@ -501,7 +501,14 @@
 				},
 
 				/**
-				 * Generate the code necessary to add the selected layers into the map
+				 * Generate the code necessary to add the selected
+				 * layers into the map *
+				 *
+				 * @param layersSelected
+				 *            array of objects selected on FancyTree
+				 *            (use fnGetSelectedLayers for get them)
+				 * @return object with layer information. 'false' in
+				 *         case of error
 				 */
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
@@ -560,6 +567,8 @@
 
 				/**
 				* Get common CRS from selected layers
+				* @param array of selected layers id
+				* @return array of common crs from selected layers
 				*/
 				"_fnGetCommonCRS" : function (aSelectedLayers){
 				// get the common crs for layers selected
@@ -735,6 +744,7 @@
 
 				/**
 				 * Get data from WMTS server indicated into server input
+				 * @param crs Indicate the CRS to filter the results
 				 */
 				"__fnGetDataFromServer" : function(crs) {
 					var st = this._state;
@@ -868,6 +878,9 @@
 
 				/**
 				 * Generate select of supported crs by the server
+ 				 * @param aSupportedCrs array of supported crs
+				 * @param oThis object GvNIX_Map_Leaflet.USERLAYERTAB.wmts where draw the select
+
 				 */
 				"_fnDrawSelectSupportedCrs" : function(aSupportedCrs,oThis){
 					this.__fnDrawSelectSupportedCrs(aSupportedCrs,oThis);
@@ -875,6 +888,8 @@
 
 				/**
 				 * Generate select of supported crs by the server
+				 * @param aSupportedCrs array of supported crs
+				 * @param oThis object GvNIX_Map_Leaflet.USERLAYERTAB.wmts where draw the select
 				 */
 				"__fnDrawSelectSupportedCrs" : function(aSupportedCrs, oThis){
 					var st = oThis._state;
@@ -913,8 +928,10 @@
 				},
 
 				/**
-           		 * Generate the code necessary to add the selected layers into the map
-           		 * Return false if it hasn't layers selected
+				 * Generate the code necessary to add the selected layers into the map
+				 * Return false if it hasn't layers selected
+ 				 * @param layersSelected array of objects selected on FancyTree (use fnGetSelectedLayers for get them)
+				 * @return object with layer information. 'false' in case of error or if it hasn't selected layers
 				 */
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
@@ -952,7 +969,8 @@
 				},
 
 				/**
-				 *  Get layer id using layer options to complete the id
+				 * Get layer id using layer options to complete the id
+				 * @param layerOptions Parameter with information of the layer. The function uses the value of 'layer', value that represents its name.
 				 */
 				"_fnGetLayerId" : function(layerOptions) {
 					var st = this._state;
@@ -1065,6 +1083,8 @@
 
 				/**
            		 * Generate the code necessary to add the selected layer into the map
+           		 * @param layersSelected URL of layer tile
+				 * @return object with layer information.
 				 */
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
@@ -1092,6 +1112,7 @@
 
 				/**
 				 * Set url of server from object oDataToSet
+				 * @param oData object with information of tile layer
 				 */
 				"_fnSetData" : function(oData) {
 					var st = this._state;
@@ -1258,6 +1279,8 @@
 
 				/**
 				 * Get data from WMS server indicated into server input
+				 * @param isLoadingData boolean to indicate if we are loading data from database.
+				 * @param oData Object with information of wms layers to load data in wizard after connect
 				 */
 				"_fnGetDataFromServer" : function(isLoadingData, oData) {
 					return this.__fnGetDataFromServer(isLoadingData, oData);
@@ -1265,7 +1288,8 @@
 
 				/**
 				 * Get data from WMS server indicated into server input
-				 * Return false in case of error
+				 * @param isLoadingData boolean to indicate if we are loading data from database.
+				 * @param oData Object with information of wms layers to load data in wizard after connect
 				 */
 				"__fnGetDataFromServer" : function(isLoadingData, oData) {
 					var st = this._state;
@@ -1459,6 +1483,9 @@
 
 				/**
 				 * Control the event that happens when the user changes wizard tab
+				 * @param event Event that calls to the function
+				 * @param currentIndex Current step
+				 * @param newIndex Destination Step
 				 */
 				"_fnChangeStepControl" : function (event, currentIndex, newIndex)
 			    {
@@ -1467,6 +1494,9 @@
 
 			    /**
 				 * Control the event that happens when the user changes wizard tab
+				 * @param event Event that calls to the function
+				 * @param currentIndex Current step
+				 * @param newIndex Destination Step
 				 */
 				"__fnChangeStepControl" : function (event, currentIndex, newIndex)
 			    {
@@ -1554,6 +1584,7 @@
 			    /**
 				 * Draw a form into wizard tab 'styles' that depends of
 				 * selected layers in wizard tab 'select layers'
+				 * @param aSelectedLayers Array of selected layers id
 				 */
 			    "_fnDrawFormStylesLayer" : function (aSelectedLayers)
 			    {
@@ -1563,6 +1594,7 @@
 			    /**
 				 * Draw a form into wizard tab 'styles' that depends of
 				 * selected layers in wizard tab 'select layers'
+				 * @param aSelectedLayers Array of selected layers id
 				 */
 				"__fnDrawFormStylesLayer" : function (aSelectedLayers)
 			    {
@@ -1628,6 +1660,7 @@
 
 			    /**
 				 * Get the styles selected in wizard tab 'styles'
+				 * @param aSelectedLayers Array of selected layers id
 				 */
 			    "_fnGetSelectedStylesLayer" : function (aSelectedLayers)
 			    {
@@ -1636,6 +1669,7 @@
 
 			    /**
 				 * Get the styles selected in wizard tab 'styles'
+				 * @param aSelectedLayers Array of selected layers id
 				 */
 				"__fnGetSelectedStylesLayer" : function (aSelectedLayers)
 			    {
@@ -1661,6 +1695,8 @@
 
 			    /**
 			     * Get common CRS from selected layers
+			     * @param array of selected layers id
+			     * @return array of common crs from selected layers
 			     */
 			    "_fnGetCommonCRS" : function (aSelectedLayers){
 			    	// get the common crs for layers selected
@@ -1685,7 +1721,8 @@
 
 				/**
 				 * Generate the code necessary to add the selected layers into the map
-				 * Return false if it hasn't layers selected or generates an error
+				 * @param layersSelected array of objects selected on FancyTree (use fnGetSelectedLayers for get them)
+				 * @return object with layer information. 'false' in case of error or if it hasn't selected layers
 				 */
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
@@ -1796,6 +1833,7 @@
 
 				/**
 				 * Set layers, styles, crs, etc. from object oDataToSet
+				 * @param oData object with information of wms layer
 				 */
 				"_fnSetData" : function(oData) {
 					var st = this._state;
@@ -1922,6 +1960,8 @@
 
 				/**
 				 * Get data from WMTS server indicated into server input
+				 * @param isLoadingData boolean to indicate if we are loading data from database.
+				 * @param oData Object with information of wmts layers to load data in wizard after connect
 				 */
 				"_fnGetDataFromServer" : function(isLoadingData, oData) {
 					this.__fnGetDataFromServer(isLoadingData, oData);
@@ -1930,6 +1970,8 @@
 				/**
 				 * Get data from WMTS server indicated into server input
 				 * Return false in case of error
+				 * @param isLoadingData boolean to indicate if we are loading data from database.
+				 * @param oData Object with information of wmts layers to load data in wizard after connect
 				 */
 				"__fnGetDataFromServer" : function(isLoadingData, oData) {
 					var st = this._state;
@@ -2119,6 +2161,9 @@
 
 				/**
 				 * Control the event that happens when the user changes wizard tab
+				 * @param event Event that calls to the function
+				 * @param currentIndex Current step
+				 * @param newIndex Destination Step
 				 */
 				"_fnChangeStepControl" : function (event, currentIndex, newIndex)
 			    {
@@ -2127,6 +2172,9 @@
 
 			    /**
 				 * Control the event that happens when the user changes wizard tab
+				 * @param event Event that calls to the function
+				 * @param currentIndex Current step
+				 * @param newIndex Destination Step
 				 */
 				"__fnChangeStepControl" : function (event, currentIndex, newIndex)
 			    {
@@ -2166,7 +2214,8 @@
 
 				/**
 				 * Generate the code necessary to add the selected layers into the map
-				 * Return false if it hasn't layers selected or generates an error
+				 * @param layersSelected array of objects selected on FancyTree (use fnGetSelectedLayers for get them)
+				 * @return object with layer information. 'false' in case of error or if it hasn't selected layers
 				 */
 				"_fnCreateLayersOptions" : function(layersSelected) {
 					var st = this._state;
@@ -2201,6 +2250,7 @@
 
 				/**
 				 *  Get layer id
+				 *  @param layerOptions Parameter with information of the layer. The function uses the value of 'layer', value that represents its name.
 				 */
 				"_fnGetLayerId" : function(layerOptions) {
 					var st = this._state;
@@ -2219,6 +2269,7 @@
 
 				/**
 				 * Set layers, styles, crs, etc. from object oDataToSet
+				 * @param oData object with information of wmts layer
 				 */
 				"_fnSetData" : function(oData) {
 					var st = this._state;

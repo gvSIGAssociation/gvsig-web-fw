@@ -27,36 +27,82 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import org.gvnix.util.fancytree.TreeNode;
+import org.gvsig.raster.wmts.ogc.struct.WMTSTileMatrixSet;
 
+/**
+ * Class with information of WMTS service
+ */
 public class WMTSInfo {
 
+    /**
+     * Tree that represent the layers of WMTS service
+     */
     private List<TreeNode> layersTree;
-
+    /**
+     * Service version
+     */
     private String version;
 
+    /**
+     * Service url
+     */
     private String serviceUrl;
 
+    /**
+     * Service name
+     */
     private String serviceName;
 
+    /**
+     * Service abstract
+     */
     private String serviceAbstract;
 
+    /**
+     * Service title
+     */
     private String serviceTitle;
 
+    /**
+     * Service type
+     */
     private String serviceType;
 
+    /**
+     * Id used for set id to pattern layer selected
+     */
     private int id;
 
+    /**
+     * List of {@link WMTSTileMatrixSet} id that supports the crs selected
+     */
     private TreeSet<String> tileMatrixSelectedId;
 
+    /**
+     * Map of the layers where the key represents the identifier of each layer
+     * and the value is {@link WMTSLayer} object
+     */
     private Map<String, WMTSLayer> layers;
 
-    // Map<identifier of tileMatrix, crs supported>
+    /**
+     * Map of the tileMatrix supported where the key represents each
+     * {@link WMTSTileMatrixSet} id, and the value, the crs supported by it
+     */
     private Map<String, String> tileMatrixCrsSupported;
 
+    /**
+     * List of supported formats
+     */
     private TreeSet<String> formatsSupported;
 
+    /**
+     * List of supported crs
+     */
     private TreeSet<String> crsSupported;
 
+    /**
+     * Indicate if any format established by user is supported
+     */
     private boolean isFormatsSupported;
 
 }

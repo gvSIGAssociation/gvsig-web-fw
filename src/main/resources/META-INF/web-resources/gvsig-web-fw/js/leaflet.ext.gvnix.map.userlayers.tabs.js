@@ -961,7 +961,7 @@
 					        "title": layersSelected[0].title,
 					        "mapTileMatrixCrs" : st.oWMTSInfo.tileMatrixCrsSupported,
 					        "all_tilematrix_selected" : layerSel.tileMatrixSelected,
-					        "all_crs_selected" :  crsSelected.join()
+					        "crs" :  crsSelected.join()
 				        };
 					}
 
@@ -2241,7 +2241,7 @@
 					        "all_tilematrix_selected" : layerSel.tileMatrixSelected,
 					        "tilematrix_set" : layerSel.tileMatrixSelected[0],
 					        "format" : layerSel.formatSelected,
-					        "all_crs_selected" :  crsSelected.join(),
+					        "crs" :  crsSelected.join(),
 					        "node_icon": ".whhg icon-layerorderup",
 							"title": layersSelected[0].title,
 					};

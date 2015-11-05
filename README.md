@@ -53,7 +53,7 @@ Geospatial web framework that includes many geographical tools for Spring MVC ba
           ....
           <dependency>
             <groupId>org.gvsig</groupId>
-            <artifactId>org.gvsig.framework.web</artifactId>
+            <artifactId>org.gvsig.web.framework</artifactId>
             <version>${gvsig.web.fw.version}</version>
           </dependency>
           ....

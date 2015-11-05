@@ -24,19 +24,11 @@
  along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
 
 -->
-   <uri>http://gvsig.org/web-framework/TLD/tools</uri>
-   <tlib-version>${project.version}</tlib-version>
-   <short-name>gvsig-fw-tools</short-name>
-   <tag-file>
-     <name>user-layers</name>
-     <path>/META-INF/tags/tools/user-layers.tagx</path>
-   </tag-file>
-   <tag-file>
-     <name>predefined-layers</name>
-     <path>/META-INF/tags/tools/predefined-layers.tagx</path>
-   </tag-file>
-   <tag-file>
-    <name>zoombox</name>
-    <path>/META-INF/tags/tools/zoombox.tagx</path>
-  </tag-file>
+	<uri>http://gvsig.org/web-framework/TLD/components</uri>
+	<tlib-version>${project.version}</tlib-version>
+	<short-name>gvsig-fw-components</short-name>
+	<tag-file>
+		<name>history</name>
+		<path>/META-INF/tags/components/history.tagx</path>
+	</tag-file>
 </taglib>

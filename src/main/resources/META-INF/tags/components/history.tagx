@@ -1,0 +1,50 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure tool" />
+  <jsp:directive.attribute name="position" type="java.lang.String" required="false" description="Which corner of the map to place your controls. VALUES:'topleft','topright','bottomleft','bottomright'. DEFAULT:'topright'" />
+  <jsp:directive.attribute name="maxMoves" type="java.lang.String" required="false" description="The number of moves in the history to save before clearing out the oldest. Use 0 or a negative number to make unlimited. DEFAULT:'10'" />
+  <jsp:directive.attribute name="backIcon" type="java.lang.String" required="false" description="The class used for the 'back' button image. DEFAULT:'fa fa-caret-left'" />
+  <jsp:directive.attribute name="forwardIcon" type="java.lang.String" required="false" description="The class used for the 'forward' button image. DEFAULT:'fa fa-caret-right'" />
+  <jsp:directive.attribute name="backText" type="java.lang.String" required="false" description="Set a text to display on 'back' button'. No default value." />
+  <jsp:directive.attribute name="forwardText" type="java.lang.String" required="false" description="Set a text to display on 'forward' button'. No default value." />
+  <jsp:directive.attribute name="backTooltip" type="java.lang.String" required="false" description="Tooltip content to display on 'back' button'. No default value." />
+  <jsp:directive.attribute name="forwardTooltip" type="java.lang.String" required="false" description="Tooltip content to display on 'forward' button'. No default value." />
+  <jsp:directive.attribute name="orientation" type="java.lang.String" required="false" description="Whether to position the buttons on top of one another or side-by-side. VALUES:'vertical','horizontal'. DEFAULT:'horizontal'" />  
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <c:if test="${empty position}">
+    <c:set var="position" value="bottomright"/>
+  </c:if>
+
+  <c:if test="${empty maxMoves}">
+    <c:set var="maxMoves" value="10"/>
+  </c:if>  
+  
+  <c:if test="${empty backIcon}">
+    <c:set var="backIcon" value="fa fa-caret-left"/>
+  </c:if>  
+  
+  <c:if test="${empty forwardIcon}">
+    <c:set var="forwardIcon" value="fa fa-caret-right"/>
+  </c:if>  
+  
+  <c:if test="${empty orientation}">
+    <c:set var="orientation" value="horizontal"/>
+  </c:if>    
+
+  <!-- Generating scale tool -->
+  <div id="${id}_history_component" class="map_component"
+  data-type="history"
+  data-position="${position}"
+  data-max_moves="${maxMoves}"
+  data-back_icon="${backIcon}"
+  data-forward_icon="${forwardIcon}"
+  data-back_text="${backText}"
+  data-forward_text="${forwardText}"
+  data-back_tooltip="${backTooltip}"
+  data-forward_tooltip="${forwardTooltip}"
+  data-orientation="${orientation}"  
+  >&amp;nbsp;</div>
+
+</jsp:root>

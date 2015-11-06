@@ -331,6 +331,7 @@
 		// Set this group _state attributes to those passed by the parameters
 		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
 			"sId" : sId,
+			"contextPath" : null,
 			"title" : "",
 			"containerId": containerId,
 			"path" : "",
@@ -398,6 +399,9 @@
 								s.fn_search_layers, jQuery.proxy(
 										this.debug, this));
 					}
+
+					// Set context path. Is necessary to get the layer legend
+					st.contextPath = s.context_path;
 
 				},
 
@@ -558,7 +562,8 @@
 								"allow_disable": true,
 								"node_icon": ".whhg icon-layerorderdown",
 								"title": st.oWMSInfo.serviceTitle,
-								"aLayers": st.oWMSInfo.layers
+								"aLayers": st.oWMSInfo.layers,
+								"context_path": st.contextPath
 							};
 							return layerOptions;
 						}
@@ -628,6 +633,7 @@
 		// Set this group _state attributes to those passed by the parameters
 		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
 			"sId" : sId,
+			"contextPath" : null,
 			"title" : "",
 			"path" : "",
 			"containerId": containerId,
@@ -688,6 +694,9 @@
 								s.fn_search_layers, jQuery.proxy(
 										this.debug, this));
 					}
+
+					// Set context path. Is necessary to get the layer legend
+					st.contextPath = s.context_path;
 				},
 
 				/**
@@ -961,7 +970,8 @@
 					        "title": layersSelected[0].title,
 					        "mapTileMatrixCrs" : st.oWMTSInfo.tileMatrixCrsSupported,
 					        "all_tilematrix_selected" : layerSel.tileMatrixSelected,
-					        "crs" :  crsSelected.join()
+					        "crs" :  crsSelected.join(),
+					        "context_path": st.contextPath
 				        };
 					}
 
@@ -1139,6 +1149,7 @@
 		// Set this group _state attributes to those passed by the parameters
 		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
 			"sId" : sId,
+			"contextPath" : null,
 			"title" : "",
 			"containerId": containerId,
 			"path" : "",
@@ -1230,6 +1241,9 @@
 								s.fn_search_layers, jQuery.proxy(
 										this.debug, this));
 					}
+
+					// Set context path. Is necessary to get the layer legend
+					st.contextPath = s.context_path;
 
 				},
 
@@ -1803,7 +1817,8 @@
 							        "allow_disable": true,
 							        "node_icon": ".whhg icon-layerorderdown",
 							        "title": st.oWMSInfo.serviceTitle,
-							        "aLayers": st.oWMSInfo.layers
+							        "aLayers": st.oWMSInfo.layers,
+							        "context_path": st.contextPath
 						        };
 								return layerOptions;
 							}
@@ -1860,6 +1875,7 @@
 		// Set this group _state attributes to those passed by the parameters
 		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.USERLAYERTAB.Base._state, {
 			"sId" : sId,
+			"contextPath" : null,
 			"title" : "",
 			"containerId": containerId,
 			"path" : "",
@@ -1931,6 +1947,9 @@
 								s.fn_search_layers, jQuery.proxy(
 										this.debug, this));
 					}
+
+					// Set context path. Is necessary to get the layer legend
+					st.contextPath = s.context_path;
 
 				},
 
@@ -2244,6 +2263,7 @@
 					        "crs" :  crsSelected.join(),
 					        "node_icon": ".whhg icon-layerorderup",
 							"title": layersSelected[0].title,
+							"context_path": st.contextPath
 					};
 					return layerOptions;
 				},

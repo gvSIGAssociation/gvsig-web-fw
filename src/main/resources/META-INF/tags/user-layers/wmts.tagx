@@ -55,7 +55,9 @@
   <spring:message code="button_connect" var="connect_button" />
 
 
-  <div id="${fn:escapeXml(id)}_wmts" data-layer_type="wmts"
+  <div id="${fn:escapeXml(id)}_wmts"
+    data-context_path="${pageContext.request.contextPath}"
+    data-layer_type="wmts"
     data-msg_layers_not_found="${layersNotFoundMsg}"
     data-msg_layers_required="${msgLayersRequired}"
     data-msg_server_required="${msgServerRequired}"

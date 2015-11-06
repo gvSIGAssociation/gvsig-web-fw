@@ -162,13 +162,10 @@ var GvNIX_Map_Predefined_Layers_Tool;
 						var $layerComponents = $layerDiv
 								.find("#layer-components")[0];
 
-						// Register layer in map
+						// Register layer in map and
+						// move selected layer to first position of TOC
 						st.oMap.fnRegisterLayer(layerId, layerData,
-								$layerComponents);
-
-						// Move selected layer to first position of TOC
-						st.oMap.fnMoveLayer(layerId, st.oMap
-								.fnGetTocLayersIds()[0], null, true);
+								$layerComponents, true);
 
 						// Save new layer in localStorage
 						var layerInfo = {

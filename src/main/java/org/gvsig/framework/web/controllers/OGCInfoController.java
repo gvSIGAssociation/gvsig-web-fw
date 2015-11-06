@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,8 +40,10 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
 
@@ -188,4 +191,35 @@ public class OGCInfoController {
         return messageSource.getMessage(SERVER_ERROR_CODE, null,
                 LocaleContextHolder.getLocale());
     }
+
+    /**
+     * Get a redirection to the image that represents the WMS layer legend
+     * @param urlServerWMS Url of the server to connect and get the data
+     * @param layerId Layer id
+     * @param styleName Layer styles
+     * @return redirect to get the image that represents the layer legend
+     */
+    @RequestMapping(value = "/getWmsLegend")
+    public String getWmsLegend(
+            @RequestParam(value = "urlServer", required = true) String urlServerWMS,
+            @RequestParam(value = "layerId", required = true) String layerId,
+            @RequestParam(value = "styleName", required = false) String styleName){
+        String legendUrl = ogcInfoServ.getWMSLegendUrl(urlServerWMS, layerId, styleName);
+        return "redirect:".concat(legendUrl);
+    }
+
+    /**
+     * Get a redirection to the image that represents the WMTS layer legend
+     * @param urlServerWMTS Url of the server to connect and get the data
+     * @param layerId Url of the server to connect and get the data
+     * @return redirect to get the image that represents the layer legend
+     */
+    @RequestMapping(value = "/getWmtsLegend")
+    public String getWmtsLegend(
+            @RequestParam(value = "urlServer", required = true) String urlServerWMTS,
+            @RequestParam(value = "layerId", required = true) String layerId){
+        String legendUrl = ogcInfoServ.getWMTSLegendUrl(urlServerWMTS, layerId);
+        return "redirect:".concat(legendUrl);
+    }
+
 }

@@ -77,6 +77,24 @@ public interface OGCInfoService {
             String crs, TreeSet<String> layers);
 
     /**
+     * Get url of WMS layer legend
+     * @param urlServerWMS Url of the server to connect and get the data
+     * @param layerId Layer id
+     * @param styleName Layer styles
+     * @return the url of the legend or empty if not exists or can't be gotten
+     */
+    public String getWMSLegendUrl(String urlServerWMS, String layerId,
+            String stylesName);
+
+    /**
+     * Get url of WMTS layer legend
+     * @param urlServerWMTS Url of the server to connect and get the data
+     * @param layerId Url of the server to connect and get the data
+     * @return the url of the legend or empty if not exists or can't be gotten
+     */
+    public String getWMTSLegendUrl(String urlServerWMTS, String layerId);
+
+    /**
      * Get supported crs of the server wmts indicated by urlServerWMTS parameter
      *
      * @param urlServerWMTS URL to access to WMTS server

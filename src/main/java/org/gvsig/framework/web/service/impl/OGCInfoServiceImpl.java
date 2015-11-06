@@ -26,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,7 +61,9 @@ import org.gvsig.raster.wmts.ogc.WMTSOGCLocator;
 import org.gvsig.raster.wmts.ogc.WMTSOGCManager;
 import org.gvsig.raster.wmts.ogc.struct.WMTSBoundingBox;
 import org.gvsig.raster.wmts.ogc.struct.WMTSLayer;
+import org.gvsig.raster.wmts.ogc.struct.WMTSLegendURL;
 import org.gvsig.raster.wmts.ogc.struct.WMTSServiceIdentification;
+import org.gvsig.raster.wmts.ogc.struct.WMTSStyle;
 import org.gvsig.raster.wmts.ogc.struct.WMTSTheme;
 import org.gvsig.raster.wmts.ogc.struct.WMTSThemes;
 import org.gvsig.raster.wmts.ogc.struct.WMTSTileMatrixSet;
@@ -696,6 +699,90 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             }
         }
         return null;
+    }
+
+    public String getWMSLegendUrl(String urlServerWMS, String layerId,
+            String stylesName){
+        String legendUrl = "";
+        org.gvsig.remoteclient.wms.WMSStyle layerStyle = null;
+        org.gvsig.remoteclient.wms.WMSStyle layerStyleDefault = null;
+        // Create conexion with server WMS
+        try {
+            WMSClient wms = new WMSClient(urlServerWMS);
+            wms.connect(null);
+            WMSLayer layer = wms.getLayer(layerId);
+            if(layer != null){
+                List<org.gvsig.remoteclient.wms.WMSStyle> lstStyles =
+                        layer.getStyles();
+                if(StringUtils.isNotEmpty(stylesName)){
+                    List<String> styList = Arrays.asList(stylesName.split(","));
+                    for(org.gvsig.remoteclient.wms.WMSStyle wmsStyle : lstStyles){
+                        // default not
+                        if(styList.contains(wmsStyle.getName()) &&
+                                wmsStyle.getName().toLowerCase() != "default"){
+                                layerStyle = wmsStyle;
+                                break;
+                        }else{
+                            if(wmsStyle.getName().toLowerCase() == "default"){
+                                layerStyleDefault = wmsStyle;
+                            }
+                        }
+                    }
+                    // if layer style isn't defined on parameter, set default style
+                    // or the first
+                    if(layerStyle == null){
+                        if(layerStyleDefault == null && !lstStyles.isEmpty()){
+                            layerStyle = lstStyles.get(0);
+                        }else{
+                            layerStyle = layerStyleDefault;
+                        }
+                    }
+                }else{
+                    // if haven't styles, get the first
+                    if(!lstStyles.isEmpty()){
+                        layerStyle = lstStyles.get(0);
+                    }
+                }
+                if(layerStyle != null){
+                    legendUrl = layerStyle.getLegendURLOnlineResourceHRef();
+                }
+            }
+        }catch (Exception exc) {
+            // Show exception in log
+            logger.error("Exception on getWMSLegendUrl", exc);
+        }
+        return legendUrl;
+    }
+
+
+    public String getWMTSLegendUrl(String urlServerWMTS, String layerId){
+        String legendUrl = "";
+        // Create conexion with server WMS
+        try {
+            // get WMTS manager
+            WMTSOGCManager wmtsMan = WMTSOGCLocator.getManager();
+            WMTSClient wmtsClient = wmtsMan.createWMTSClient(urlServerWMTS);
+            wmtsClient.connect(true, null);
+
+            WMTSLayer layer = getLayerWMTSById(wmtsClient, layerId);
+            if(layer != null){
+                List<WMTSStyle> lstStyles = layer.getStyle();
+                for(WMTSStyle wmtsStyle : lstStyles){
+                    if(wmtsStyle.isDefault()){
+                        WMTSLegendURL wmtsLegendURL = wmtsStyle.getLegendURL();
+                        legendUrl = wmtsLegendURL.getHref();
+                    }
+                }
+                if(StringUtils.isEmpty(legendUrl) && !lstStyles.isEmpty()){
+                    WMTSLegendURL wmtsLegendURL = lstStyles.get(0).getLegendURL();
+                    legendUrl = wmtsLegendURL.getHref();
+                }
+            }
+        }catch (Exception exc) {
+            // Show exception in log
+            logger.error("Exception on getWMTSLegendUrl", exc);
+        }
+        return legendUrl;
     }
 
     /*******

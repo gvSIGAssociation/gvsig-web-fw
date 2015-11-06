@@ -75,6 +75,7 @@
   <spring:message code="tooltip_button_change_server" var="change_server_tooltip" />
 
   <div class="wizard_dialog" id="${fn:escapeXml(id)}_wmts_wizard"
+       data-context_path="${pageContext.request.contextPath}"
        data-layer_type="wmts"
        data-msg_connect_required="${msgConnectRequired}"
        data-msg_crs_supported="${crsSupportedLabel}"

@@ -57,6 +57,7 @@
 
 
   <div id="${fn:escapeXml(id)}_wms" data-format="${format}"
+       data-context_path="${pageContext.request.contextPath}"
        data-layer_type="wms"
        data-msg_incompatible_layers="${msgIncompatibleLayers}"
        data-msg_layers_not_found="${layersNotFoundMsg}"

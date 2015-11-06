@@ -159,7 +159,8 @@ var GvNIX_Map_User_Layers_Tool;
 											"visible" : "true",
 											"styles" : style,
 											"id_on_server" : oLayer.name,
-											"group" : idLayerToInsert
+											"group" : idLayerToInsert,
+											"context_path" : layerOptions.context_path
 								}
 								oLayerChild = {"id" : idChildLayer,
 										 	   "options" : oChildLayerOptions
@@ -167,13 +168,10 @@ var GvNIX_Map_User_Layers_Tool;
 								aoChildLayers.push(oLayerChild);
 							}
 							GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(st.oMap, oWmsLayer,
-									aoChildLayers);
+									aoChildLayers, true);
 						}else{
-							st.oMap.fnRegisterLayer(idLayerToInsert, layerOptions);
+							st.oMap.fnRegisterLayer(idLayerToInsert, layerOptions, null, true);
 						}
-						// Move selected layer to first position of TOC
-						st.oMap.fnMoveLayer(idLayerToInsert, st.oMap
-								.fnGetTocLayersIds()[0], null, true);
 						// Check this layer
 						if(!($focusedTab instanceof GvNIX_Map_Leaflet.USERLAYERTAB.shape)){
 							st.oMap.fnGetLayerById(idLayerToInsert).fnCheckLayer();

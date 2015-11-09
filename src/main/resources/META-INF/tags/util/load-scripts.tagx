@@ -34,7 +34,11 @@
 <spring:url value="/resources/gvsig-web-fw/js/L.Control.ZoomBox.js" var="js_leaflet_zoom_box_js"/>
     <script src="${js_leaflet_zoom_box_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
-</script>  
+</script> 
+<spring:url value="/resources/gvsig-web-fw/js/L.MeasureAreaTool.js" var="js_leaflet_measure_area_js"/>
+    <script src="${js_leaflet_measure_area_js}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+</script> 
 <spring:url value="/resources/gvsig-web-fw/js/leaflet-history-src.js" var="js_leaflet_history_js"/>
     <script src="${js_leaflet_history_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
@@ -47,6 +51,10 @@
     <script src="${js_leaflet_zoom_box_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->
  </script>  
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.measure-area.tool.js" var="js_leaflet_measure_area_tool"/>
+  <script src="${js_leaflet_measure_area_tool}" type="text/javascript">
+      <!--required for FF3 and Opera-->
+</script>   
 <spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.userlayers.tool.js" var="js_leaflet_ext_gvnix_userlayers_tool"/>
     <script src="${js_leaflet_ext_gvnix_userlayers_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->

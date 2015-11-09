@@ -1,0 +1,23 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure area tool" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+    <c:if test="${!empty preventExitMessage}">
+    <spring:message code="${preventExitMessage}" var="label" htmlEscape="false" />
+    </c:if>
+    <spring:message code="label_measure_area" htmlEscape="false"  var="measureMsg"/>
+    <spring:message code="label_measure_area_tooltip_start" htmlEscape="false"  var="tooltip_start"/>
+    <spring:message code="label_measure_area_tooltip_cont" htmlEscape="false"  var="tooltip_cont"/>
+    <spring:message code="label_measure_area_tooltip_end" htmlEscape="false"  var="tooltip_end"/>
+    <spring:message code="label_measure_area_tooltip_error" htmlEscape="false"  var="tooltip_error"/>
+    <spring:message code="label_measure_area_tooltip_finish_type" htmlEscape="false"  var="tooltip_type"/>
+
+  <i id="${id}_measure_area_tool"
+    class="whhg icon-canvasrulers toolbar_button" data-type="measureArea"
+    data-tooltipstart="${tooltip_start}" data-tooltipunits="${tooltip_type}"
+    data-tooltipcont="${tooltip_cont}" data-tooltipend="${tooltip_end}"
+    data-tooltiperror="${tooltip_error}" title="${measureMsg}">&amp;nbsp;</i>
+
+</jsp:root>

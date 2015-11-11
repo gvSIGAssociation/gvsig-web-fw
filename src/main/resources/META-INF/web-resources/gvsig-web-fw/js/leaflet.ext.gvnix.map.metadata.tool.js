@@ -79,7 +79,7 @@
 			st.layerTitle = layer.fnGetTitle();
 			// Set callback and get metadata
 			var callbackFn = jQuery.proxy(this._fnShowMetadata, this)
-			layer.fnGetMetadata(st.dialogWidth, st.dialogHeight, callbackFn);
+			layer.fnGetMetadata(callbackFn);
 
 		},
 
@@ -91,18 +91,47 @@
 		},
 
 		/**
-		 * Show layer metadata(html) into dialog
+		 * Show layer metadata into dialog
 		 */
-		"_fnShowMetadata" : function (metadata){
+		"_fnShowMetadata" : function (metadata, metadataType){
 			var st = this._state;
+			var html = this._fnTransformMetada(metadata, metadataType);
 			// open dialog
-			this._fnShowDialog(metadata, st.layerTitle);
+			this._fnShowDialog(html, st.layerTitle);
+		},
+
+		/**
+		 * Transform metadata to html
+		 */
+		"_fnTransformMetada" : function (metadata, metadataType){
+			var st = this._state;
+			var html = "<div>";
+			if(metadataType == "URL"){
+				html += "<iframe src='";
+				html += metadata;
+				html += "' width='"+st.dialogWidth+"'";
+				html += " height='"+st.dialogHeight+"'";
+				html += "/> </BR>";
+			}else{
+				if(metadataType == "STRING"){ //html
+					html += "<div>";
+					html += metadata;
+					html += "</div> </BR>";
+				}else{ // JSON
+					html += "<div>";
+					html += GvNIX_Map_Leaflet.Util.JSONToHtml(metadata);
+					//this._fnJSONMetadataToHtml(metadata);
+					html += "</div> </BR>";
+				}
+			}
+			html += "</div>";
+			return html;
 		},
 
 		/**
 		 * Create and show dialog with layer metadata information
 		 */
-		"_fnShowDialog" : function(textDialog, layerTitle) {
+		"_fnShowDialog" : function(textDialog, titleDialog) {
 			var st = this._state;
 
 			// Delete dialog if exists
@@ -113,7 +142,7 @@
 			// Generating Extended Dialog with Maximize and
 			// Collapsable functions
 			var metadataDialog = jQuery(divDialog).dialog({
-				title : layerTitle,
+				title : titleDialog,
 				autoOpen : false,
 				modal : false,
 				resizable : false,

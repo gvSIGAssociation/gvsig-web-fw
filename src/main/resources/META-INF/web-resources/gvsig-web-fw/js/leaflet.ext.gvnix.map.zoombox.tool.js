@@ -20,7 +20,7 @@ var GvNIX_Map_Zoom_Box;
 (function(jQuery, window, document) {
 	GvNIX_Map_Leaflet.CONTROLS.zoombox = function(oMap, sId, options) {
 		if (!this instanceof GvNIX_Map_Leaflet.CONTROLS.zoombox) {
-			alert("Warning: GvNIX_Map_Leaflet measure control must be initialised with the keyword 'new'");
+			alert("Warning: GvNIX_Map_Leaflet zoom box control must be initialised with the keyword 'new'");
 		}
 
 		this._default_options = jQuery.extend({},

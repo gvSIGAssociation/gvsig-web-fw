@@ -51,7 +51,7 @@
     <script src="${js_leaflet_zoom_box_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->
  </script>  
-<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.measure-area.tool.js" var="js_leaflet_measure_area_tool"/>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.measurearea.tool.js" var="js_leaflet_measure_area_tool"/>
   <script src="${js_leaflet_measure_area_tool}" type="text/javascript">
       <!--required for FF3 and Opera-->
 </script>   

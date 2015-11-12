@@ -120,7 +120,6 @@
 				}else{ // JSON
 					html += "<div>";
 					html += GvNIX_Map_Leaflet.Util.JSONToHtml(metadata);
-					//this._fnJSONMetadataToHtml(metadata);
 					html += "</div> </BR>";
 				}
 			}
@@ -145,7 +144,7 @@
 				title : titleDialog,
 				autoOpen : false,
 				modal : false,
-				resizable : false,
+				resizable : true,
 				width : st.dialogWidth,
 				height : st.dialogHeight
 			}).dialogExtend({

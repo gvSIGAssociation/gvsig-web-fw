@@ -30,9 +30,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
@@ -52,6 +55,11 @@ import org.gvsig.framework.web.ogc.CSWCriteria;
 import org.gvsig.framework.web.ogc.CSWISO19115LangCatalogServiceDriver;
 import org.gvsig.framework.web.ogc.CSWResult;
 import org.gvsig.framework.web.ogc.CSWSingleResult;
+import org.gvsig.framework.web.ogc.ContactAddressMetadata;
+import org.gvsig.framework.web.ogc.ContactMetadata;
+import org.gvsig.framework.web.ogc.Layer;
+import org.gvsig.framework.web.ogc.OperationsMetadata;
+import org.gvsig.framework.web.ogc.ServiceMetadata;
 import org.gvsig.framework.web.ogc.WMSInfo;
 import org.gvsig.framework.web.ogc.WMSStyle;
 import org.gvsig.framework.web.ogc.WMTSInfo;
@@ -783,6 +791,101 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             logger.error("Exception on getWMTSLegendUrl", exc);
         }
         return legendUrl;
+    }
+
+    public ServiceMetadata getMetadataInfoFromWMS(String urlServer){
+
+        ServiceMetadata servMetadata = new ServiceMetadata();
+
+        try {
+            WMSClient wms = new WMSClient(urlServer);
+            wms.connect(null);
+
+            // set server information
+            WMSServiceInformation serviceInfo = wms.getServiceInformation();
+
+            servMetadata.setAbstractStr(serviceInfo.abstr);
+            servMetadata.setFees(serviceInfo.fees);
+            servMetadata.setKeywords(serviceInfo.keywords);
+            servMetadata.setName(serviceInfo.name);
+            servMetadata.setTitle(serviceInfo.title);
+            servMetadata.setUrl(urlServer);
+            servMetadata.setVersion(serviceInfo.version);
+
+            // get layers
+            List<Layer> lstLayers = new ArrayList<Layer>();
+            TreeMap layers = wms.getLayers();
+            if(layers != null){
+                Set<String> keys = layers.keySet();
+                for(String key: keys){
+                    WMSLayer wmsLayer = (WMSLayer)layers.get(key);
+                    Layer layer = new Layer();
+                    layer.setName(wmsLayer.getName());
+                    layer.setTitle(wmsLayer.getTitle());
+                    lstLayers.add(layer);
+                }
+            }
+            servMetadata.setLayers(lstLayers);
+
+            // get operations
+            List<OperationsMetadata> lstOperations = new ArrayList<OperationsMetadata>();
+            Hashtable supportedOperations = serviceInfo.getSupportedOperationsByName();
+            if(supportedOperations != null){
+                Set<String> keys = supportedOperations.keySet();
+                for(String key: keys){
+                    OperationsMetadata opMetadata = new OperationsMetadata();
+                    opMetadata.setName(key);
+                    opMetadata.setUrl((String) supportedOperations.get(key));
+                    lstOperations.add(opMetadata);
+                }
+            }
+            servMetadata.setOperations(lstOperations);
+            // get contact address
+            ContactAddressMetadata contactAddress = new ContactAddressMetadata();
+            contactAddress.setAddress(serviceInfo.address);
+            contactAddress.setAddressType(serviceInfo.addresstype);
+            contactAddress.setCity(serviceInfo.place);
+            contactAddress.setCountry(serviceInfo.country);
+            contactAddress.setPostCode(serviceInfo.postcode);
+            contactAddress.setStateProvince(serviceInfo.province);
+
+            // get contact info
+            ContactMetadata contactMetadata = new ContactMetadata();
+            contactMetadata.setContactAddress(contactAddress);
+            contactMetadata.setEmail(serviceInfo.email);
+            contactMetadata.setFax(serviceInfo.fax);
+            contactMetadata.setOrganization(serviceInfo.organization);
+            contactMetadata.setPerson(serviceInfo.personname);
+            contactMetadata.setPosition(serviceInfo.function);
+            contactMetadata.setTelephone(serviceInfo.phone);
+
+            servMetadata.setContact(contactMetadata);
+
+        }
+        catch (Exception exc) {
+            // Show exception in log
+            logger.error("Exception on getMetadataInfoFromWMS", exc);
+            throw new ServerGeoException();
+        }
+
+        return servMetadata;
+    }
+
+
+    public ServiceMetadata getMetadataInfoFromWMTS(String urlServer){
+
+        ServiceMetadata servMetadata = new ServiceMetadata();
+
+        try {
+
+
+        }
+        catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return servMetadata;
     }
 
     /*******

@@ -30,6 +30,7 @@ import org.gvsig.catalog.exceptions.NotSupportedVersionException;
 import org.gvsig.framework.web.ogc.CSWCriteria;
 import org.gvsig.framework.web.ogc.CSWResult;
 import org.gvsig.framework.web.ogc.CSWSingleResult;
+import org.gvsig.framework.web.ogc.ServiceMetadata;
 import org.gvsig.framework.web.ogc.WMSInfo;
 import org.gvsig.framework.web.ogc.WMTSInfo;
 
@@ -102,6 +103,13 @@ public interface OGCInfoService {
      */
     public List<String> getCRSSupportedByWMTS(String urlServerWMTS);
 
+    /**
+     * Get layer metadata of service WMS
+     * @param urlServer Url of the server wms to connect and get the data
+     * @return Metadata info of wms server ({@code ServiceMetadata})
+     */
+    public ServiceMetadata getMetadataInfoFromWMS(String urlServer);
+
     /*****************************
      * CSW (Catalog Service Web) *
      *****************************/
@@ -170,4 +178,5 @@ public interface OGCInfoService {
      * @return the result of the indicated position.
      */
     public CSWSingleResult getCswSingleRecord(CSWResult cswResults, int position);
+
 }

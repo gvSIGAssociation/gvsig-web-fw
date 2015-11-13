@@ -22,10 +22,14 @@
  */
 package org.gvsig.framework.web.controllers;
 
+
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeSet;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
@@ -242,5 +246,37 @@ public class OGCInfoController {
     }
 
 
+    /**
+     * Get layer metadata of service WMTS
+     *
+     * @param request the {@code HttpServletRequest}.
+     * @return ResponseEntity with metadata info of wmts server ({@code ServiceMetadata})
+     */
+    @RequestMapping(params = "getWmtsMetadata",
+            headers = "Accept=application/json",
+            produces = { "application/json; charset=UTF-8" })
+    @ResponseBody
+    public ResponseEntity<ServiceMetadata> getWmtsMetadata(WebRequest request) {
+        String urlServer = request.getParameter("url");
+        ServiceMetadata serviceMetadata = null;
+        if (StringUtils.isNotEmpty(urlServer)) {
+            serviceMetadata = ogcInfoServ.getMetadataInfoFromWMTS(urlServer);
+        }
+        return new ResponseEntity<ServiceMetadata>(serviceMetadata, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/loadmetadatalabel.js"/*,
+            produces = { "application/javascript; charset=UTF-8" }*/)
+    public ResponseEntity<String> getMetadataLabel(HttpServletRequest request,
+            HttpServletResponse response, Locale locale) throws IOException {
+        
+        // TODO
+        StringBuilder body = new StringBuilder("");
+        body.append("var metadataLabels = [];");
+        String labelName = request.getParameter("l");
+        body.append("metadataLabels['name']='").append(labelName).append("'");
+        return new ResponseEntity<String>(body.toString()/*, responseHeaders*/, HttpStatus.OK);
+
+    }
 
 }

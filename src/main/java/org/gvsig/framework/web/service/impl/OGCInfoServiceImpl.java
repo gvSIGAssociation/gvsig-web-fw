@@ -71,6 +71,7 @@ import org.gvsig.raster.wmts.ogc.struct.WMTSBoundingBox;
 import org.gvsig.raster.wmts.ogc.struct.WMTSLayer;
 import org.gvsig.raster.wmts.ogc.struct.WMTSLegendURL;
 import org.gvsig.raster.wmts.ogc.struct.WMTSServiceIdentification;
+import org.gvsig.raster.wmts.ogc.struct.WMTSServiceProvider;
 import org.gvsig.raster.wmts.ogc.struct.WMTSStyle;
 import org.gvsig.raster.wmts.ogc.struct.WMTSTheme;
 import org.gvsig.raster.wmts.ogc.struct.WMTSThemes;
@@ -811,6 +812,8 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             servMetadata.setTitle(serviceInfo.title);
             servMetadata.setUrl(urlServer);
             servMetadata.setVersion(serviceInfo.version);
+            // I can't get from service the accessContraints value
+            //servMetadata.setAccessContraints(accessContraints);
 
             // get layers
             List<Layer> lstLayers = new ArrayList<Layer>();
@@ -877,12 +880,58 @@ public class OGCInfoServiceImpl implements OGCInfoService {
         ServiceMetadata servMetadata = new ServiceMetadata();
 
         try {
+            // get WMTS manager
+            WMTSOGCManager wmtsMan = WMTSOGCLocator.getManager();
+
+            WMTSClient wmtsClient = wmtsMan.createWMTSClient(urlServer);
+            wmtsClient.connect(true, null);
+
+            WMTSServiceIdentification wmtsServIden = wmtsClient
+                    .getServiceIdentification();
+
+            servMetadata.setUrl(urlServer);
+            servMetadata.setName(wmtsServIden.getServiceType());
+            servMetadata.setAbstractStr(wmtsServIden.getAbstract());
+            servMetadata.setAccessContraints(wmtsServIden.getAccessConstraints());
+            servMetadata.setFees(wmtsServIden.getFees());
+            servMetadata.setKeywords(StringUtils.join(wmtsServIden.getKeywords(), ','));
+            servMetadata.setVersion(wmtsServIden.getServiceTypeVersion());
+            servMetadata.setTitle(wmtsServIden.getTitle());
 
 
+            // get contact info
+            WMTSServiceProvider serviceProvider = wmtsClient.getServiceProvider();
+
+            ContactMetadata contact = new ContactMetadata();
+            // TODO I can't get all the info of contact and contact address
+            contact.setPerson(serviceProvider.getServiceContact());
+            contact.setOrganization(serviceProvider.getProviderName());
+            servMetadata.setContact(contact);
+
+            // get layers
+            List<Layer> lstLayers = new ArrayList<Layer>();
+            WMTSThemes layerListAsThemes = wmtsClient.getLayerListAsThemes();
+            for (int i = 0; i < layerListAsThemes.getChildCount(); i++) {
+                WMTSTheme wmtsTheme = layerListAsThemes.getChildren(i);
+                WMTSLayer wmtsLayer = wmtsTheme.getLayer();
+                Layer layer = new Layer();
+                layer.setName(wmtsLayer.getIdentifier());
+                layer.setTitle(wmtsLayer.getTitle());
+                lstLayers.add(layer);
+            }
+            servMetadata.setLayers(lstLayers);
+
+            /**
+                private String name;
+                private ContactMetadata contact;
+                private List<Layer> layers;
+                private List<OperationsMetadata> operations;
+             */
         }
-        catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        catch (Exception exc) {
+            // Show exception in log
+            logger.error("Exception on getMetadataInfoFromWMTS", exc);
+            throw new ServerGeoException();
         }
 
         return servMetadata;

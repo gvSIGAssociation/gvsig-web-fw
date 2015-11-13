@@ -110,6 +110,13 @@ public interface OGCInfoService {
      */
     public ServiceMetadata getMetadataInfoFromWMS(String urlServer);
 
+    /**
+     * Get layer metadata of service WMTS
+     * @param urlServer Url of the server wms to connect and get the data
+     * @return Metadata info of wmts server ({@code ServiceMetadata})
+     */
+    public ServiceMetadata getMetadataInfoFromWMTS(String urlServer);
+
     /*****************************
      * CSW (Catalog Service Web) *
      *****************************/

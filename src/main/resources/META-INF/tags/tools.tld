@@ -43,4 +43,8 @@
     <name>measure-area</name>
     <path>/META-INF/tags/tools/measure-area.tagx</path>
   </tag-file>
+    <tag-file>
+    <name>info-by-point</name>
+    <path>/META-INF/tags/tools/info-by-point.tagx</path>
+  </tag-file>
 </taglib>

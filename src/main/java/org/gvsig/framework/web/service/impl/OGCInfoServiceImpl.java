@@ -812,13 +812,13 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             servMetadata.setTitle(serviceInfo.title);
             servMetadata.setUrl(urlServer);
             servMetadata.setVersion(serviceInfo.version);
-            // I can't get from service the accessContraints value
-            //servMetadata.setAccessContraints(accessContraints);
+            // I can't get from service the accessConstraints value
+            //servMetadata.setAccessConstraints(accessConstraints);
 
             // get layers
-            List<Layer> lstLayers = new ArrayList<Layer>();
             TreeMap layers = wms.getLayers();
             if(layers != null){
+                List<Layer> lstLayers = new ArrayList<Layer>();
                 Set<String> keys = layers.keySet();
                 for(String key: keys){
                     WMSLayer wmsLayer = (WMSLayer)layers.get(key);
@@ -827,13 +827,13 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                     layer.setTitle(wmsLayer.getTitle());
                     lstLayers.add(layer);
                 }
+                servMetadata.setLayers(lstLayers);
             }
-            servMetadata.setLayers(lstLayers);
 
             // get operations
-            List<OperationsMetadata> lstOperations = new ArrayList<OperationsMetadata>();
             Hashtable supportedOperations = serviceInfo.getSupportedOperationsByName();
             if(supportedOperations != null){
+                List<OperationsMetadata> lstOperations = new ArrayList<OperationsMetadata>();
                 Set<String> keys = supportedOperations.keySet();
                 for(String key: keys){
                     OperationsMetadata opMetadata = new OperationsMetadata();
@@ -841,27 +841,45 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                     opMetadata.setUrl((String) supportedOperations.get(key));
                     lstOperations.add(opMetadata);
                 }
+                servMetadata.setOperations(lstOperations);
             }
-            servMetadata.setOperations(lstOperations);
             // get contact address
-            ContactAddressMetadata contactAddress = new ContactAddressMetadata();
-            contactAddress.setAddress(serviceInfo.address);
-            contactAddress.setAddressType(serviceInfo.addresstype);
-            contactAddress.setCity(serviceInfo.place);
-            contactAddress.setCountry(serviceInfo.country);
-            contactAddress.setPostCode(serviceInfo.postcode);
-            contactAddress.setStateProvince(serviceInfo.province);
+            ContactAddressMetadata contactAddress = null;
+            if(StringUtils.isNotEmpty(serviceInfo.address) ||
+                    StringUtils.isNotEmpty(serviceInfo.addresstype) ||
+                    StringUtils.isNotEmpty(serviceInfo.place) ||
+                    StringUtils.isNotEmpty(serviceInfo.country) ||
+                    StringUtils.isNotEmpty(serviceInfo.postcode) ||
+                    StringUtils.isNotEmpty(serviceInfo.province)
+                    ){
+                contactAddress = new ContactAddressMetadata();
+                contactAddress.setAddress(serviceInfo.address);
+                contactAddress.setAddressType(serviceInfo.addresstype);
+                contactAddress.setCity(serviceInfo.place);
+                contactAddress.setCountry(serviceInfo.country);
+                contactAddress.setPostCode(serviceInfo.postcode);
+                contactAddress.setStateProvince(serviceInfo.province);
+            }
 
             // get contact info
-            ContactMetadata contactMetadata = new ContactMetadata();
-            contactMetadata.setContactAddress(contactAddress);
-            contactMetadata.setEmail(serviceInfo.email);
-            contactMetadata.setFax(serviceInfo.fax);
-            contactMetadata.setOrganization(serviceInfo.organization);
-            contactMetadata.setPerson(serviceInfo.personname);
-            contactMetadata.setPosition(serviceInfo.function);
-            contactMetadata.setTelephone(serviceInfo.phone);
-
+            ContactMetadata contactMetadata = null;
+            if(contactAddress != null ||
+                    StringUtils.isNotEmpty(serviceInfo.email) ||
+                    StringUtils.isNotEmpty(serviceInfo.fax) ||
+                    StringUtils.isNotEmpty(serviceInfo.organization) ||
+                    StringUtils.isNotEmpty(serviceInfo.personname) ||
+                    StringUtils.isNotEmpty(serviceInfo.function) ||
+                    StringUtils.isNotEmpty(serviceInfo.phone)
+                    ){
+                contactMetadata = new ContactMetadata();
+                contactMetadata.setContactAddress(contactAddress);
+                contactMetadata.setEmail(serviceInfo.email);
+                contactMetadata.setFax(serviceInfo.fax);
+                contactMetadata.setOrganization(serviceInfo.organization);
+                contactMetadata.setPerson(serviceInfo.personname);
+                contactMetadata.setPosition(serviceInfo.function);
+                contactMetadata.setTelephone(serviceInfo.phone);
+            }
             servMetadata.setContact(contactMetadata);
 
         }
@@ -892,7 +910,7 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             servMetadata.setUrl(urlServer);
             servMetadata.setName(wmtsServIden.getServiceType());
             servMetadata.setAbstractStr(wmtsServIden.getAbstract());
-            servMetadata.setAccessContraints(wmtsServIden.getAccessConstraints());
+            servMetadata.setAccessConstraints(wmtsServIden.getAccessConstraints());
             servMetadata.setFees(wmtsServIden.getFees());
             servMetadata.setKeywords(StringUtils.join(wmtsServIden.getKeywords(), ','));
             servMetadata.setVersion(wmtsServIden.getServiceTypeVersion());
@@ -902,31 +920,34 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             // get contact info
             WMTSServiceProvider serviceProvider = wmtsClient.getServiceProvider();
 
-            ContactMetadata contact = new ContactMetadata();
+            ContactMetadata contact = null;
             // TODO I can't get all the info of contact and contact address
-            contact.setPerson(serviceProvider.getServiceContact());
-            contact.setOrganization(serviceProvider.getProviderName());
+            if(StringUtils.isNotEmpty(serviceProvider.getServiceContact()) ||
+                    StringUtils.isNotEmpty(serviceProvider.getProviderName())
+                    ){
+                contact = new ContactMetadata();
+                contact.setPerson(serviceProvider.getServiceContact());
+                contact.setOrganization(serviceProvider.getProviderName());
+            }
             servMetadata.setContact(contact);
 
             // get layers
-            List<Layer> lstLayers = new ArrayList<Layer>();
+            List<Layer> lstLayers = null;
             WMTSThemes layerListAsThemes = wmtsClient.getLayerListAsThemes();
-            for (int i = 0; i < layerListAsThemes.getChildCount(); i++) {
-                WMTSTheme wmtsTheme = layerListAsThemes.getChildren(i);
-                WMTSLayer wmtsLayer = wmtsTheme.getLayer();
-                Layer layer = new Layer();
-                layer.setName(wmtsLayer.getIdentifier());
-                layer.setTitle(wmtsLayer.getTitle());
-                lstLayers.add(layer);
+            if(layerListAsThemes  != null &&
+                    layerListAsThemes.getChildCount() > 0){
+                lstLayers = new ArrayList<Layer>();
+                for (int i = 0; i < layerListAsThemes.getChildCount(); i++) {
+                    WMTSTheme wmtsTheme = layerListAsThemes.getChildren(i);
+                    WMTSLayer wmtsLayer = wmtsTheme.getLayer();
+                    Layer layer = new Layer();
+                    layer.setName(wmtsLayer.getIdentifier());
+                    layer.setTitle(wmtsLayer.getTitle());
+                    lstLayers.add(layer);
+                }
             }
             servMetadata.setLayers(lstLayers);
 
-            /**
-                private String name;
-                private ContactMetadata contact;
-                private List<Layer> layers;
-                private List<OperationsMetadata> operations;
-             */
         }
         catch (Exception exc) {
             // Show exception in log

@@ -93,4 +93,17 @@ Geospatial web framework that includes many geographical tools for Spring MVC ba
       </jsp:root>
 ```
 
+- copy files that contains the messages from  `src/main/resources/templates/i18n/` to `WEB-INF/i18n`. Include them into the configuration of the bean `ReloadableResourceBundleMessageSource` modifying the file `webmvc-config.xml`:
+```
+     ....
+    <bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource" id="messageSource" p:basenames="WEB-INF/i18n/messages,WEB-INF/i18n/application,WEB-INF/i18n/gvsig-fw-msg" p:fallbackToSystemLocale="false"/>
+    ....
+```
+
+- copy the content of the folder `src/main/resources/templates/views` into the folder `views` of your project.
+
+- copy `default-empty.jspx` into your `layouts` folder.
+
+- copy the definition `default-dialog-empty` (included inside the file `gvsig-fw-msg-layouts.xml`) into the file `layout.xml`.
+
 Now you are able to use tools on your map view

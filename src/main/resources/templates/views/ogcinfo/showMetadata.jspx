@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:gvsig-form-fields="http://gvsig.org/web-framework/TLD/form/fields" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:spring="http://www.springframework.org/tags" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+
+   <dl class="dl-horizontal">
+      <gvsig-form-fields:list-element id="s_service_metadata_name" value="${srvMetadata.name}" />
+      <gvsig-form-fields:list-element id="s_service_metadata_url" value="${srvMetadata.url}" />
+      <gvsig-form-fields:list-element id="s_service_metadata_title" value="${srvMetadata.title}" />
+      <gvsig-form-fields:list-element id="s_service_metadata_abstract" value="${srvMetadata.abstractStr}" />
+      <gvsig-form-fields:list-element id="s_service_metadata_version" value="${srvMetadata.version}" />
+      <gvsig-form-fields:list-element id="s_service_metadata_keywords" value="${srvMetadata.keywords}" />
+      <gvsig-form-fields:list-element id="s_service_metadata_fees" value="${srvMetadata.fees}" />
+      <gvsig-form-fields:list-element id="s_service_metadata_access_constraints" value="${srvMetadata.accessConstraints}" />
+      <!-- Contact -->
+      <gvsig-form-fields:list-element-obj id="s_service_metadata_contact" value="${srvMetadata.contact}">
+        <gvsig-form-fields:list-element id="s_service_metadata_contact_person" value="${srvMetadata.contact.person}" />
+	      <gvsig-form-fields:list-element id="s_service_metadata_contact_organization" value="${srvMetadata.contact.organization}" />
+	      <gvsig-form-fields:list-element id="s_service_metadata_contact_position" value="${srvMetadata.contact.position}" />
+	      <gvsig-form-fields:list-element id="s_service_metadata_contact_telephone" value="${srvMetadata.contact.telephone}" />
+	      <gvsig-form-fields:list-element id="s_service_metadata_contact_fax" value="${srvMetadata.contact.fax}" />
+	      <gvsig-form-fields:list-element id="s_service_metadata_contact_email" value="${srvMetadata.contact.email}" />
+        <!--  Contact Address -->
+        <gvsig-form-fields:list-element-obj id="s_service_metadata_contact_contact_address" value="${srvMetadata.contact.contactAddress}">
+          <gvsig-form-fields:list-element id="s_service_metadata_contact_address_address_type" value="${srvMetadata.contact.contactAddress.addressType}" />
+		      <gvsig-form-fields:list-element id="s_service_metadata_contact_address_address" value="${srvMetadata.contact.contactAddress.address}" />
+		      <gvsig-form-fields:list-element id="s_service_metadata_contact_address_post_code" value="${srvMetadata.contact.contactAddress.postCode}" />
+		      <gvsig-form-fields:list-element id="s_service_metadata_contact_address_city" value="${srvMetadata.contact.contactAddress.city}" />
+		      <gvsig-form-fields:list-element id="s_service_metadata_contact_address_state_province" value="${srvMetadata.contact.contactAddress.stateProvince}" />
+		      <gvsig-form-fields:list-element id="s_service_metadata_contact_address_country" value="${srvMetadata.contact.contactAddress.country}" />
+        </gvsig-form-fields:list-element-obj>
+      </gvsig-form-fields:list-element-obj>
+      <!-- Layers -->
+      <!-- check if have layers -->
+      <gvsig-form-fields:list-element-obj id="s_service_metadata_layers" value="${srvMetadata.layers}">
+        <c:forEach var="layer" items="${srvMetadata.layers}">
+          <gvsig-form-fields:list-element id="s_service_metadata_layers_name" value="${layer.name}" />
+          <gvsig-form-fields:list-element id="s_service_metadata_layers_title" value="${layer.title}" />
+          <gvsig-form-fields:list-element id="s_service_metadata_layers_crs" value="${layer.crs}" />
+        </c:forEach>
+      </gvsig-form-fields:list-element-obj>
+	    <!-- Operations -->
+	    <!-- check if have operations -->
+	    <gvsig-form-fields:list-element-obj id="s_service_metadata_operations" value="${srvMetadata.operations}">
+	      <c:forEach var="operation" items="${srvMetadata.operations}">
+          <gvsig-form-fields:list-element id="s_service_metadata_operations_name" value="${operation.name}" />
+          <gvsig-form-fields:list-element id="s_service_metadata_operations_url" value="${operation.url}" />
+        </c:forEach>
+      </gvsig-form-fields:list-element-obj>
+    </dl>
+</div>

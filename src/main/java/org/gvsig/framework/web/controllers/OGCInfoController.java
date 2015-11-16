@@ -23,13 +23,10 @@
 package org.gvsig.framework.web.controllers;
 
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.TreeSet;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
@@ -44,11 +41,13 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 
 @RequestMapping("/ogcinfo")
 @Controller
@@ -225,58 +224,43 @@ public class OGCInfoController {
         return "redirect:".concat(legendUrl);
     }
 
-
     /**
-     * Get layer metadata of service WMS
+     * Get layer metadata of service WMS and show it in page
      *
      * @param request the {@code HttpServletRequest}.
+     * @param uiModel the {@code Model}.
      * @return ResponseEntity with metadata info of wms server ({@code ServiceMetadata})
      */
     @RequestMapping(params = "getWmsMetadata",
-            headers = "Accept=application/json",
-            produces = { "application/json; charset=UTF-8" })
-    @ResponseBody
-    public ResponseEntity<ServiceMetadata> getWmsMetadata(WebRequest request) {
+            headers = "Accept=application/json")
+    public String getWmsMetadata(WebRequest request, Model uiModel) {
         String urlServer = request.getParameter("url");
         ServiceMetadata serviceMetadata = null;
         if (StringUtils.isNotEmpty(urlServer)) {
             serviceMetadata = ogcInfoServ.getMetadataInfoFromWMS(urlServer);
         }
-        return new ResponseEntity<ServiceMetadata>(serviceMetadata, HttpStatus.OK);
+        uiModel.addAttribute("srvMetadata", serviceMetadata);
+        return "ogcinfo/showMetadata";
     }
 
-
     /**
-     * Get layer metadata of service WMTS
+     * Get layer metadata of service WMTS and show it in page
      *
      * @param request the {@code HttpServletRequest}.
+     * @param uiModel the {@code Model}.
      * @return ResponseEntity with metadata info of wmts server ({@code ServiceMetadata})
      */
     @RequestMapping(params = "getWmtsMetadata",
-            headers = "Accept=application/json",
-            produces = { "application/json; charset=UTF-8" })
-    @ResponseBody
-    public ResponseEntity<ServiceMetadata> getWmtsMetadata(WebRequest request) {
+            headers = "Accept=application/json"
+            )
+    public String getWmtsMetadata(WebRequest request, Model uiModel) {
         String urlServer = request.getParameter("url");
         ServiceMetadata serviceMetadata = null;
         if (StringUtils.isNotEmpty(urlServer)) {
             serviceMetadata = ogcInfoServ.getMetadataInfoFromWMTS(urlServer);
         }
-        return new ResponseEntity<ServiceMetadata>(serviceMetadata, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "/loadmetadatalabel.js"/*,
-            produces = { "application/javascript; charset=UTF-8" }*/)
-    public ResponseEntity<String> getMetadataLabel(HttpServletRequest request,
-            HttpServletResponse response, Locale locale) throws IOException {
-        
-        // TODO
-        StringBuilder body = new StringBuilder("");
-        body.append("var metadataLabels = [];");
-        String labelName = request.getParameter("l");
-        body.append("metadataLabels['name']='").append(labelName).append("'");
-        return new ResponseEntity<String>(body.toString()/*, responseHeaders*/, HttpStatus.OK);
-
+        uiModel.addAttribute("srvMetadata", serviceMetadata);
+        return "ogcinfo/showMetadata";
     }
 
 }

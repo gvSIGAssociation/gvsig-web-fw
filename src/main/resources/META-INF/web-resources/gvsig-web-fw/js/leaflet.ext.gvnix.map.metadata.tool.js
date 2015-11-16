@@ -111,16 +111,16 @@
 				html += metadata;
 				html += "' width='"+st.dialogWidth+"'";
 				html += " height='"+st.dialogHeight+"'";
-				html += "/> </BR>";
+				html += "/>";
 			}else{
 				if(metadataType == "STRING"){ //html
 					html += "<div>";
 					html += metadata;
-					html += "</div> </BR>";
+					html += "</div>";
 				}else{ // JSON
 					html += "<div>";
 					html += GvNIX_Map_Leaflet.Util.JSONToHtml(metadata);
-					html += "</div> </BR>";
+					html += "</div>";
 				}
 			}
 			html += "</div>";

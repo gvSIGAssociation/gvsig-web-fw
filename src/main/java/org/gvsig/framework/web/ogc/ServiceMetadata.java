@@ -44,7 +44,7 @@ public class ServiceMetadata {
 
     private String fees;
 
-    private String accessContraints;
+    private String accessConstraints;
 
     private ContactMetadata contact;
 

@@ -63,12 +63,12 @@ privileged aspect ServiceMetadata_Roo_JavaBean {
         this.fees = fees;
     }
 
-    public String ServiceMetadata.getAccessContraints() {
-        return this.accessContraints;
+    public String ServiceMetadata.getAccessConstraints() {
+        return this.accessConstraints;
     }
 
-    public void ServiceMetadata.setAccessContraints(String accessContraints) {
-        this.accessContraints = accessContraints;
+    public void ServiceMetadata.setAccessConstraints(String accessConstraints) {
+        this.accessConstraints = accessConstraints;
     }
 
     public ContactMetadata ServiceMetadata.getContact() {

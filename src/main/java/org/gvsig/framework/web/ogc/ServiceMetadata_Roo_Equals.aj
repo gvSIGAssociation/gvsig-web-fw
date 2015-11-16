@@ -16,11 +16,11 @@ privileged aspect ServiceMetadata_Roo_Equals {
             return true;
         }
         ServiceMetadata rhs = (ServiceMetadata) obj;
-        return new EqualsBuilder().append(abstractStr, rhs.abstractStr).append(accessContraints, rhs.accessContraints).append(contact, rhs.contact).append(fees, rhs.fees).append(keywords, rhs.keywords).append(name, rhs.name).append(title, rhs.title).append(url, rhs.url).append(version, rhs.version).isEquals();
+        return new EqualsBuilder().append(abstractStr, rhs.abstractStr).append(accessConstraints, rhs.accessConstraints).append(contact, rhs.contact).append(fees, rhs.fees).append(keywords, rhs.keywords).append(name, rhs.name).append(title, rhs.title).append(url, rhs.url).append(version, rhs.version).isEquals();
     }
 
     public int ServiceMetadata.hashCode() {
-        return new HashCodeBuilder().append(abstractStr).append(accessContraints).append(contact).append(fees).append(keywords).append(name).append(title).append(url).append(version).toHashCode();
+        return new HashCodeBuilder().append(abstractStr).append(accessConstraints).append(contact).append(fees).append(keywords).append(name).append(title).append(url).append(version).toHashCode();
     }
 
 }

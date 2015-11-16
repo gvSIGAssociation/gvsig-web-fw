@@ -34,27 +34,27 @@
 <spring:url value="/resources/gvsig-web-fw/js/L.Control.ZoomBox.js" var="js_leaflet_zoom_box_js"/>
     <script src="${js_leaflet_zoom_box_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
-</script> 
+</script>
 <spring:url value="/resources/gvsig-web-fw/js/L.MeasureAreaTool.js" var="js_leaflet_measure_area_js"/>
     <script src="${js_leaflet_measure_area_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
-</script> 
+</script>
 <spring:url value="/resources/gvsig-web-fw/js/leaflet-history-src.js" var="js_leaflet_history_js"/>
     <script src="${js_leaflet_history_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
-</script> 
+</script>
 <spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.history.component.js" var="js_leaflet_history_component_js"/>
     <script src="${js_leaflet_history_component_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
-</script> 
+</script>
  <spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.zoombox.tool.js" var="js_leaflet_zoom_box_tool"/>
     <script src="${js_leaflet_zoom_box_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->
- </script>  
+ </script>
 <spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.measurearea.tool.js" var="js_leaflet_measure_area_tool"/>
   <script src="${js_leaflet_measure_area_tool}" type="text/javascript">
       <!--required for FF3 and Opera-->
-</script>   
+</script>
 <spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.userlayers.tool.js" var="js_leaflet_ext_gvnix_userlayers_tool"/>
     <script src="${js_leaflet_ext_gvnix_userlayers_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->
@@ -106,8 +106,8 @@
 <spring:url value="/resources/gvsig-web-fw/styles/jquery.steps.css" var="styles_jquery_steps"/>
     <link href="${styles_jquery_steps}" media="screen,print" rel="stylesheet" type="text/css"/>
 <spring:url value="/resources/gvsig-web-fw/styles/L.Control.ZoomBox.css" var="styles_zoom_box_css"/>
-    <link href="${styles_zoom_box_css}" media="screen,print" rel="stylesheet" type="text/css"/>   
+    <link href="${styles_zoom_box_css}" media="screen,print" rel="stylesheet" type="text/css"/>
  <spring:url value="/resources/gvsig-web-fw/styles/leaflet-history-src.css" var="styles_history_css"/>
-    <link href="${styles_history_css}" media="screen,print" rel="stylesheet" type="text/css"/>      
+    <link href="${styles_history_css}" media="screen,print" rel="stylesheet" type="text/css"/>
 
 </jsp:root>

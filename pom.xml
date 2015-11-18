@@ -202,15 +202,85 @@
 			<artifactId>org.gvnix.util.fancytree</artifactId>
 			<version>${gvnix.version}</version>
 		</dependency>
+    <dependency>
+			<groupId>xml-apis</groupId>
+			<artifactId>xml-apis</artifactId>
+			<version>1.4.01</version>
+    </dependency>
+		<dependency>
+			<groupId>org.gvsig</groupId>
+			<artifactId>org.gvsig.tools.lib</artifactId>
+			<version>3.0.60</version>
+		</dependency>
 		<dependency>
 			<groupId>org.gvsig</groupId>
 			<artifactId>org.gvsig.raster.wmts.ogc.api</artifactId>
 			<version>2.2.10</version>
+      <exclusions>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.andami</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.mapcontext.api</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.mapcontext.impl</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.mapcontext.operation</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.gvsig</groupId>
 			<artifactId>org.gvsig.raster.wmts.ogc.impl</artifactId>
 			<version>2.2.10</version>
+      <exclusions>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.tools.swing.api</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.i18n</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.dal.api</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.dal.impl</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.dal.spi</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.andami</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.mapcontext.api</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.mapcontext.impl</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.fmap.mapcontext.operation</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.gvsig</groupId>
+          <artifactId>org.gvsig.tools.lib</artifactId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.gvsig</groupId>
@@ -231,6 +301,18 @@
 					<groupId>org.springframework</groupId>
 					<artifactId>spring</artifactId>
 				</exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.i18n</artifactId>
+        </exclusion>
+        <exclusion>
+					<groupId>org.gvsig</groupId>
+					<artifactId>org.gvsig.tools.swing.api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.gvsig</groupId>
+          <artifactId>org.gvsig.tools.lib</artifactId>
+        </exclusion>
 			</exclusions>
 		</dependency>
 	</dependencies>

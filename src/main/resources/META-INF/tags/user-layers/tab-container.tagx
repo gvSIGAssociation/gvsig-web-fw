@@ -24,7 +24,7 @@
 -->
   <jsp:output omit-xml-declaration="yes" />
 
-  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure clean (include at final substring '_user_layers_tabs')" />
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify the tab container (include at final substring '_user_layers_tabs')" />
   <jsp:directive.attribute name="display" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Set if container tabs is shown, default 'false'" />
 
   <c:set var="styleDisplay" value="display:none"/>

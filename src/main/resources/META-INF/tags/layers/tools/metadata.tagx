@@ -26,7 +26,7 @@
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify metadata tool" />
   <jsp:directive.attribute name="dialogHeight" type="java.lang.Integer" required="false" description="Height of the dialog in pixels. Default 500" />
-  <jsp:directive.attribute name="dialogWidth" type="java.lang.Integer" required="false" description="Height of the dialog in pixels. Default 800"  />
+  <jsp:directive.attribute name="dialogWidth" type="java.lang.Integer" required="false" description="Width of the dialog in pixels. Default 800"  />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty dialogHeight}">

@@ -1,18 +1,24 @@
 /*
- * gvNIX. Spring Roo based RAD tool for Generalitat Valenciana
- * Copyright (C) 2013 Generalitat Valenciana
+ * gvSIG Web Framework is sponsored by the General Directorate for Information
+ * Technologies (DGTI) of the Regional Ministry of Finance and Public
+ * Administration of the Generalitat Valenciana (Valencian Community,
+ * Spain), managed by gvSIG Association and led by DISID.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (C) 2015 DGTI - Generalitat Valenciana
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
 var GvNIX_Map_Info_By_Point;
@@ -62,6 +68,7 @@ var GvNIX_Map_Info_By_Point;
 					// Enable click event on map
 					st.oMap.fnGetMapObject().on("click",
 							jQuery.proxy(this._fnOnClick, this));
+
 					return true;
 				},
 
@@ -80,7 +87,7 @@ var GvNIX_Map_Info_By_Point;
 				 * To do when click on map with this tool active. Add a marker
 				 * and show a pop-up with requested info from layer if any layer
 				 * is active.
-				 * 
+				 *
 				 * @param event
 				 *            click event of Leaflet map
 				 */
@@ -91,7 +98,7 @@ var GvNIX_Map_Info_By_Point;
 					// Getting active layer
 					var layer = st.oMap.fnGetLayerById(st.oMap
 							.fnGetActiveLayer());
-					
+
 					if (layer) {
 						layer.fnGetFeatureInfo(event.containerPoint, jQuery
 								.proxy(this._fnAddMarkerOnMap, this));
@@ -104,9 +111,9 @@ var GvNIX_Map_Info_By_Point;
 				 * Adds a marker on map on the position where user clicked. It
 				 * also will show a pop-up with information received from active
 				 * layer
-				 * 
-				 * @param info 
-				 * 			(String) Information to display on pop-up	
+				 *
+				 * @param info
+				 * 			(String) Information to display on pop-up
 				 * @param type
 				 * 			(String) Type which information is given.
 				 * 			Supported values are 'URL' and 'STRING'
@@ -130,7 +137,7 @@ var GvNIX_Map_Info_By_Point;
 
 				/**
 				 * Returns a div element to display any information
-				 * 
+				 *
 				 * @param info
 				 *            (String) Information to convert. Can be HTML text
 				 *            or an url.

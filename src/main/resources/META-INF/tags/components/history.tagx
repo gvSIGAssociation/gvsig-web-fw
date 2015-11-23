@@ -1,4 +1,27 @@
 <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+<!--
+
+ gvSIG Web Framework is sponsored by the General Directorate for Information
+ Technologies (DGTI) of the Regional Ministry of Finance and Public
+ Administration of the Generalitat Valenciana (Valencian Community,
+ Spain), managed by gvSIG Association and led by DISID.
+
+ Copyright (C) 2015 DGTI - Generalitat Valenciana
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
+
+-->
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure tool" />
@@ -10,7 +33,7 @@
   <jsp:directive.attribute name="forwardText" type="java.lang.String" required="false" description="Set a text to display on 'forward' button'. No default value." />
   <jsp:directive.attribute name="backTooltip" type="java.lang.String" required="false" description="Tooltip content to display on 'back' button'. No default value." />
   <jsp:directive.attribute name="forwardTooltip" type="java.lang.String" required="false" description="Tooltip content to display on 'forward' button'. No default value." />
-  <jsp:directive.attribute name="orientation" type="java.lang.String" required="false" description="Whether to position the buttons on top of one another or side-by-side. VALUES:'vertical','horizontal'. DEFAULT:'horizontal'" />  
+  <jsp:directive.attribute name="orientation" type="java.lang.String" required="false" description="Whether to position the buttons on top of one another or side-by-side. VALUES:'vertical','horizontal'. DEFAULT:'horizontal'" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty position}">
@@ -19,19 +42,19 @@
 
   <c:if test="${empty maxMoves}">
     <c:set var="maxMoves" value="10"/>
-  </c:if>  
-  
+  </c:if>
+
   <c:if test="${empty backIcon}">
     <c:set var="backIcon" value="fa fa-caret-left"/>
-  </c:if>  
-  
+  </c:if>
+
   <c:if test="${empty forwardIcon}">
     <c:set var="forwardIcon" value="fa fa-caret-right"/>
-  </c:if>  
-  
+  </c:if>
+
   <c:if test="${empty orientation}">
     <c:set var="orientation" value="horizontal"/>
-  </c:if>    
+  </c:if>
 
   <!-- Generating scale tool -->
   <div id="${id}_history_component" class="map_component"
@@ -44,7 +67,7 @@
   data-forward_text="${forwardText}"
   data-back_tooltip="${backTooltip}"
   data-forward_tooltip="${forwardTooltip}"
-  data-orientation="${orientation}"  
+  data-orientation="${orientation}"
   >&amp;nbsp;</div>
 
 </jsp:root>

@@ -1,4 +1,27 @@
 <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+ <!--
+
+ gvSIG Web Framework is sponsored by the General Directorate for Information
+ Technologies (DGTI) of the Regional Ministry of Finance and Public
+ Administration of the Generalitat Valenciana (Valencian Community,
+ Spain), managed by gvSIG Association and led by DISID.
+
+ Copyright (C) 2015 DGTI - Generalitat Valenciana
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
+
+-->
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure area tool" />

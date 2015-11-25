@@ -26,7 +26,9 @@
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify zoombos tool" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
+  <spring:message code="tooltip_tool_zoombox" var="tooltip"/>
+
   <i id="${id}_zoombox_tool" class="whhg icon-selectionadd toolbar_button"
-     data-type="zoombox">&amp;nbsp;</i>
+     data-type="zoombox" title="${tooltip}">&amp;nbsp;</i>
 
 </jsp:root>

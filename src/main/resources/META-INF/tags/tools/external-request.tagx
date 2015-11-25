@@ -40,6 +40,7 @@
   <jsp:directive.attribute name="showResultDialogTitleCode" type="java.lang.String" required="false" description="TODO" />
   <jsp:directive.attribute name="msgSelectPointCode" type="java.lang.String" required="false" description="TODO" />
   <jsp:directive.attribute name="titleSelectPointCode" type="java.lang.String" required="false" description="TODO" />
+  <jsp:directive.attribute name="codeTooltip" type="java.lang.String" required="false" description="Code of i18n message to show like tooltip" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <c:if test="${empty getPointOverMap}">
@@ -95,6 +96,10 @@
   <spring:message code='button_submit' var='labelButtonSubmit' />
   <spring:message code='button_cancel' var='labelButtonCancel' />
 
+  <c:if test="${not empty codeTooltip}">
+      <spring:message code="${codeTooltip}" var="tooltip"/>
+  </c:if>
+
 	<!-- Generating tool -->
 	<i id="${id}_external_req_tool" class="toolbar_button ${iconLibrary} ${icon}"
         data-type="external_request"
@@ -113,6 +118,7 @@
         data-label_button_cancel="${labelButtonCancel}"
         data-msg_select_point="${msgSelectPoint}"
         data-title_select_point="${titleSelectPoint}"
+        title="${tooltip}"
         >&amp;nbsp;</i>
 
  </jsp:root>

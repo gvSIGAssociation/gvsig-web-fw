@@ -27,9 +27,11 @@
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
+  <spring:message code="tooltip_tool_predefined_layers" var="tooltip"/>
+
   <!-- Generating predefined layers tool -->
   <i id="${id}_predefined_layers_tool" class="whhg icon-burstmode toolbar_button"
-       data-type="predefined_layers"
+       data-type="predefined_layers" title="${tooltip}"
        >&amp;nbsp;</i>
 
   <ul id="${id}_predefined_layers_tool_root" style="display:none; position:absolute" >

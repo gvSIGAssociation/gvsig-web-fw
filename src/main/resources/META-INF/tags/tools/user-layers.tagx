@@ -39,9 +39,10 @@
   </c:choose>
 
   <spring:message code="server_label" var="serverLabel" htmlEscape="false"/>
+  <spring:message code="tooltip_tool_user_layers" var="tooltip"/>
 
 	<i id="${fn:escapeXml(id)}_user_layers_tool" class="whhg icon-addtolist toolbar_button"
-        data-type="user_layers" data-dialog_title="${dialogTitle}">&amp;nbsp;</i>
+        data-type="user_layers" data-dialog_title="${dialogTitle}" title="${tooltip}">&amp;nbsp;</i>
 
   <div id="${fn:escapeXml(id)}_user_layers_tool_container" style="display:none">
     <jsp:doBody/>

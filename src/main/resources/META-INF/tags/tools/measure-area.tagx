@@ -30,7 +30,7 @@
     <c:if test="${!empty preventExitMessage}">
     <spring:message code="${preventExitMessage}" var="label" htmlEscape="false" />
     </c:if>
-    <spring:message code="label_measure_area" htmlEscape="false"  var="measureMsg"/>
+    <spring:message code="tooltip_tool_measure_area" var="tooltip"/>
     <spring:message code="label_measure_area_tooltip_start" htmlEscape="false"  var="tooltip_start"/>
     <spring:message code="label_measure_area_tooltip_cont" htmlEscape="false"  var="tooltip_cont"/>
     <spring:message code="label_measure_area_tooltip_end" htmlEscape="false"  var="tooltip_end"/>
@@ -41,6 +41,6 @@
     class="whhg icon-canvasrulers toolbar_button" data-type="measureArea"
     data-tooltipstart="${tooltip_start}" data-tooltipunits="${tooltip_type}"
     data-tooltipcont="${tooltip_cont}" data-tooltipend="${tooltip_end}"
-    data-tooltiperror="${tooltip_error}" title="${measureMsg}">&amp;nbsp;</i>
+    data-tooltiperror="${tooltip_error}" title="${tooltip}">&amp;nbsp;</i>
 
 </jsp:root>

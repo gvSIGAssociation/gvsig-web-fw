@@ -150,9 +150,6 @@ var GvNIX_Map_External_Request_Tool;
 					this._fnCreateFormDialog(st.idContainerForm);
 				}
 			}
-			/*st.oMap.fnGetMapObject().dragging.disable();
-			st.oMap.fnGetMapObject().doubleClickZoom.disable();
-			st.oMap.fnGetMapObject().getContainer().focus();*/
 			return true;
 		},
 
@@ -320,7 +317,8 @@ var GvNIX_Map_External_Request_Tool;
 			}
 
 			//quit event click over map
-			st.oMap.fnGetMapObject().off("click");
+			st.oMap.fnGetMapObject().off("click",st._proxy_onClick);
+			//st.oMap.fnGetMapObject().off("click");
 
 			return true;
 		}

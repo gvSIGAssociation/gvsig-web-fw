@@ -221,7 +221,7 @@ var GvNIX_Map_User_Layers_Tool;
 			st.oTabContainer.fnCreateTabs();
 
 			// Clone button accept and add to dialog with its id changed
-			var buttonAccept = jQuery("#".concat(st.sId).concat("_button_accept")).clone();
+			var buttonAccept = jQuery("#".concat(st.sId).concat("_button_accept")).clone(true,true);
 			buttonAccept.show();
 			buttonAccept.click(jQuery.proxy(this._fnOnClickAccept, this));
 			jQuery("#".concat(st.sId).concat("_dialog")).append(buttonAccept);

@@ -25,21 +25,21 @@
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify the tool  (include at final substring '_external_req_tool')" />
-  <jsp:directive.attribute name="getPointOverMap" type="java.lang.Boolean" required="false" description="TODO" />
-  <jsp:directive.attribute name="setDataByForm" type="java.lang.Boolean" required="false" description="TODO" />
-  <jsp:directive.attribute name="idContainerFormGetData" type="java.lang.String" required="false" description="TODO" />
-  <jsp:directive.attribute name="showResultInDialog" type="java.lang.Boolean" required="false" description="TODO" />
-  <jsp:directive.attribute name="fnDoRequest" type="java.lang.String" required="true" description="TODO" />
+  <jsp:directive.attribute name="getPointOverMap" type="java.lang.Boolean" required="false" description="Indicate if activate the option to get the position of a point in the map" />
+  <jsp:directive.attribute name="setDataByForm" type="java.lang.Boolean" required="false" description="Indicate if shown a form in a dialog (if getPointOverMap is 'true' this form is shown after select a point)" />
+  <jsp:directive.attribute name="idContainerFormGetData" type="java.lang.String" required="false" description="Id that contains the form to show. Require setDataByForm with 'true' value" />
+  <jsp:directive.attribute name="showResultInDialog" type="java.lang.Boolean" required="false" description="Indicate if the result will be shown in a dialog" />
+  <jsp:directive.attribute name="fnDoRequest" type="java.lang.String" required="true" description="Function that will be call when select a point or push 'Submit' button in the form defined. Have three parameters (object with the form data, map object and tool object)" />
   <jsp:directive.attribute name="icon" type="java.lang.String" required="true" description="Icon to show on ToolBar to identiy the tool element" />
   <jsp:directive.attribute name="iconLibrary" type="java.lang.String" required="false" rtexprvalue="true" description="Select de icon library.| DEFAULT: 'glyphicon' | POSSIBLE VALUES: 'fa' for font-awesome, 'glyphicon' for bootstrap 3 or 'whhg' for Webhostinghub glyphs " />
   <jsp:directive.attribute name="formDialogHeight" type="java.lang.Integer" required="false" description="Height of the dialog in pixels. Default 500" />
   <jsp:directive.attribute name="formDialogWidth" type="java.lang.Integer" required="false" description="Width of the dialog in pixels. Default 800"  />
-  <jsp:directive.attribute name="formDialogTitleCode" type="java.lang.String" required="false" description="TODO" />
+  <jsp:directive.attribute name="formDialogTitleCode" type="java.lang.String" required="false" description="Set the title of the form dialog" />
   <jsp:directive.attribute name="showResultDialogHeight" type="java.lang.Integer" required="false" description="Height of the dialog in pixels. Default 500" />
   <jsp:directive.attribute name="showResultDialogWidth" type="java.lang.Integer" required="false" description="Width of the dialog in pixels. Default 800"  />
-  <jsp:directive.attribute name="showResultDialogTitleCode" type="java.lang.String" required="false" description="TODO" />
-  <jsp:directive.attribute name="msgSelectPointCode" type="java.lang.String" required="false" description="TODO" />
-  <jsp:directive.attribute name="titleSelectPointCode" type="java.lang.String" required="false" description="TODO" />
+  <jsp:directive.attribute name="showResultDialogTitleCode" type="java.lang.String" required="false" description="Set the title of the result dialog" />
+  <jsp:directive.attribute name="msgSelectPointCode" type="java.lang.String" required="false" description="Code of i18n message to indicate at the user that must have select a point of the map" />
+  <jsp:directive.attribute name="titleSelectPointCode" type="java.lang.String" required="false" description="Code of i18n message that will be shown like title of select point dialog" />
   <jsp:directive.attribute name="codeTooltip" type="java.lang.String" required="false" description="Code of i18n message to show like tooltip" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
@@ -49,10 +49,6 @@
 
   <c:if test="${empty setDataByForm}">
     <c:set var="setDataByForm" value="false"/>
-  </c:if>
-
-  <c:if test="${showResultInDialog}">
-    <c:set var="showResultInDialog" value="false"/>
   </c:if>
 
   <c:if test="${empty iconLibrary}">
@@ -67,24 +63,12 @@
     <c:set var="formDialogWidth" value="800" />
   </c:if>
 
-  <c:if test="${empty showResultDialogHeight}">
-    <c:set var="showResultDialogHeight" value="500" />
-  </c:if>
-
-  <c:if test="${empty showResultDialogWidth}">
-    <c:set var="showResultDialogWidth" value="800" />
-  </c:if>
-
   <c:if test="${empty msgSelectPointCode}">
     <c:set var="msgSelectPointCode" value="msg_select_point" />
   </c:if>
 
   <c:if test="${empty titleSelectPointCode}">
     <c:set var="titleSelectPointCode" value="title_select_point" />
-  </c:if>
-
-  <c:if test="${not empty showResultDialogTitleCode}">
-    <spring:message code='${showResultDialogTitleCode}' var='showResultDialogTitleCode' />
   </c:if>
 
   <c:if test="${not empty formDialogTitleCode}">
@@ -106,14 +90,10 @@
         data-get_point_over_map="${getPointOverMap}"
         data-set_data_by_form="${setDataByForm}"
         data-id_container_form="${idContainerFormGetData}"
-        data-show_result_in_dialog="${showResultInDialog}"
         data-fn_do_request="${fnDoRequest}"
         data-form_dialog_height="${formDialogHeight}"
         data-form_dialog_width="${formDialogWidth}"
         data-form_dialog_title="${formDialogTitleCode}"
-        data-show_result_dialog_height="${showResultDialogHeight}"
-        data-show_result_dialog_width="${showResultDialogWidth}"
-        data-show_result_dialog_title="${showResultDialogTitleCode}"
         data-label_button_submit="${labelButtonSubmit}"
         data-label_button_cancel="${labelButtonCancel}"
         data-msg_select_point="${msgSelectPoint}"

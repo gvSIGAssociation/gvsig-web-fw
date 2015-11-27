@@ -51,14 +51,11 @@ var GvNIX_Map_External_Request_Tool;
 			"formDialogWidth" : 800, // dialog width on pixels
 			"formDialogHeight" : 500, // dialog height on pixels
 			"formDialogTitle" : "", // dialog title
-			"showResultDialogWidth" : 800, // dialog width on pixels
-			"showResultDialogHeight" : 500, // dialog height on pixels
-			"showResultDialogTitle" : "", // dialog title
 			"data" : {},
 			"labelButtonSubmit" : "Submit",
 			"labelButtonSubmit" : "Cancel",
 			"msgSelectPoint" : "Select point on the map",
-			"titleSelectPoint" : "Information"
+			"titleSelectPoint" : "Information",
 		});
 
 		this._fnConstructor();
@@ -76,7 +73,6 @@ var GvNIX_Map_External_Request_Tool;
 			st.getPointOverMap = s.get_point_over_map;
 			st.setDataByForm = s.set_data_by_form;
 			st.idContainerForm = s.id_container_form;
-			st.showResultInDialog = s.show_result_in_dialog;
 
 			st.formDialogTitle = s.form_dialog_title;
 
@@ -91,16 +87,6 @@ var GvNIX_Map_External_Request_Tool;
 
 			if(s.form_dialog_height){
 				st.formDialogHeight = s.form_dialog_height;
-			}
-
-			st.showResultDialogTitle = s.show_result_dialog_title;
-
-			if(s.show_result_dialog_width){
-				st.showResultDialogWidth = s.show_result_dialog_width;
-			}
-
-			if(s.show_result_dialog_height){
-				st.showResultDialogHeight = s.show_result_dialog_height;
 			}
 
 			// Register accept function
@@ -248,19 +234,18 @@ var GvNIX_Map_External_Request_Tool;
 		/**
 		 * Open a dialog with the html passed in resultHtml parameter
 		 */
-		"fnShowResultsOnDialog" : function(resultHtml){
+		"fnShowResultsOnDialog" : function(resultHtml, title, height, width){
 			var st = this._state;
 			var divDialog = '<div id="'+st.sId+'_show_result_dialog" >';
 			divDialog += resultHtml + '</div>';
 
 			var showResultDialog = jQuery(divDialog).dialog({
-				//TODO title multiidioma
-				title : st.showResultDialogTitle,
+				title : title,
 				autoOpen : false,
 				modal : false,
 				resizable : true,
-				width : st.showResultDialogWidth,
-				height : st.showResultDialogHeight
+				width : width,
+				height : height
 			}).dialogExtend({
 				"closable" : true,
 				"maximizable" : true,
@@ -318,8 +303,6 @@ var GvNIX_Map_External_Request_Tool;
 
 			//quit event click over map
 			st.oMap.fnGetMapObject().off("click",st._proxy_onClick);
-			//st.oMap.fnGetMapObject().off("click");
-
 			return true;
 		}
 

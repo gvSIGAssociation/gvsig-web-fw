@@ -51,4 +51,8 @@
     <name>external-request</name>
     <path>/META-INF/tags/tools/external-request.tagx</path>
   </tag-file>
+  <tag-file>
+    <name>min-zoom</name>
+    <path>/META-INF/tags/tools/min-zoom.tagx</path>
+  </tag-file>
 </taglib>

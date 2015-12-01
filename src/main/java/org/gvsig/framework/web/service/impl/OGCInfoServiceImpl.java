@@ -22,6 +22,7 @@
  */
 package org.gvsig.framework.web.service.impl;
 
+import java.awt.geom.Rectangle2D;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
@@ -50,6 +51,7 @@ import org.gvsig.catalog.exceptions.NotSupportedVersionException;
 import org.gvsig.catalog.metadataxml.XMLNode;
 import org.gvsig.catalog.querys.CatalogQuery;
 import org.gvsig.catalog.schemas.Record;
+import org.gvsig.compat.net.ICancellable;
 import org.gvsig.framework.web.exceptions.ServerGeoException;
 import org.gvsig.framework.web.ogc.CSWCriteria;
 import org.gvsig.framework.web.ogc.CSWISO19115LangCatalogServiceDriver;
@@ -81,6 +83,7 @@ import org.gvsig.remoteclient.utils.BoundaryBox;
 import org.gvsig.remoteclient.wms.WMSClient;
 import org.gvsig.remoteclient.wms.WMSLayer;
 import org.gvsig.remoteclient.wms.WMSServiceInformation;
+import org.gvsig.remoteclient.wms.WMSStatus;
 import org.gvsig.tools.library.LibrariesInitializer;
 import org.gvsig.tools.library.impl.DefaultLibrariesInitializer;
 import org.slf4j.Logger;
@@ -619,7 +622,48 @@ public class OGCInfoServiceImpl implements OGCInfoService {
             throw new ServerGeoException();
         }
         return boundingBox;
+    }
 
+    /**
+     * {@inheritDoc}}
+     */
+    @Override
+    public String getFeatureInfoFromWMS(String urlServer, String crs,
+          Vector<String> layers, Vector<String> styles, int x, int y,
+          int height, int width, List<String> bounds) {
+      String featureInfo = null;
+
+      Float xmin = new Float(Float.parseFloat(bounds.get(0)));
+      Float ymin = new Float(Float.parseFloat(bounds.get(1)));
+      Float xmax = new Float(Float.parseFloat(bounds.get(2)));
+      Float ymax = new Float(Float.parseFloat(bounds.get(3)));
+
+      Rectangle2D.Float extent = new Rectangle2D.Float();
+      extent.setFrameFromDiagonal(xmin, ymin, xmax, ymax);
+
+      WMSStatus status = new WMSStatus();
+      status.setSrs(crs);
+      status.setStyles(styles);
+      status.setLayerNames(layers);
+      status.setOnlineResource(urlServer);
+      status.setExtent(extent);
+      status.setHeight(height);
+      status.setWidth(width);
+      status.setInfoFormat("text/html");
+      status.setExceptionFormat("text/plain");
+
+      try {
+        WMSClient wms = new WMSClient(urlServer);
+        wms.connect(null);
+
+        featureInfo = wms.getFeatureInfo(status, x, y, 0, null);
+
+      }catch (Exception exc) {
+          // Show exception in log
+          logger.error("Exception on getFeatureInfoFromWMS", exc);
+          throw new ServerGeoException();
+      }
+      return featureInfo;
     }
 
     /**
@@ -1165,5 +1209,4 @@ public class OGCInfoServiceImpl implements OGCInfoService {
         }
         return cswResults;
     }
-
 }

@@ -116,7 +116,7 @@ var GvNIX_Map_Info_By_Point;
 				 * 			(String) Information to display on pop-up
 				 * @param type
 				 * 			(String) Type which information is given.
-				 * 			Supported values are 'URL' and 'STRING'
+				 * 			Supported values are 'URL', JSON or'STRING'
 				 */
 				"_fnAddMarkerOnMap" : function(info, type) {
 					var st = this._state;
@@ -133,6 +133,20 @@ var GvNIX_Map_Info_By_Point;
 					st.oMap._fnAddGraphic(id, lat, lng, html, "red", true,
 							true, null);
 					st.oMarkerLayer = st.oMap.fnGetMarkerById(id);
+					st.oMarkerLayer.id = id;
+				},
+
+				/**
+				 * Function called when layer is activated or deactivated
+				 * (Custom implementation for this tool)
+				 *
+				 * Removes current Info-By-Point markers from map
+				 */
+				"_fnActiveLayerChanged" : function(){
+ 					var st = this._state;
+					if(st.oMarkerLayer){
+						st.oMap._fnRemoveGraphics(st.oMarkerLayer.id);
+					}
 				},
 
 				/**
@@ -143,7 +157,7 @@ var GvNIX_Map_Info_By_Point;
 				 *            or an url.
 				 * @param type
 				 *            (String) Type which information is given.
-				 *            Supported values are 'URL' and 'STRING'
+				 *            Supported values are 'URL', 'JSON' or 'STRING'
 				 */
 				"_fnConvertInfoToHtml" : function(info, type) {
 					var st = this._state;
@@ -156,6 +170,10 @@ var GvNIX_Map_Info_By_Point;
 						html += "<div>";
 						html += info;
 						html += "</div> </BR>";
+					}else{ // JSON
+						html += "<div>";
+						html += GvNIX_Map_Leaflet.Util.JSONToHtml(info);
+						html += "</div>";
 					}
 					html += "</div>";
 					return html;

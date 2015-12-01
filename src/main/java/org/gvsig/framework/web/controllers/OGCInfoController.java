@@ -23,9 +23,11 @@
 package org.gvsig.framework.web.controllers;
 
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.ModelAndView;
 
 @RequestMapping("/ogcinfo")
 @Controller
@@ -239,6 +240,8 @@ public class OGCInfoController {
         if (StringUtils.isNotEmpty(urlServer)) {
             serviceMetadata = ogcInfoServ.getMetadataInfoFromWMS(urlServer);
         }
+
+
         uiModel.addAttribute("srvMetadata", serviceMetadata);
         return "ogcinfo/showMetadata";
     }
@@ -261,6 +264,53 @@ public class OGCInfoController {
         }
         uiModel.addAttribute("srvMetadata", serviceMetadata);
         return "ogcinfo/showMetadata";
+    }
+
+    /**
+     * Get layer FeatureInfo of service WMS and show it in page
+     *
+     * @param request the {@code HttpServletRequest}.
+     * @param uiModel the {@code Model}.
+     * @return ResponseEntity with FeatureInfo data of wms server
+     */
+    @RequestMapping(params = "getWmsFeatureInfo",
+            headers = "Accept=application/json")
+       public ResponseEntity<String> getWmsFeatureInfo(WebRequest request, Model uiModel) {
+        String urlServer = request.getParameter("url");
+        String crs = request.getParameter("crs");
+        String layers = request.getParameter("layers");
+        String styles = request.getParameter("styles");
+        int x = Integer.parseInt(request.getParameter("pointX"));
+        int y = Integer.parseInt(request.getParameter("pointY"));
+        int heigth = Integer.parseInt(request.getParameter("mapHeight"));
+        int width = Integer.parseInt(request.getParameter("mapWidth"));
+        String bounds = request.getParameter("bounds");
+
+        String featureInfo = null;
+
+        Vector<String> layersVector = new Vector<String>();
+        if(StringUtils.isNotEmpty(layers)){
+          Collections.addAll(layersVector, layers.split(","));
+        }
+
+        Vector<String> stylesVector = new Vector<String>();
+        if(StringUtils.isNotBlank(styles)){
+          Collections.addAll(stylesVector, styles.split(","));
+        }
+
+        List<String> boundsTree = new ArrayList<String>();
+        if(StringUtils.isNotBlank(bounds)){
+          Collections.addAll(boundsTree, bounds.split(","));
+        }
+
+
+        if (StringUtils.isNotEmpty(urlServer)) {
+          featureInfo = ogcInfoServ.getFeatureInfoFromWMS(
+              urlServer, crs, layersVector,
+                  stylesVector, x, y, heigth, width, boundsTree);
+        }
+
+        return new ResponseEntity<String>(featureInfo, HttpStatus.OK);
     }
 
 }

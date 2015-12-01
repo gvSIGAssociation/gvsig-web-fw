@@ -25,6 +25,7 @@ package org.gvsig.framework.web.service;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.Vector;
 
 import org.gvsig.catalog.exceptions.NotSupportedVersionException;
 import org.gvsig.framework.web.ogc.CSWCriteria;
@@ -116,6 +117,33 @@ public interface OGCInfoService {
      * @return Metadata info of wmts server ({@code ServiceMetadata})
      */
     public ServiceMetadata getMetadataInfoFromWMTS(String urlServer);
+
+    /**
+     * Get featureInfo from a request to a WMS service
+     *
+     * @param urlServer
+     *        Url of the server to connect and get the data
+     * @param crs
+     *        Spatial Reference System for map output
+     * @param layers
+     *        Layers to display on map
+     * @param styles
+     *        Styles in which layers are to be rendered
+     * @param x
+     *        X ordinate of query point on map, in pixels
+     * @param y
+     *        Y ordinate of query point on map, in pixels
+     * @param height
+     *        Height of map output, in pixels.
+     * @param width
+     *        Width of map output, in pixels.
+     * @param bounds
+     *          Bounding box for map extent. Value is minx,miny,maxx,maxy.
+     * @return featureInfo of WMS data in HTML format
+     */
+    public String getFeatureInfoFromWMS(String urlServer, String crs,
+                                         Vector<String> layers, Vector<String> styles,
+                                        int x, int y, int height, int width, List<String> bounds);
 
     /*****************************
      * CSW (Catalog Service Web) *

@@ -144,8 +144,6 @@ var GvNIX_Map_Info_By_Point;
 					st.oMap._fnAddGraphic(markerId, lat, lng, html, s.marker_color, opts, true,
 							true, "Remove");
 					st.oMarkerLayer = st.oMap.fnGetMarkerById(markerId);
-					var popup = st.oMarkerLayer.getPopup();
-
 					st.oMarkerLayer.id = markerId;
 				},
 

@@ -1,0 +1,27 @@
+
+@media print {
+	html {
+	  /*For google chrome*/
+	  -webkit-print-color-adjust:exact;
+	  print-color-adjust: exact;
+	}
+	.leaflet-control-toolbar{
+	  display: none!important;
+	}
+	.leaflet-control-zoomslider{
+    display: none!important;
+  }
+  .leaflet-control-layers-collapse-button{
+    display: none!important;
+  }
+  .leaflet-control-layers-list{
+    font-size: 10px;
+  }
+  .awesome-marker-big i p b{
+    color: #fff;
+  }
+  @page{
+    size: landscape;
+  }
+
+}

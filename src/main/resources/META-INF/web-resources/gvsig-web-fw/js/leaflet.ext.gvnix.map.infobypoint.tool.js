@@ -103,7 +103,7 @@ var GvNIX_Map_Info_By_Point;
 						layer.fnGetFeatureInfo(event.containerPoint, jQuery
 								.proxy(this._fnAddMarkerOnMap, this));
 					} else {
-						this._fnAddMarkerOnMap("Please activate a layer", "STRING");
+						console.log("Please activate a layer");
 					}
 				},
 
@@ -119,21 +119,34 @@ var GvNIX_Map_Info_By_Point;
 				 * 			Supported values are 'URL', JSON or'STRING'
 				 */
 				"_fnAddMarkerOnMap" : function(info, type) {
+					var s = this.s
 					var st = this._state;
 					var lat = st.latlng.lat;
 					var lng = st.latlng.lng;
 					var html = this._fnConvertInfoToHtml(info, type);
-					var id = (st.sId + "_marker")
+
+					if(info == "" || info == null){
+						html = this._fnConvertInfoToHtml(s.empty_message, "STRING");
+					}
+					var markerId = (st.sId + "_marker")
 
 					// Remove previous graphics
 					if (st.oMarkerLayer) {
-						st.oMap._fnRemoveGraphics(id);
+						st.oMap._fnRemoveGraphics(markerId);
 					}
+
+					// parse pop-up options
+					if (s.popup_options) {
+						var opts = GvNIX_Map_Leaflet.Util.parseJSONOption(s.popup_options);
+					}
+
 					// Create new graphic and register
-					st.oMap._fnAddGraphic(id, lat, lng, html, "red", true,
-							true, null);
-					st.oMarkerLayer = st.oMap.fnGetMarkerById(id);
-					st.oMarkerLayer.id = id;
+					st.oMap._fnAddGraphic(markerId, lat, lng, html, s.marker_color, opts, true,
+							true, "Remove");
+					st.oMarkerLayer = st.oMap.fnGetMarkerById(markerId);
+					var popup = st.oMarkerLayer.getPopup();
+
+					st.oMarkerLayer.id = markerId;
 				},
 
 				/**

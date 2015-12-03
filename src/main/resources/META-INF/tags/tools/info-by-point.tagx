@@ -30,6 +30,7 @@
 
   <spring:message code="tooltip_tool_info_by_point" var="tooltip"/>
   <spring:message code="error_info_by_point_empty" var="emptyMsg" />
+  <spring:message code="error_info_by_point-no-selected" var="noSelectedMsg" />
 
   <c:if test="${empty markerColor}">
     <c:set var="markerColor" value="white" />
@@ -39,6 +40,7 @@
      data-type="info_by_point" title="${tooltip}"
      data-popup_options="${popupOptions}"
      data-marker_color="${markerColor}"
-     data-empty_message="${emptyMsg}">&amp;nbsp;</i>
+     data-empty_message="${emptyMsg}"
+     data-no_selected_message="${noSelectedMsg}">&amp;nbsp;</i>
 
 </jsp:root>

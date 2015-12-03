@@ -64,22 +64,25 @@ var GvNIX_Map_Info_By_Point;
 						return false;
 					}
 					var mapDiv = st.oMap._data.class;
+					var map = st.oMap.fnGetMapObject();
 
 					// Enable click event on map
-					st.oMap.fnGetMapObject().on("click",
+					map.on("click",
 							jQuery.proxy(this._fnOnClick, this));
 
 					return true;
 				},
 
 				"_fnDoDeselect" : function() {
+					var st = this._state;
 					if (!this.__fnDoDeselect()) {
 						return false;
 					}
-					var mapDiv = this._state.oMap._data.class;
+					var mapDiv = st.oMap._data.class;
+					var map = st.oMap.fnGetMapObject();
 
 					// Disable click event on map
-					this._state.oMap.fnGetMapObject().off("click");
+					map.off("click");
 					return true;
 				},
 
@@ -103,7 +106,9 @@ var GvNIX_Map_Info_By_Point;
 						layer.fnGetFeatureInfo(event.containerPoint, jQuery
 								.proxy(this._fnAddMarkerOnMap, this));
 					} else {
-						console.log("Please activate a layer");
+						 L.popup()
+						    .setLatLng(st.latlng).setContent(this.s.no_selected_message)
+						    	.openOn(st.oMap.fnGetMapObject());
 					}
 				},
 
@@ -126,7 +131,7 @@ var GvNIX_Map_Info_By_Point;
 					var html = this._fnConvertInfoToHtml(info, type);
 
 					if(info == "" || info == null){
-						html = this._fnConvertInfoToHtml(s.empty_message, "STRING");
+						html = s.empty_message;
 					}
 					var markerId = (st.sId + "_marker")
 

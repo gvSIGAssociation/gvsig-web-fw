@@ -148,6 +148,11 @@ var GvNIX_Map_Leaflet;
 			"display_Toolbar" : divData.displaytoolbar,
 
 			/**
+			 * Display Legend
+			 */
+			"display_Legend" : divData.displaylegend,
+
+			/**
 			 * Layer toolbar object
 			 */
 			"controlLayerToolbar" : null,
@@ -217,7 +222,7 @@ var GvNIX_Map_Leaflet;
 			/**
 			 * Map markers layer
 			 */
-			"markersLayer" : null,
+			"markerLayer" : null,
 
 			/**
 			 * Map markers
@@ -422,6 +427,10 @@ var GvNIX_Map_Leaflet;
 			// Adding layers control
 			this._fnLoadTocControl();
 
+			// Include markers on map
+			st.markerLayer = L.featureGroup();
+			map.addLayer(st.markerLayer);
+
 			// Adding events to reload data
 			map.on("moveend", jQuery.proxy(this._fnSaveCurrentCenter, this),
 					this);
@@ -522,9 +531,11 @@ var GvNIX_Map_Leaflet;
 		 *            information associated to current layer, like toc title,
 		 *            layer tools, etc... If empty ignore it and generate TOC
 		 *            element by default without extra components.
+		 * @param insertAtBegin
+		 *            boolean to indicate if insert the layer at begin
+		 *
 		 */
-		"fnRegisterLayer" : function(sId, options, layerDiv) {
-
+		"fnRegisterLayer" : function(sId, options, layerDiv, insertAtBegin) {
 			var sLayerType = options.layer_type;
 
 			if (sLayerType == "Base") {
@@ -648,6 +659,34 @@ var GvNIX_Map_Leaflet;
 			// Append node to parent
 			parentNode.addChildren(newLayer.fnGetNodeData());
 			newLayer.fnInitializeLayerNode();
+
+			// Get layer legend and add it to layer container
+			var legendEnabled = newLayer.fnIsLegendEnabled();
+			if(legendEnabled == true){
+				var legend = newLayer.fnCreateLegend();
+				var tocControl = this._data.controlLayers;
+				var oDivContainer = tocControl.fnGetLegendContainer();
+			}
+			if(insertAtBegin){
+				if(legendEnabled == true){
+					oDivContainer.prepend(legend);
+				}
+				var firstNodeId = this.fnGetTocLayersIds()[0];
+					if (parentId != "" && !undefined && parentId != null) {
+						var firstChild = parentNode.getFirstChild();
+						if(firstChild != null){
+							firstNodeId = firstChild.key;
+						}else{
+							firstNodeId = parentId;
+						}
+					}
+				// Move layer to first position of TOC
+				this.fnMoveLayer(newLayer.fnGetId(), firstNodeId, null, true);
+			}else{
+				if(legendEnabled == true){
+					oDivContainer.append(legend);
+				}
+			}
 		},
 
 		/**
@@ -800,12 +839,29 @@ var GvNIX_Map_Leaflet;
 			for(x in aLayers){
 				var layerId = aLayers[x];
 				var layer = this.fnGetLayerById(layerId);
-				layer._state.oLayer.setZIndex(index);
+				layer.fnSetZIndex(index);
 				index --;
 
 			}
 
+		},
 
+		/**
+		 * Function to get the zIndex value of a layer using its TOC position
+		 *
+		 * @param sId
+		 *            layer unique ID
+		 */
+		"fnGetLayerIndex" : function(sId) {
+			var aLayers = this.fnGetTocLayersIds();
+			var index = 0;
+			for (x in aLayers) {
+				var layerId = aLayers[x];
+				if (layerId == sId) {
+					return index;
+				}
+				index--;
+			}
 		},
 
 		/**
@@ -890,6 +946,7 @@ var GvNIX_Map_Leaflet;
 				"dnd" : this._data.dragAndDrop
 			};
 			options.gvNIXMap = this;
+			options.displayLegend = this.s.display_Legend;
 			this._data.controlLayers = L.control.fancytreeLayers(options);
 			// Adding controlLayers to map
 			this._data.controlLayers.addTo(this._data.map);
@@ -1424,10 +1481,10 @@ var GvNIX_Map_Leaflet;
 		},
 
 		/**
-		 * Get marker by Id
+		 * Return a Leaflet.FeatureGroup instance by its ID
 		 *
 		 * @param sId
-		 * @returns
+		 * 		Marker object identifier
 		 */
 		"__fnGetMarkerById" : function(sId) {
 			return this._data.markersById[sId];
@@ -1450,9 +1507,7 @@ var GvNIX_Map_Leaflet;
 			var index = 0;
 			for(x in aLayers){
 				var gvNIXLayer = this.fnGetLayerById(aLayers[x]);
-				var oLayer = gvNIXLayer._state.oLayer;
-				oLayer.setZIndex(index);
-
+				gvNIXLayer.fnSetZIndex(index);
 				if(bSaveOnLocalStorage){
 					this._fnSaveMapStatus(aLayers[x] + "_layer_position", index * -1);
 				}
@@ -1507,15 +1562,32 @@ var GvNIX_Map_Leaflet;
 		},
 
 		/**
-		 * Register marker on markerLayer by Id
+		 * Register marker on markerLayer by Id and shows it in the map
 		 *
-		 * @param mId
-		 * @param lat
-		 * @param lng
-		 * @param text
-		 * @param style
-		 * @param closeBtn
+		 * @param mId Id of the marker
+		 * @param lat Latitude of the marker
+		 * @param lng Longitude of the marker
+		 * @param text Text to show in the popup of the marker
+		 * @param style Style of the marker
+		 * @param closeBtn Boolean that indicates if show delete button in the
+		 *                 marker popup
+		 */
+		"fnAddGraphic" : function(mId, lat, lng, textFunction, color,
+				displayOnStart, closeBtn, cleanMessage) {
+			this._fnAddGraphic(mId, lat, lng, textFunction, color,
+					displayOnStart, closeBtn, cleanMessage);
+		},
+
+		/**
+		 * Register marker on markerLayer by Id and shows it in the map
 		 *
+		 * @param mId Id of the marker
+		 * @param lat Latitude of the marker
+		 * @param lng Longitude of the marker
+		 * @param text Text to show in the popup of the marker
+		 * @param style Style of the marker
+		 * @param closeBtn Boolean that indicates if show delete button in the
+		 *                 marker popup
 		 */
 		"_fnAddGraphic" : function(mId, lat, lng, textFunction, color,
 				displayOnStart, closeBtn, cleanMessage) {
@@ -1546,23 +1618,26 @@ var GvNIX_Map_Leaflet;
 			});
 			this._fnRegisterAMarker(mId, marker);
 			this._data.markerLayer.addLayer(marker);
-			marker.on("click", $.proxy(function(textFunction, additionalText,
+			marker.on("click", jQuery.proxy(function(textFunction, additionalText,
 					marker, e) {
+				marker.unbindPopup();
 				var content = "";
 				// Check if popup content is a function or is html
-				if ($.isFunction(textFunction)) {
+				if (jQuery.isFunction(textFunction)) {
 					content = textFunction();
 				} else {
 					content = textFunction + additionalText;
 				}
-				marker.bindPopup(content).openPopup(marker._latlnglatlng);
+
+				marker.bindPopup(content).openPopup(marker._latlng);
+
 			}, this, textFunction, additionalText, marker));
 
 			// popup event
 			marker.on("popupopen", function(e) {
 				var marker = e.popup._source;
 				jQuery(".markerDelete").on('click', 'a',
-						$.proxy(function(mId, e) {
+						jQuery.proxy(function(mId, e) {
 							console.log("Delete marker: " + mId);
 							this._fnRemoveGraphics(mId);
 						}, this, mId))
@@ -1577,12 +1652,149 @@ var GvNIX_Map_Leaflet;
 		},
 
 		/**
+		 * Transform wkt into Vector Layer and register it on markerLayer by Id
+		 * and shows it in the map
+ 		 *
+		 * @param sWkt Wkt that will be transformed into Vector Layer
+		 * @param id Id of the marker
+		 * @param color Color of the marker
+		 * @param textFunction Function or html that is shown in pop
+		 */
+		"fnAddGraphicWkt" : function(sWkt, id, color, textFunction) {
+			this._fnAddGraphicWkt(sWkt, id, color, textFunction);
+		},
+
+		/**
+		 * Transform wkt into Vector Layer and register it on markerLayer by Id
+		 * and shows it in the map
+		 *
+		 * @param sWkt Wkt that will be transformed into Vector Layer
+		 * @param id Id of the marker
+		 * @param color Color of the marker (default: blue)
+		 * @param textFunction Function or html that is shown in pop
+		 */
+		"_fnAddGraphicWkt" : function(sWkt, id, color, textFunction) {
+			if(!color){
+				color = "blue";
+			}
+			// id is required
+			if(id){
+				var oGeomLayerWkt = GvNIX_Map_Leaflet.Util.parseWkt(sWkt);
+				this._fnRegisterAMarker(id, oGeomLayerWkt);
+				if(oGeomLayerWkt.setIcon){
+					var markerIcon = L.AwesomeMarkers.icon({
+						"icon" : "map-marker",
+						"markerColor" : color
+					});
+					oGeomLayerWkt.setIcon(markerIcon);
+				}else{
+					var style = {"color" : color};
+					oGeomLayerWkt.setStyle(style);
+				}
+				this._data.markerLayer.addLayer(oGeomLayerWkt);
+				// add popup when click on layer
+				if(textFunction){
+					oGeomLayerWkt.on("click", jQuery.proxy(function(textFunction,
+							marker, e) {
+						marker.unbindPopup();
+						var content = "";
+						// Check if popup content is a function or is html
+						if (jQuery.isFunction(textFunction)) {
+							content = textFunction();
+						} else {
+							content = textFunction;
+						}
+
+						marker.bindPopup(content).openPopup(marker._latlng);
+
+					}, this, textFunction, oGeomLayerWkt));
+				}
+			}
+		},
+
+		/**
+		 * Register Vector Layer on markerLayer by Id and shows it in the map
+		 *
+		 * @param leafletVectorLayer Vector layer to register
+		 * @param id Id to identify the Vector Layer
+		 */
+		"fnAddGraphicVectorLayer" : function(leafletVectorLayer, id) {
+			this._fnAddGraphicVectorLayer(leafletVectorLayer, id);
+		},
+
+		/**
+		 * Register Vector Layer on markerLayer by Id and shows it in the map
+		 *
+		 * @param leafletVectorLayer Vector layer to register
+		 * @param id Id to identify the Vector Layer
+		 */
+		"_fnAddGraphicVectorLayer" : function(leafletVectorLayer, id) {
+			// id is required
+			if(id){
+				this._fnRegisterAMarker(id, leafletVectorLayer);
+				this._data.markerLayer.addLayer(leafletVectorLayer);
+			}
+		},
+
+		/**
+		 * Register label on markerLayer by Id and shows it in the map
+		 *
+		 * @param id Identifier of the label
+		 * @param className Class to apply in the label
+		 * @param text String to show
+		 * @param lat Latitude of the marker
+		 * @param lng Longitude of the marker
+		 */
+		"fnAddGraphicLabel" : function(id, className, text, lat, lng){
+			this._fnAddGraphicLabel(id, className, text, lat, lng);
+		},
+
+		/**
+		 * Register label on markerLayer by Id and shows it in the map
+		 *
+		 * @param id Identifier of the label
+		 * @param className Class to apply in the label
+		 * @param text String to show
+		 * @param lat Latitude of the marker
+		 * @param lng Longitude of the marker
+		 */
+		"_fnAddGraphicLabel" : function(id, className, text, lat, lng){
+			// id is required
+			if(id){
+				var latlng = L.latLng(lat, lng);
+				var oLeafletLabelIcon = L.divIcon(
+						{
+							className: className,
+							html: text
+						});
+				var oMarker = L.marker(latlng, { "icon" : oLeafletLabelIcon});
+				this._fnRegisterAMarker(id, oMarker);
+				this._data.markerLayer.addLayer(oMarker);
+			}
+		},
+
+		/**
+		 * Removes all graphics from markerLayer
+		 */
+		"fnCleanGraphics" : function() {
+			this._fnCleanGraphics();
+		},
+
+
+		/**
 		 * Removes all graphics from markerLayer
 		 */
 		"_fnCleanGraphics" : function() {
 			// Clean Layer and dictionary
 			this._data.markerLayer.clearLayers();
 			this._data.markersById = {};
+		},
+
+		/**
+		 * Removes all graphics from markerLayer
+		 */
+		"fnRemoveGraphics" : function(id) {
+			this._fnRemoveGraphics(id);
 		},
 
 		/**
@@ -1650,6 +1862,14 @@ var GvNIX_Map_Leaflet;
 		},
 
 		/**
+		 * Return the GvNIX_Map_Leaflet.LAYERS of current active layer
+		 * on map
+		 */
+		"fnGetActiveLayer" : function(){
+			return this._fnGetMapStatus("current_active_layer");
+		},
+
+		/**
 		 * Return a GvNIX_Map_Leaflet.LAYERS instance by its ID
 		 *
 		 * @param sId
@@ -1688,13 +1908,31 @@ var GvNIX_Map_Leaflet;
 		},
 
 		/**
-		 * Return a GvNIX_Map_Leaflet.LAYERS instance by its ID
+		 * Return a GvNIX_Map_Leaflet.CONTROLS instance from
+		 * the select map tool item
+		 */
+		"fnGetCurrentTool" : function(){
+			return this._data.currentTool;
+		},
+
+		/**
+		 * Return a Leaflet.FeatureGroup instance by its ID
 		 *
 		 * @param sId
-		 *            of required layer
+		 *            Marker object identifier
 		 */
 		"fnGetMarkerById" : function(sId) {
-			return this._data.markersById[sId];
+			return this._fnGetMarkerById(sId);
+		},
+
+		/**
+		 * Return a Leaflet.FeatureGroup instance by its ID
+		 *
+		 * @param sId
+		 *            Marker object identifier
+		 */
+		"_fnGetMarkerById" : function(sId) {
+			return this.__fnGetMarkerById(sId);
 		},
 
 		/**
@@ -1805,14 +2043,45 @@ var GvNIX_Map_Leaflet;
 				}
 
 				// Getting current active layer
-				var currentActiveLayer = this
-					._fnGetMapStatus("current_active_layer");
+				var currentActiveLayer = this.fnGetActiveLayer();
 				if (layer._state.sId == currentActiveLayer) {
 					layer._fnActivateLayer();
 				}
 			}
-		}
+		},
 
+		/**
+		 * Function to recreate all legends into layer container
+		 */
+		"fnRecreateLegend" : function(){
+			this._fnRecreateLegend();
+		},
+
+		/**
+		 * Function to recreate all legends into layer container
+		 */
+		"_fnRecreateLegend" : function(){
+			var tocControl = this._data.controlLayers;
+			var toc = tocControl.fnGetTocTree();
+			// get all the layers of the toc
+			var aLayers = this.fnGetTocLayersIds();
+			// get legend container and clean it
+			var oDivContainer = tocControl.fnGetLegendContainer();
+			oDivContainer.html("");
+			for(x in aLayers){
+				var layerId = aLayers[x];
+				var layerNode = toc.getNodeByKey(layerId);
+				// if layer has children, don't recreate it, create only children legends
+				if(!layerNode.hasChildren()){
+					var gvNIXLayer = this.fnGetLayerById(layerId);
+					if(gvNIXLayer.fnIsLegendEnabled() == true){
+						var legend = gvNIXLayer.fnCreateLegend();
+						oDivContainer.append(legend);
+					}
+				}
+
+			}
+		},
 	};
 
 	// Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -2264,11 +2533,11 @@ var GvNIX_Map_Leaflet;
 							// Registering tool
 							map._data.layersToolBar.tools.push(this);
 
-							// Append to the begining of the controlLayers
+							// Append to the begining of the fancytreeDiv
 							// container
 							s.layersToolBar._setHtmlContent(s.htmlTool);
-							jQuery(".leaflet-control-layers").prepend(
-									s.layersToolBar._container);
+							jQuery(".fancytreeDiv").prepend(
+											s.layersToolBar._container);
 
 							// Register change layer callback
 							map.s.toolsLayersCallbacks.add(jQuery.proxy(
@@ -2422,6 +2691,9 @@ var GvNIX_Map_Leaflet;
 			"min_zoom" : null, // Minimun zoom level on which layer is displayed
 			"max_zoom" : null, // Maximun zoom level on which layer is displayed
 			"index" : null, // Set fixed layer index inside container
+			"msgLegendUndefined" : "Legend ins't defined", // message to show when legend isn't defined or has an error
+			"msgMetadataUndefined" : "Layer information not available ", // message to show when metadata isn't defined or has an error
+			"enable_legend" : true // Indicate if legend is enabled
 		},
 
 		/**
@@ -2437,7 +2709,14 @@ var GvNIX_Map_Leaflet;
 			"oGroup" : null, // GvNIX_Map_Leaflet.LAYERS.group instance which contain this layer (optional)
 			"oGroupIndex" : null, // Layer's group index
 			"oActiveLayer" : null, // Focused layer on toc
-			"aLayerToolsById" : null // Layer tools, registered by id
+			"aLayerToolsById" : null, // Layer tools, registered by id
+			"fnPrepareFeatureInfo" : null, // Specify the name of function to get layer feature info
+			"featureInfoType" : null, // Specify feature info type returned by fnPrepareFeatureInfo function
+			"featureInfoErrorMsg" : null, // Error message to show when it's unable to get any feature information
+			"legendType" : null, // Specify legend type returned by fnPrepareLegend function
+			"metadataType" : null, // Specify metadata type returned by fnPrepareMetadata function
+			"fnPrepareLegend" : null, // Specify the name of function to draw layer legend
+			"fnPrepareMetadata" : null // Specify the name of function to get layer metadata
 		},
 
 		/**
@@ -2508,10 +2787,204 @@ var GvNIX_Map_Leaflet;
 				}
 				s.index = toInt(s.index);
 
+				if(s.fn_prepare_feature_info){
+					st.fnPrepareFeatureInfo = this.Util.getFunctionByName(s.fnpreparefeatureinfo,
+							jQuery.proxy(this.debug, this));
+				}
+
+				if(s.feature_info_type){
+					st.featureInfoType = s.featureinfotype.toUpperCase();
+				}
+
+				if(s.feature_info_eror_msg){
+					st.featureInfoErrorMsg = s.feature_info_eror_msg;
+				}
+
+				if(s.legend_type){
+					st.legendType = s.legend_type.toUpperCase();
+				}
+
+				if(s.fn_prepare_legend){
+					st.fnPrepareLegend =
+						this.Util.getFunctionByName(s.fn_prepare_legend,
+								jQuery.proxy(this.debug, this));
+				}
+
+				if(s.metadata_type){
+					st.metadataType = s.metadata_type.toUpperCase();
+				}
+
+				if(s.fn_prepare_metadata){
+					st.fnPrepareMetadata =
+						this.Util.getFunctionByName(s.fn_prepare_metadata,
+								jQuery.proxy(this.debug, this));
+				}
+
+				if(s.msg_legend_undefined){
+					st.msgLegendUndefined = s.msg_legend_undefined;
+				}
+
+				if(s.msg_metadata_undefined){
+					st.msgMetadataUndefined = s.msg_metadata_undefined;
+				}
+
+				if(s.enable_legend){
+					st.enableLegend = s.enable_legend;
+				}
+
 				// Register on move listener
 				var oLeafletMap = st.oMap.fnGetMapObject();
 				oLeafletMap.on("zoomend", jQuery.proxy(this._fnZoomChanged,
 						this));
+			},
+
+			/**
+			 * Check if legend is enabled
+			 */
+			"fnIsLegendEnabled" : function(){
+				return this.s.enable_legend;
+			},
+
+			/**
+			 * Check if have the required parameters to use the function
+			 * to set layer legend defined by user
+			 */
+			"fnIsPrepareLegendDefined" : function(){
+				var st = this._state;
+				if(st.fnPrepareLegend &&
+						(st.legendType == "URL" || st.legendType == "STRING"
+							|| st.legendType == "IMG")
+						){
+					return true;
+				}else{
+					return false;
+				}
+			},
+
+			/**
+			 * Check if have the required parameters to use the function
+			 * to set layer metadata defined by user
+			 */
+			"fnIsPrepareMetadataDefined" : function(){
+				var st = this._state;
+				if(st.fnPrepareMetadata &&
+						(st.metadataType == "URL" || st.metadataType == "STRING"
+							|| st.metadataType == "JSON")
+						){
+					return true;
+				}else{
+					return false;
+				}
+			},
+
+			/**
+			 * Call function defined into fnPrepareLegend parameter
+			 * and return the hmtl to add into legend container
+			 */
+			"__fnCreateLegendUserFn" : function(){
+				// parameters are map and layer
+				var st = this._state;
+				var value = st.fnPrepareLegend(st.oMap, this);
+				var altMsg = st.msgLegendUndefined;
+				var html = "<div id='"+st.sId+"_legend'>";
+				html += "<p>"+this.s.title+"</p>";
+				if(st.legendType == "URL"){
+					html += "<iframe src='";
+					html += value;
+					html += "'/> </BR>";
+				}else{
+					if(st.legendType == "IMG"){
+						html += "<img src='";
+						html += value;
+						html += "' alt='" +altMsg;
+						html += "'/> </BR>";
+					}else{ // html
+						html += "<div class='leaflet-control-layers-legend-div'>";
+						html += value;
+						html += "</div> </BR>";
+					}
+				}
+				html += "</div>"
+				return html;
+			},
+
+			/**
+			 * Function to create layer legend
+			 * Returns html to add into legend container
+			 */
+			"fnCreateLegend" : function(){
+				var html = "";
+				if(this.fnIsPrepareLegendDefined()){
+					html = this.__fnCreateLegendUserFn();
+				}else{
+					html = this.__fnCreateLegend();
+				}
+				return html;
+			},
+
+			/**
+			 * Function to create layer legend
+			 * Returns html to add into legend container
+			 */
+			"__fnCreateLegend" : function(){
+				var st = this._state;
+				var html = "<div id='"+st.sId+"_legend'>";
+				var title = "";
+				if (this.s.title != undefined) {
+					title = this.s.title;
+				}
+				html += "<p>"+title+"</p>";
+				html += "<span>";
+				html += st.msgLegendUndefined;
+				html += "</span> </div>";
+				return html;
+			},
+
+			/**
+			 * Call function defined into fnPrepareMetadata parameter
+			 * and return the hmtl to add into dialog to show layer metadata
+			 */
+			"__fnGetMetadataUserFn" : function(callbackFn){
+				// parameters are map and layer
+				var st = this._state;
+				var value = st.fnPrepareMetadata(st.oMap, this);
+				callbackFn(value, st.metadataType);
+			},
+
+			/**
+			 * Function to get layer metadata
+			 */
+			"fnGetMetadata" : function(callbackFn){
+				var html = "";
+				if(this.fnIsPrepareMetadataDefined()){
+					this.__fnGetMetadataUserFn(callbackFn);
+				}else{
+					this.__fnGetMetadata(callbackFn);
+				}
+			},
+
+			/**
+			 * Function to get layer metadata
+			 */
+			"__fnGetMetadata" : function(callbackFn){
+				var st = this._state;
+				var html = "<span style='font-weight: bold;font-size: 16px;'>";
+				html += st.msgMetadataUndefined;
+				html += "</span>";
+				callbackFn(html, "STRING");
+			},
+
+			/**
+			 * Get title of the layer
+			 */
+			"fnGetTitle" : function(){
+				var title = "";
+				if (this.s.title != undefined) {
+					title = this.s.title;
+				} else {
+					title = this._state.sId;
+				}
+				return title;
 			},
 
 			/**
@@ -2550,7 +3023,7 @@ var GvNIX_Map_Leaflet;
 				if (this._state.aLayerToolsById
 						&& this._state.aLayerToolsById.length > 0) {
 					node.title += "<span id='" + node.key
-							+ "_span-tools'></span>"
+							+ "_span-tools' class='toc_layers_span'></span>";
 				}
 
 				return node;
@@ -2593,6 +3066,26 @@ var GvNIX_Map_Leaflet;
 						this.fnSetLayerTools(node);
 					}
 				}
+			},
+
+			/**
+			 * Sets layer ZIndex if necessary
+			 *
+			 * @param index
+			 */
+			"fnSetZIndex" : function(index) {
+				this._fnSetZIndex(index);
+			},
+
+			/**
+			 * Sets layer ZIndex if necessary
+			 *
+			 * (Default implementation)
+			 *
+			 * @param index
+			 */
+			"_fnSetZIndex" : function(index) {
+				this._state.oLayer.setZIndex(index);
 			},
 
 			/**
@@ -2657,11 +3150,10 @@ var GvNIX_Map_Leaflet;
 							"#" + this._state.sId + "_span-tools");
 
 					if (spanTools.length == 0) {
-						var spanTools = jQuery.parseHTML("<span id='" + this._state.sId
+						var spanTools = jQuery.parseHTML("<span class='toc_layers_span' id='" + this._state.sId
 								+ "_span-tools'></span>")[0];
-						jQuery(spanTools).appendTo(node.span);
 					}
-
+					jQuery(spanTools).prependTo(node.span);
 					for (i in this._state.aLayerToolsById) {
 						var tool = this._state.aLayerToolsById[i];
 						// Adding tools to span tools
@@ -2695,6 +3187,81 @@ var GvNIX_Map_Leaflet;
 			},
 
 			/**
+			 * Function to check current layer on Toc
+			 */
+			"fnCheckLayer" : function() {
+				this._fnCheckLayer();
+			},
+
+			/**
+			 * Function to check current layer on Toc
+			 *
+			 * (Default implementation)
+			 */
+			"_fnCheckLayer" : function() {
+				var node = this._state.oMap._data.tree
+					.getNodeByKey(this._state.sId);
+
+				if (node != null) {
+					setTimeout(function() {
+						// Activate layer
+						node.setSelected(true);
+					}, 100);
+				}
+			},
+
+			/**
+			 * Function to get layer checkbox status
+			 */
+			"fnIsSelected" : function() {
+				return this._state.oCheckbox;
+			},
+
+			/**
+			 * Check if have the required parameters to use the function
+			 * to set layer featureInfo defined by user
+			 */
+			"fnIsPrepareFeatureInfoDefined" : function(){
+				var st = this._state;
+				if(st.fnPrepareFeatureInfo &&
+						(st.featureInfoType == "URL" || st.featureInfoType == "STRING")){
+					return true;
+				}else{
+					return false;
+				}
+			},
+
+			/**
+			 * Function to get layer feature info
+			 *
+			 * @param point
+			 * 		Clicked point in pixels of cointainer layer where
+			 * 		user had clicked. Used for requesting data to WMS server.
+			 * @param callback
+			 * 		Function to call when data request finishes successfull
+			 */
+			"fnGetFeatureInfo" : function(point, callback){
+				if(this.fnIsPrepareFeatureInfoDefined()){
+					this.__fnGetFeatureInfoUserFn(point, callback);
+				}else{
+					this.__fnGetFeatureInfo(point, callback);
+				}
+			},
+
+			/**
+			 * Function to get layer feature info
+			 *
+			 * @param point
+			 * 		Clicked point in pixels of cointainer layer where
+			 * 		user had clicked. Used for requesting data to WMS server.
+			 * @param callback
+			 * 		Function to call when data request finishes successfull
+			 */
+			"__fnGetFeatureInfo" : function(point, callback){
+				callback(this._state.featureInfoErrorMsg, "STRING");
+			},
+
+			/**
 			 * Set layer's node icons
 			 *
 			 * @param $treeNode
@@ -2718,7 +3285,7 @@ var GvNIX_Map_Leaflet;
 						$treeNode.data.iconclass = "layer_legend";
 					} else {
 						// Load library icon (Glyphicon)
-						$treeNode.data.iconclass = "glyphicon " + icon + " layer_legend_icon";
+						$treeNode.data.iconclass = "glyphicon " + icon;
 					}
 
 					// Render CSS changes
@@ -2729,6 +3296,32 @@ var GvNIX_Map_Leaflet;
 
 				}
 				return $treeNode;
+			},
+
+			/**
+			 * Function to set a title to be displayed on a layer
+			 *
+			 * @param layerId
+			 * @param title
+			 */
+			"fnSetLayerTitle" : function(layerId, title) {
+				this._fnSetLayerTitle(layerId, title);
+			},
+
+			/**
+			 * Function to set a title to be displayed on a layer
+			 *
+			 * (Default implementation)
+			 *
+			 * @param layerId
+			 * @param title
+			 */
+			"_fnSetLayerTitle" : function(layerId, title) {
+				var st = this._state;
+				var map = st.oMap;
+				var tree = map._data.tree;
+				var node = tree.getNodeByKey(layerId);
+				node.setTitle(title);
 			},
 
 			/**
@@ -2799,7 +3392,15 @@ var GvNIX_Map_Leaflet;
 			 * Function called when layer is activated or deactivated
 			 */
 			"fnActiveLayerChanged" : function(isActive) {
-				return this.__fnActiveLayerChanged(isActive);
+				var st = this._state;
+				// Call custom implementation of current tool, if exists
+				var currentTool = st.oMap.fnGetCurrentTool();
+				if(currentTool && currentTool._fnActiveLayerChanged){
+					currentTool._fnActiveLayerChanged();
+				}else{
+					// Default implementation
+					this.__fnActiveLayerChanged(isActive);
+				}
 			},
 
 			/**
@@ -2808,7 +3409,7 @@ var GvNIX_Map_Leaflet;
 			 * Default implementation (useful for inheritance)
 			 */
 			"__fnActiveLayerChanged" : function(isActive) {
-
+				// Nothing to do
 			},
 
 			/**
@@ -2836,9 +3437,9 @@ var GvNIX_Map_Leaflet;
 				var oLeafletMap = st.oMap.fnGetMapObject();
 				var curZoom = oLeafletMap.getZoom();
 				// Check min and max range (if any)
-				if (s.min_zoom != null && curZoom < s.min_zoom) {
+				if (s.min_zoom != null && curZoom <= s.min_zoom) {
 					// not visible
-					return false;
+					return true;
 				} else if (s.max_zoom != null && curZoom > s.max_zoom) {
 					// not visible
 					return false;
@@ -3449,6 +4050,13 @@ var GvNIX_Map_Leaflet;
 			},
 
 			/**
+			 * Returns the Leaflet layer instance related with this class instance.
+			 */
+			"fnGetLeafletLayer" : function(){
+				return this._state.oLayer;
+			},
+
+			/**
 			 * Function that reload layer childs to be able to
 			 * register tools
 			 */
@@ -3487,6 +4095,48 @@ var GvNIX_Map_Leaflet;
 					// Check if current child has childs
 					var childChilds = oMap.fnGetLayersByGroup(child._state.sId);
 					child.__fnReloadChilds();
+				}
+			},
+
+			/**
+			 * Show loading icon to let user know that a
+			 * request-for-data is in progress
+			 */
+			"_fnShowLoadingIcon" : function() {
+				this.__fnShowLoadingIcon();
+			},
+
+			/**
+			 * Show loading icon to let user know that a
+			 * request-for-data is in progress
+			 *
+			 * Default implementation
+			 */
+			"__fnShowLoadingIcon" : function() {
+				var st = this._state;
+				if (st.oLoadingIcon) {
+					st.oLoadingIcon.show();
+				}
+			},
+
+			/**
+			 * Hide loading icon to as request-for-data is done/fail
+			 */
+			"_fnHideLoadingIcon" : function() {
+				this.__fnHideLoadingIcon();
+			},
+
+			/**
+			 * Hide loading icon to as request-for-data is done/fail
+			 *
+			 * Default implementation
+			 */
+			"__fnHideLoadingIcon" : function() {
+				var st = this._state;
+				if (st.oLoadingIcon) {
+					setTimeout(function(){
+						st.oLoadingIcon.hide();
+					}, 500);
 				}
 			}
 		}
@@ -3688,7 +4338,10 @@ var GvNIX_Map_Leaflet;
 			"layerOptions" : {
 				continuousWorld : true
 			},
-			"aLayerToolsById" : []
+			"aLayerToolsById" : [],
+			"aoServerLayers" : [],
+			"contextPath" : null,
+			"oLoadingIcon" : null // Loading image
 		});
 
 		this.fnSettings = function() {
@@ -3735,23 +4388,577 @@ var GvNIX_Map_Leaflet;
 					setOption(s, 'version', lop);
 					setOption(s, 'max_zoom', lop, 'maxZoom', null, toInt);
 					setOption(s, 'min_zoom', lop, 'minZoom', null, toInt);
+					this._state.layerOptions = lop;
 
-					// Create leaflet WMS layer instance
-					st.oLayer = L.tileLayer.wms(s.url, lop);
-					if (s.opacity != null) {
-						st.oLayer.setOpacity(s.opacity);
-					}
+					// Create leaflet layerGroup as container geomField
+					// leaflet layer
+					st.oLayer = L.featureGroup();
 					st.oLayer._gvNIX_layer_id = st.sId;
-					// save configured index of layer
-					st.oLayer._gvNIX_layer_index = this.s.index;
 
-					if (this.s.index || this.s.index == 0) {
-						if ("setZIndex" in st.oLayer) {
-							st.oLayer.setZIndex(this.s.index);
+					if (s.layers) {
+						// Create leaflet WMS layer instance
+						st.oWmsLayer = L.tileLayer.wms(s.url, st.layerOptions);
+						if (s.opacity != null) {
+							st.oWmsLayer.setOpacity(s.opacity);
+						}
+						st.oLayer.addLayer(st.oWmsLayer);
+					} else {
+						st.oWmsLayer = null;
+					}
+					// Set context path. Is necessary to get the layer legend
+					st.contextPath = s.context_path;
+				},
+
+				/**
+				 * Constructor: prepare WMS child server layers
+				 */
+				"_fnRegisterServerLayer" : function(oLayer) {
+					this.__fnRegisterServerLayer(oLayer);
+				},
+
+				/**
+				 * Constructor: prepare WMS child server layers Initialize
+				 * Leaflet WMS layer or feature group according to its children
+				 * layers
+				 *
+				 * @param oServerLayer
+				 *            gvNIX layer object to be registered
+				 */
+				"__fnRegisterServerLayer" : function(oLayer) {
+					var st = this._state;
+					if (!oLayer.fnIsWmsServerLayer
+							&& oLayer.fnIsWmsServerLayer()) {
+						this.debug("ERROR: layer '" + oLayer.fnGetId()
+								+ "' is not a WMS server layer --> Ignored");
+						return;
+					}
+					this._state.aoServerLayers.push(oLayer);
+				},
+
+				/**
+				 * Function to initialize Leaflet layer instance from this
+				 * object
+				 */
+				"_fnInitializeWmsLayer" : function() {
+					this.__fnInitializeWmsLayer();
+				},
+
+				/**
+				 * Initializes a WMS Leaflet layer with children layers
+				 *
+				 * (Default implementation)
+				 */
+				"__fnInitializeWmsLayer" : function() {
+					var s = this.s;
+					var st = this._state;
+					if (st.aoServerLayers && st.aoServerLayers.length > 0) {
+						// First, clean current layer
+						st.oLayer.clearLayers();
+						var aSelectedLayerIds = [];
+						var aSelectedLayerStyles = [];
+						// Iterate over children layers
+						for ( var i in st.aoServerLayers) {
+							var serverLayer = st.aoServerLayers[i];
+							// Get the options from selected
+							// items
+							if (serverLayer.fnIsSelected()) {
+								var serverLayerOpts = serverLayer
+										.fnGetLayerOptions();
+								aSelectedLayerIds
+										.push(serverLayerOpts.id_on_server);
+								aSelectedLayerStyles.push(serverLayerOpts.styles);
+							}
+						}
+						// If any selected children
+						if (aSelectedLayerIds.length > 0) {
+							// Get String of selected layers ids
+							st.layerOptions.layers = aSelectedLayerIds.join();
+							st.layerOptions.styles = aSelectedLayerStyles.join();
+							// Initialize Leaflet layer with given
+							// children
+							// options
+							st.oWmsLayer = L.tileLayer.wms(s.url,
+									st.layerOptions);
+							st.oWmsLayer.setZIndex(st.oMap
+									.fnGetLayerIndex(st.sId));
+							// Add new Leaflet layer to this layer
+							// object
+							st.oLayer.addLayer(st.oWmsLayer);
+						} else {
+							// Can't make Leaflet layer
+							st.oWmsLayer = null;
 						}
 					}
-				}
+				},
 
+				/**
+				 * Function to update children layers according of its toc
+				 * position
+				 */
+				"fnUpdateChildren" : function() {
+					this._fnUpdateChildren();
+				},
+
+				/**
+				 * Function to update children layers according of its toc
+				 * position
+				 *
+				 * (Default implementation)
+				 */
+				"_fnUpdateChildren" : function() {
+					var st = this._state;
+					// Clean list of registered children
+					st.aoServerLayers = [];
+					// Get toc children nodes
+					var toc = st.oMap.fnGetTocTree();
+					var node = toc.getNodeByKey(st.sId);
+					var aChildren = node.getChildren();
+					// Fill again the list with children in new order
+					for (var i = aChildren.length; i--;) {
+						var child = aChildren[i];
+						var sId = child.key
+						st.aoServerLayers.push(st.oMap.fnGetLayerById(sId));
+					}
+					// Reload layer
+					if (st.aoServerLayers.length > 0) {
+						this._fnInitializeWmsLayer();
+					}
+				},
+
+				/**
+				 * Returns a Map with necessary data to be used as parameters of
+				 * a controller request.
+				 */
+				"fnGetRequestParams" : function() {
+					var s = this.s
+					var opts = this._state.layerOptions;
+					return {
+						"url" : s.url,
+						"crs" : s.crs,
+						"format" : s.format,
+						"layers" : opts.layers,
+						"styles" : opts.styles,
+						"version" : opts.version,
+					}
+				},
+
+				/**
+				 * Function to create layer legend
+				 * Returns html to add into legend container
+				 */
+				"fnCreateLegend" : function(){
+					var html = "";
+					if(this.fnIsPrepareLegendDefined()){
+						html = this.__fnCreateLegendUserFn();
+					}else{
+						html = this._fnCreateLegend();
+					}
+					return html;
+				},
+
+				/**
+				 * Function to create layer legend using WMS Server
+				 * Returns html to add into legend container
+				 */
+				"_fnCreateLegend" : function(){
+					var st = this._state;
+
+					var html = "";
+					var url = null;
+					var altMsg = st.msgLegendUndefined;
+					if(st.oWmsLayer != null){
+						url = st.oWmsLayer._url;
+					}
+					var styles = st.layerOptions.styles;
+					var layers = st.layerOptions.layers.toString().split(",");
+					// if layers is empty, the children are nodes and them
+					// will create their own legends
+					if(st.layerOptions.layers != "" && url != null){
+						html = "<div id='"+st.sId+"_legend'>";
+						html += "<p>"+this.s.title+"</p>";
+						//draw each child legend
+						for(i = 0; i < layers.length; i++){
+							html += "<img src='";
+							html += st.contextPath+"/ogcinfo/getWmsLegend";
+							html += "?urlServer="+ url;
+							html += "&layerId="+layers[i];
+							html += "&stylesName="+styles;
+							html += "' alt='" + altMsg;
+							html += "'/> </BR>";
+						}
+						html += "</div>"
+					}
+					return html;
+				},
+
+				/**
+				 * Function to get layer metadata
+				 */
+				"fnGetMetadata" : function(callbackFn){
+					var html = "";
+					if(this.fnIsPrepareMetadataDefined()){
+						this.__fnGetMetadataUserFn(callbackFn);
+					}else{
+						this._fnGetMetadata(callbackFn);
+					}
+				},
+
+
+				/**
+				 * Function to get layer metadata
+				 */
+				"_fnGetMetadata" : function(callbackFn){
+					// Set loading img
+					this._fnShowLoadingIcon();
+					var oThis = this;
+					var callbackFunction = callbackFn;
+					// Request to server
+					var params = { url: this.s.url};
+					jQuery.ajax({
+						"url" : "ogcinfo?getWmsMetadata",
+						"data" : params,
+						"cache" : false,
+						"success" : function(response) {
+							callbackFunction(response, "STRING"); // html
+							// hide loading icon
+							oThis._fnHideLoadingIcon();
+						},
+						"error" : function(jqXHR, textStatus, errorThrown) {
+							// show default message, information is not available
+							oThis.__fnGetMetadata(callbackFunction);
+							oThis._fnHideLoadingIcon();
+						}
+					});
+				},
+
+				"fnGetFeatureInfo" : function(point, callbackFn){
+					var html = "";
+					if(this.fnIsPrepareFeatureInfoDefined()){
+						this.__fnGetFeatureInfoUserFn(point, callbackFn);
+					}else{
+						this._fnGetFeatureInfo(point, callbackFn);
+					}
+				},
+
+				"_fnGetFeatureInfo" : function(point, callbackFn){
+					var st = this._state;
+					var oThis = this;
+					var callbackFunction = callbackFn;
+					var opts = st.layerOptions;
+
+					var params = this.fnGetRequestParams();
+					params.width = point.x;
+					params.height = point.y;
+					params.bbox = st.oMap.fnGetMapObject().getBounds();
+
+					jQuery.ajax({
+						"url" : oThis.s.controller_url + "?getWmsFeatureInfo",
+						"data" : params,
+						"cache" : false,
+						"success" : function(response) {
+							callbackFunction(response, "JSON");
+						},
+						"error" : function(jqXHR, textStatus, errorThrown) {
+							console.log("ERROR" +  errorThrown + ":" + textStatus);
+							oThis.__fnGetFeatureInfo(point, callbackFunction);
+						}
+					});
+				},
+
+				/**
+				 * Function that returns current layer opacity
+				 */
+				"fnGetOpacity" : function() {
+					return this.__fnLoadOpacityStatus();
+				},
+
+				/**
+				 * Function that sets opacity level of WMST layer
+				 *
+				 * @param opacityLevel
+				 *            to set on layer
+				 *
+				 */
+				"fnSetOpacity" : function(opacityLevel) {
+
+					// Changing layer opacity
+					this._state.oWmsLayer.setOpacity(opacityLevel);
+
+					// Saving layer opacity on localStorage
+					this._fnSaveOpacityStatus(opacityLevel);
+				}
+			});
+
+	/**
+     * Function to register a WMS layer and its child visible layer in map
+     *
+     * @param oMap
+     *             GvNIX_Map_Leaflet instance
+     * @param oWmsLayer
+     *             Wms layer object to be registered in map: Contains properties 'id'(String) and 'options'(Map)
+     * @param aoChildLayers
+     *             Wms-child layer object to be registered in map: Contains properties 'id'(String) and 'options'(Map)
+     * @param insertAtBegin
+     *            boolean to indicate if insert the layer at begin
+     */
+    GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer = function(oMap, oWmsLayer,
+            aoChildLayers, insertAtBegin) {
+        var map = oMap;
+        // Register "parent" Wms layer on toc
+        map.fnRegisterLayer(oWmsLayer.id, oWmsLayer.options, null, insertAtBegin);
+        // Register and append wms_child layers into its parent
+        for(var i in aoChildLayers){
+            var childLayer = aoChildLayers[i];
+            map.fnRegisterLayer(childLayer.id, childLayer.options, null, insertAtBegin);
+        }
+        // Initialize Wms layer with the registered children in TOC's order
+        map.fnGetLayerById(oWmsLayer.id).fnUpdateChildren();
+    };
+
+	/**
+	 * Layer to be shown from a WMS service. Instance declaration
+	 */
+	GvNIX_Map_Leaflet.LAYERS.wms_child = function(oMap, sId, options) {
+		// Santiy check that we are a new instance
+		if (!this instanceof GvNIX_Map_Leaflet.LAYERS.wms_child) {
+			alert("Warning: GvNIX_Map_Leaflet WMS Child Layer must be initialised with the keyword 'new'");
+		}
+
+		// overwrite options to add specific values
+		this._default_options = jQuery.extend({},
+				GvNIX_Map_Leaflet.LAYERS.Base.default_options, {
+					"group" : null,
+					"title" : null,
+					"visible" : null,
+					"styles" : null,
+					"id_on_server" : null,
+					"url" : null
+				});
+
+		this.s = jQuery.extend({}, this._default_options, options);
+
+		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.LAYERS.Base._state, {
+			"sId" : sId, // layer ID
+			"oMap" : oMap, // GvNIX_Map_Leaflet instance
+			"layerOptions" : {},
+			"oParentLayer" : null,
+			"contextPath" : null,
+			"oLoadingIcon" : null // Loading image
+		});
+
+		this.fnSettings = function() {
+			return this.s;
+		};
+
+		// Constructor
+		this._fnConstructor();
+	};
+
+	// Layer to be shown from a WMS service. Class method declaration
+	GvNIX_Map_Leaflet.LAYERS.wms_child.prototype = jQuery.extend({},
+			GvNIX_Map_Leaflet.LAYERS.Base._prototype, {
+				"debug" : function(message) {
+					var st = this._state;
+					st.oMap.debug("[WMS-Child:" + st.sId + "] " + message);
+				},
+
+				"_fnConstructor" : function() {
+					// call super
+					this.__fnConstructor();
+					var s = this.s;
+					var st = this._state;
+					st.oParentLayer = st.oMap.fnGetLayerById(s.group);
+					var lop = st.layerOptions;
+					lop.id_on_server = s.id_on_server;
+
+					setOption(s, 'visible', lop);
+					setOption(s, 'styles', lop);
+					this._state.layerOptions = lop;
+
+					if (s.title) {
+						setOption(s, 'title', lop);
+						st.oParentLayer._fnRegisterServerLayer(this);
+					} else {
+						this._fnGetTitleByRequest();
+					}
+					// Set context path. Is necessary to get the layer legend
+					st.contextPath = s.context_path;
+				},
+
+				/**
+				 * Function to get the title of a WMS server layer by a request
+				 * to service.
+				 */
+				"_fnGetTitleByRequest" : function() {
+					var ctx = this;
+					var s = this.s;
+					var st = this._state;
+					var oThis = this;
+					// Get necessary data from parent WMS layer
+					var params = st.oParentLayer.fnGetRequestParams();
+					// Request to server
+					jQuery.ajax({
+						"url" : s.url + "?findWmsCapabilities",
+						"data" : {
+							"url" : params.url,
+							"crs" : params.crs,
+							"format" : params.format
+						},
+						"cache" : false,
+						"success" : function(response) {
+							// Iterate over siblings of this
+							for ( var i in response.layers) {
+								var item = response.layers[i];
+								// Found this server layer
+								if (item.name == s.id_on_server) {
+									// Set received title
+									s.title = item.title;
+									// Set new title on toc node
+									ctx.fnSetLayerTitle(st.sId, item.title);
+								}
+							}
+							// Register this layer in parent
+							st.oParentLayer._fnRegisterServerLayer(ctx);
+							st.oMap.fnRecreateLegend();
+						},
+						"error" : function(jqXHR, textStatus, errorThrown) {
+							console.log("REQUEST ERROR [" + action + "]: "
+									+ errorThrown);
+						}
+					});
+				},
+
+				/**
+				 * Returns a Map with the options of this layer
+				 */
+				"fnGetLayerOptions" : function() {
+					return this._state.layerOptions;
+				},
+
+				/**
+				 * Allows to identify this layer as a WMS server layer
+				 */
+				"fnIsWmsServerLayer" : function() {
+					return true;
+				},
+
+				/**
+				 * Function to call when selection of wms-child layers changed
+				 * on TOC.
+				 */
+				"_fnOnCheckChanged" : function() {
+					this.__fnOnCheckChanged();
+				},
+
+				/**
+				 * Function to refresh a WMS layer according to its children
+				 */
+				"__fnOnCheckChanged" : function() {
+					this._state.oParentLayer._fnInitializeWmsLayer();
+				},
+
+				/**
+				 * Sets layer ZIndex if necessary
+				 *
+				 * (WMS Child implementation)
+				 *
+				 * @param index
+				 */
+				"_fnSetZIndex" : function(index) {
+					// There is not Leaflet layer to set index.
+					// Update parent layer
+					this._state.oParentLayer.fnUpdateChildren();
+				},
+
+				/**
+				 * Change the checkbox value and save selection status if
+				 * necessary
+				 *
+				 * (Custom WMS Child implementation)
+				 *
+				 * @param updateCheck
+				 * @param bDontSaveStatus
+				 *            if true, layer will be showed but current status
+				 *            will not be saved on localStorage
+				 *
+				 * @returns true if layer becomes visible
+				 */
+				"__fnShow" : function(updateCheck, bDontSaveStatus) {
+					var st = this._state;
+
+					if (updateCheck != false) {
+						st.oCheckbox = true;
+					}
+
+					if (!bDontSaveStatus) {
+						this.fnSaveState();
+					}
+				},
+
+				/**
+				 * Hide this layer.
+				 *
+				 * (Custom WMS Child implementation)
+				 *
+				 * @param updateCheck
+				 * @param bDontSaveStatus
+				 *            if true, layer will be hided but current status
+				 *            will not be saved on localStorage
+				 *
+				 */
+				"__fnHide" : function(updateCheck, bDontSaveStatus) {
+					var st = this._state;
+
+					if (updateCheck != false) {
+						st.oCheckbox = false;
+					}
+
+					if (!bDontSaveStatus) {
+						this.fnSaveState();
+					}
+				},
+
+				/**
+				 * Function to create layer legend
+				 * Returns html to add into legend container
+				 */
+				"fnCreateLegend" : function(){
+					var html = "";
+					if(this.fnIsPrepareLegendDefined()){
+						html = this.__fnCreateLegendUserFn();
+					}else{
+						html = this._fnCreateLegend();
+					}
+					return html;
+				},
+
+				/**
+				 * Function to create layer legend using WMS Server
+				 * Returns html to add into legend container
+				 */
+				"_fnCreateLegend" : function(){
+					var st = this._state;
+					var html = "";
+					var url = null;
+					var altMsg = st.msgLegendUndefined;
+					if(st.oParentLayer != null){
+						url = st.oParentLayer.s.url;
+					}
+					var styles = st.layerOptions.styles;
+					if(url != null){
+						html = "<div id='"+st.sId+"_legend'>";
+						html += "<p>"+this.s.title+"</p>";
+						html += "<img src='";
+						html += st.contextPath+"/ogcinfo/getWmsLegend";
+						html += "?urlServer="+ url;
+						html += "&layerId="+st.layerOptions.id_on_server;
+						html += "&stylesName="+styles;
+						html += "' alt='" +altMsg;
+						html += "'/> </BR>";
+						html += "</div>"
+					}
+					return html;
+				}
 			});
 
 	/**
@@ -3886,7 +5093,10 @@ var GvNIX_Map_Leaflet;
 			"layerOptions" : {
 				continuousWorld : true
 			},
-			"aLayerToolsById" : []
+			"aLayerToolsById" : [],
+			"contextPath" : null,
+			"oLoadingIcon" : null // Loading image
+
 		});
 
 		this.fnSettings = function() {
@@ -3943,6 +5153,8 @@ var GvNIX_Map_Leaflet;
 							st.oLayer.setZIndex(this.s.index);
 						}
 					}
+					// Set context path. Is necessary to get the layer legend
+					st.contextPath = s.context_path;
 				},
 
 				/**
@@ -3965,6 +5177,86 @@ var GvNIX_Map_Leaflet;
 				 */
 				"fnGetOpacity" : function() {
 					return this.__fnLoadOpacityStatus();
+				},
+
+				/**
+				 * Function to create layer legend
+				 * Returns html to add into legend container
+				 */
+				"fnCreateLegend" : function(){
+					var html = "";
+					if(this.fnIsPrepareLegendDefined()){
+						html = this.__fnCreateLegendUserFn();
+					}else{
+						html = this._fnCreateLegend();
+					}
+					return html;
+				},
+
+				/**
+				 * Function to create layer legend using WMTS Server
+				 * Returns html to add into legend container
+				 */
+				"_fnCreateLegend" : function(){
+					var st = this._state;
+					var html = "";
+					var url = null;
+					var altMsg = st.msgLegendUndefined;
+					if(st.oLayer != null){
+						url = st.oLayer._url;
+					}
+					var styles = st.layerOptions.styles;
+					if(url != null){
+						html = "<div id='"+st.sId+"_legend'>";
+						html += "<p>"+this.s.title+"</p>";
+						html += "<img src='";
+						html += st.contextPath+"/ogcinfo/getWmtsLegend";
+						html += "?urlServer="+ url;
+						html += "&layerId="+st.layerOptions.layer;
+						html += "' alt='" +altMsg;
+						html += "'/> </BR>";
+						html += "</div>"
+					}
+					return html;
+				},
+
+				/**
+				 * Function to get layer metadata
+				 */
+				"fnGetMetadata" : function(callbackFn){
+					var html = "";
+					if(this.fnIsPrepareMetadataDefined()){
+						this.__fnGetMetadataUserFn(callbackFn);
+					}else{
+						this._fnGetMetadata(callbackFn);
+					}
+				},
+
+				/**
+				 * Function to get layer metadata
+				 */
+				"_fnGetMetadata" : function(callbackFn){
+					// Set loading img
+					this._fnShowLoadingIcon();
+					var oThis = this;
+					var callbackFunction = callbackFn;
+					// Request to server
+					var params = { url: this.s.url};
+					jQuery.ajax({
+						"url" : "ogcinfo?getWmtsMetadata",
+						"data" : params,
+						"cache" : false,
+						"success" : function(response) {
+							callbackFunction(response, "STRING"); // html
+							// hide loading icon
+							oThis._fnHideLoadingIcon();
+						},
+						"error" : function(jqXHR, textStatus, errorThrown) {
+							// show default message, information is not available
+							oThis.__fnGetMetadata(callbackFunction);
+							oThis._fnHideLoadingIcon();
+						}
+					});
 				}
 			});
 	/**
@@ -4213,26 +5505,6 @@ var GvNIX_Map_Leaflet;
 			 */
 			"fnGetLeafletGroup" : function() {
 				return this._state.oLayer;
-			},
-
-
-			/**
-			 * Require this layer visible. The layer visibility will depende on
-			 * fnIsVisibleOnThisZoom value.
-			 *
-			 * @param updateCheck
-			 * @param bDontSaveStatus
-			 * 				if true, layer will be showed but current status
-			 * 				will not be saved on localStorage
-			 *
-			 * @returns true if layer becomes visible
-			 */
-
-			"fnShow" : function(updateCheck, bDontSaveStatus){
-				var bVisible = this.__fnShow(updateCheck, bDontSaveStatus);
-				if(bVisible){
-					this._fnRequestData();
-				}
 			},
 
 			/**
@@ -4879,48 +6151,6 @@ var GvNIX_Map_Leaflet;
 			},
 
 			/**
-			 * Show loading icon to let user know that a
-			 * request-for-data is in progress
-			 */
-			"_fnShowLoadingIcon" : function() {
-				this.__fnShowLoadingIcon();
-			},
-
-			/**
-			 * Show loading icon to let user know that a
-			 * request-for-data is in progress
-			 *
-			 * Default implementation
-			 */
-			"__fnShowLoadingIcon" : function() {
-				var st = this._state;
-				if (st.oLoadingIcon) {
-					st.oLoadingIcon.show();
-				}
-			},
-
-			/**
-			 * Hide loading icon to as request-for-data is done/fail
-			 */
-			"_fnHideLoadingIcon" : function() {
-				this.__fnHideLoadingIcon();
-			},
-
-			/**
-			 * Hide loading icon to as request-for-data is done/fail
-			 *
-			 * Default implementation
-			 */
-			"__fnHideLoadingIcon" : function() {
-				var st = this._state;
-				if (st.oLoadingIcon) {
-					setTimeout(function(){
-						st.oLoadingIcon.hide();
-					}, 500);
-				}
-			},
-
-			/**
 			 * Update filter icon with current state (if any)
 			 */
 			"_fnUpdateFilterIconState" : function() {
@@ -5135,7 +6365,7 @@ var GvNIX_Map_Leaflet;
 			"oDataLayer" : null, // Layer for data layers (markers and path)
 			"oLabelingLayer": null, // Layer for labeling
 			"oLabelingMarkerLayer": null, // Layer for labeling of markers
-			"oLabelingPathLayer": null, // Layer for labeling of Path layersç
+			"oLabelingPathLayer": null, // Layer for labeling of Path layers
 			"aLayerToolsById" : []
 		});
 
@@ -5203,7 +6433,7 @@ var GvNIX_Map_Leaflet;
 			},
 
 			/**
-			 * Constructor: prepara native (leaflet) layers
+			 * Constructor: prepare native (leaflet) layers
 			 * used to draw items
 			 *
 			 * @param s optioms object
@@ -5688,7 +6918,7 @@ var GvNIX_Map_Leaflet;
 
 				if (itemHasChanges) {
 					if (curItem.oPopup) {
-						this.Util.unbindPopup(curItem.oLayer);
+						curItem.oLayer.unbindPopup();
 					}
 					curItem.sWkt = sWkt;
 					curItem.oFeature = oFeature;
@@ -5709,7 +6939,7 @@ var GvNIX_Map_Leaflet;
 				 * jQuery.extend(oGeoJSONOptions,st.oPathStyle); }
 				 *
 				 * var oGeomLayer =
-				 * this._fnGetJSONBaseLayer(oGeoJSONOptions); XXX
+				 * this._fnGetJSONBaseLayer(oGeoJSONOptions);
 				 */
 
 				if (!sWkt) {
@@ -5959,7 +7189,7 @@ var GvNIX_Map_Leaflet;
 					fnPrepareInfo = U.createLayerInfoString;
 				}
 				if (curItem.oPopup) {
-					this.Util.unbindPopup(curItem.oLayer);
+					curItem.oLayer.unbindPopup();
 					curItem.oPopup = null;
 				}
 				var sInfo = fnPrepareInfo(
@@ -6069,7 +7299,7 @@ var GvNIX_Map_Leaflet;
 
 				// check and clear popup dialog
 				if (item.oPopup) {
-					this.Util.unbindPopup(item.oLayer);
+					item.oLayer.unbindPopup();
 					item.oLayer.oPopup = null;
 				}
 				item.oLayerContainer.removeLayer(item.oLayer);
@@ -6237,7 +7467,8 @@ var GvNIX_Map_Leaflet;
 					if (bSelected && st.oPathStyleSelect) {
 						oSrcGeomLayer.setStyle(st.oPathStyleSelect);
 					} else if (bSelected) {
-									oSrcGeomLayer.setStyle({
+						oSrcGeomLayer
+								.setStyle({
 									'color' : s.marker_color_selected ? s.marker_color_selected
 									: s.marker_color
 								});
@@ -6245,8 +7476,9 @@ var GvNIX_Map_Leaflet;
 						oSrcGeomLayer.setStyle(st.oPathStyle);
 					} else {
 						oSrcGeomLayer.setStyle({
-									'color' : s.marker_color
-								});								}
+							'color' : s.color
+						});
+					}
 					if (oSrcGeomLayer.setRadius && s.radius) {
 						oSrcGeomLayer.setRadius(s.radius);
 					}
@@ -6602,26 +7834,8 @@ var GvNIX_Map_Leaflet;
 				}
 
 				return this.__fnLoadState(bUseLocalStorage);
-			},
+			}
 
-			/**
-			 * Require this layer visible. The layer visibility will depende on
-			 * fnIsVisibleOnThisZoom value.
-			 *
-			 * @param updateCheck
-			 * @param bDontSaveStatus
-			 * 				if true, layer will be showed but current status
-			 * 				will not be saved on localStorage
-			 *
-			 * @returns true if layer becomes visible
-			 */
-
-			"fnShow" : function(updateCheck, bDontSaveStatus){
-				var bVisible = this.__fnShow(updateCheck, bDontSaveStatus);
-				if(bVisible){
-					this._fnRequestData();
-				}
-			},
 		});
 
 	/**
@@ -7020,23 +8234,12 @@ var GvNIX_Map_Leaflet;
 			},
 
 			// Clean the map layer
-			"fnClean" : function() {
-			    this.__fnClean();
-			},
-
-			"__fnClean" : function() {
-			    var st = this._state;
-			    if (st.oLayer) {
-			    	st.oMarkerLayer.clearLayers();
-			    	st.oPathLayer.clearLayers();
-			    	if(st.oLabelingLayer){
-				    	st.oLabelingMarkerLayer.clearLayers();
-				    	st.oLabelingPathLayer.clearLayers();
-			    	}
-			    }
-			    if(st.$Input){
-			    	st.$Input.val("");
-			    }
+			"fnClear" : function() {
+				this._fnClear();
+				var st = this._state;
+				if (st.$Input) {
+					st.$Input.val("");
+				}
 			},
 
 			// Check if layer has geometry draws
@@ -7046,8 +8249,8 @@ var GvNIX_Map_Leaflet;
 			"__fnIsEmpty" : function() {
 				var st = this._state;
 				if (st.oLayer) {
-					return st.oMarkerLayer.getLayers().length == 0
-					|| st.oPathLayer.getLayers().length == 0;
+					return st.oMarkerLayer.getLayers().length > 0
+					|| st.oPathLayer.getLayers().length > 0;
 				}
 				return true;
 			},
@@ -7103,6 +8306,212 @@ var GvNIX_Map_Leaflet;
 					geom : sWkt
 				}, "0", false);
 				st.$Input.val(sWkt);
+			},
+
+		});
+
+	/**
+	 * Layer combination of GvNIX_Map_Leaflet.LAYERS.entity and
+	 * GvNIX_Map_Leaflet.LAYERS.entity_field to represent geometry data from a shapefile.
+	 * Extends from GvNIX_Map_Leaflet.LAYERS.entity_simple.
+	 */
+	GvNIX_Map_Leaflet.LAYERS.shape = function(oMap, sId, options) {
+		// Santiy check that we are a new instance
+		if (!this instanceof GvNIX_Map_Leaflet.LAYERS.shape) {
+			alert("Warning: GvNIX_Map_Leaflet Shape layer must be initialised with the keyword 'new'");
+		}
+
+		// extends entity and entity_field options
+		this._default_options = jQuery.extend({},
+				GvNIX_Map_Leaflet.LAYERS.entity_simple.default_options);
+
+		this.s = jQuery.extend({}, this._default_options, options, {
+			"pk" : options.layerId,
+			"path" : options.layerId,
+			"field" : "geom"
+		});
+
+		this._state = jQuery.extend({}, GvNIX_Map_Leaflet.LAYERS.entity_simple._state, {
+			"sId" : sId, // layer ID
+			"oMap" : oMap, // GvNIX_Map_Leaflet instance From entity
+			"oCrs" : null, // L.CRS instance of current field
+			"oLayer" : null,
+			"oSelection" : null, // selection data get from Dtt info
+			"oFilterConfig" : null, // filter configuration object (only if filte_type == "auto")
+			"oLastRequest" : null, // last data request info (for "not_volatile" layers)
+			"oLoadingIcon" : null, // jQuery object of loading-icon DOM element (if any)
+			"fOpacity" : null, // Stores current layer opactiy (1.0 max - 0 transparent)
+			"sFieldEscaped" : null, // Field name for geometry escaped (if needed)
+			"fnRender" : null, // reference to function to call for render a item
+			"fnClusterRender" : null, 	 // reference to function to call for render a cluster item
+			"fnPrepareInfo" : null, // reference to functio to call for prepara item info
+			"oPathStyle" : null, // path options to draw items (if any)
+			"oPathStyleSelected" : null, // path options to draw selected items (if any)
+			"fnLabeling" : null, // function to function to call for custom simple labeling
+			"fnLabelingText" : null, // function to get simple labeling text
+			"sLabelingProperty" : null, // item property name to use as labeling text
+			"sLabelingText" : null, // String to use as labelingText for all items
+			"oLabelingOptions" : null, // labeling options (if any) (http://leafletjs.com/reference.html#divicon-options)
+			"bHasLabeling" : false, // true if item should be render with label items (if any)
+			"itemById" : {}, // Map of current item of layer by Id (pk)
+			"oMarkerLayer": null, // Layer for markers
+			"oPathLayer" : null, // Layer for path layers
+			"oDataLayer" : null, // Layer for data layers (markers and path)
+			"oLabelingLayer": null, // Layer for labeling
+			"oLabelingMarkerLayer": null, // Layer for labeling of markers
+			"oLabelingPathLayer": null, // Layer for labeling of Path layers
+			"aLayerToolsById" : [],
+			"file" : this.s.file,// File loaded in input file
+			"url" :this.s.url,
+			"shapeLoaded" : false, // boolean which indicates if this layer has been loaded from arrayBuffer
+			"oUtil" : null
+		});
+
+		this.fnSettings = function() {
+			return this.s;
+		};
+
+		// Constructor
+		this._fnConstructor();
+	};
+
+	/**
+	 * Inherit entity_simple methods
+	 */
+	GvNIX_Map_Leaflet.LAYERS.shape.prototype = jQuery.extend({},
+		GvNIX_Map_Leaflet.LAYERS.entity_simple.prototype,
+		{
+			/**
+			 * Constructor for overriding some options of entity_simple layers
+			 */
+			"_fnConstructor" : function(){
+				// Filling required parameters
+				if(!this.s.path){
+					this.s.path = this._state.sId;
+				}
+				if(!this.s.pk){
+					this.s.pk = this._state.sId;
+				}
+
+				var s = this.s;
+				var st = this._state;
+
+				// Call LAYERS.Base constructor
+				this.__fnConstructor();
+
+				// Create layer as layer group for data layers
+				st.oLayer = L.featureGroup();
+				st.oLayer._gvNIX_layer_id = st.sId;
+				// save configured index of layer
+				st.oLayer._gvNIX_layer_index = this.s.index;
+
+				this.UDtt = GvNIX_Map_Leaflet.Util_dtt;
+				this._state.oUtil = GvNIX_Map_Leaflet.Util;
+
+				// [entity]
+				// Configure filter and selection objects
+				this._fnConstructor_initializeFilter(s,st);
+
+				// [field]
+				this._fnConstructor_preareField(s,st);
+				this._fnConstructor_prepareRenderAndInfo(s,st);
+				this._fnConstructor_prepareStyleOps(s,st);
+				this._fnConstructor_prepareCRS(s,st);
+
+				// [field]
+				// Create layerGroup layer
+				this._fnConstructor_prepareLeafletLayer(s,st);
+
+				// Register on-move and on-zoom listener
+				this._fnConstructor_registerMapListener(s,st);
+			},
+
+	/**
+			 * Overwrite _fnRequestData for loading of data from arrayBuffer
+			 */
+			"_fnRequestData" : function(){
+				if (this._state.shapeLoaded == false && this._state.oCheckbox == true){
+					this._fnLoadData();
+				}
+			},
+
+			/**
+			 * Load data for showing the shape layer
+			 */
+			"_fnLoadData" : function(){
+				this._state.oUtil.startWaitMeAnimation();
+				if (this._state.file){
+					return this._fnLoadDataFromLocalFile();
+				}else{
+					return this._fnLoadDataFromURL();
+				}
+			},
+
+			/**
+			 * Read data from a local shape zip file and transform it
+			 * to an arrayBuffer.
+			 */
+			"_fnLoadDataFromLocalFile" : function(){
+				var st = this._state;
+				var reader = new FileReader();
+				var shpLayer = this;
+	        	reader = new FileReader();
+	            reader.onerror = this._fnLoadFileErrorHandler;
+	            reader.onload = function(e) {
+	            	shpLayer._fnLoadLayerData(reader.result);
+	            }
+	            reader.readAsArrayBuffer(st.file);
+			},
+
+			/**
+			 * Read arrayBuffer with geoJSON, create layers and transform them to Wkt format
+			 */
+			"_fnLoadLayerData" : function(source){
+				var st = this._state;
+				var shapeLayer = this;
+				var featuresCount = 0;
+				var shpfile = new L.Shapefile(source, {
+	                  onEachFeature: function(feature, layer) {
+	                	  var sWkt = shapeLayer.Util.leafletToWkt(
+	      						layer, shapeLayer._state.oMap, shapeLayer._state.oCrs);
+	                	  if (sWkt != undefined) {
+	      					shapeLayer.fnAddFromFeature({
+	      						geom : sWkt
+	      					}, shapeLayer.s.pk + "_" + featuresCount, false);
+	      					featuresCount++;
+	      				  }
+	                  }
+	            });
+				shpfile.once("data:loaded", function() {
+					st.oDataLayer = shpfile;
+					st.oLayer.addLayer(st.oDataLayer);
+				st.shapeLoaded = true;
+		            st.oUtil.stopWaitMeAnimation();
+				});
+			},
+
+			/**
+			 * Function for loading shapelayer form external URL
+			 */
+			"_fnLoadDataFromURL" : function(){
+				var st = this._state;
+				this._fnLoadLayerData(st.url);
+			},
+
+			/**
+			 * Error handler for shape layer loading
+			 */
+			"_fnLoadFileErrorHandler" : function(event) {
+	            switch(event.target.error.code) {
+	              case event.target.error.NOT_FOUND_ERR:
+	                alert('File Not Found!');
+	                break;
+	              case event.target.error.NOT_READABLE_ERR:
+	                alert('File is not readable. Zip shapefile required.');
+	                break;
+	              default:
+	                alert('An error occurred reading this file.');
+	            };
 			},
 
 		});
@@ -7210,6 +8619,19 @@ var GvNIX_Map_Leaflet;
 			} else if (oLeafletLayer instanceof L.LayerGroup
 					|| oLeafletLayer instanceof L.FeatureGroup) {
 				var layers = oLeafletLayer.getLayers();
+				// Check if layer is Polyline or Polygon
+				var type = null;
+				if (oLeafletLayer.feature && oLeafletLayer.feature.geometry) {
+					type = oLeafletLayer.feature.geometry.type;
+				}
+				if (!type){
+					// Check if first and last coordinate are equal
+					if(layers[0].options.fill == true){
+						type = "MultiPolygon";
+					}else{
+						type = "MultiLineString";
+					}
+				}
 				for (var i = 0; i < layers.length; i++) {
 					coords = [];
 					var latlngs = layers[i].getLatLngs();
@@ -7217,21 +8639,21 @@ var GvNIX_Map_Leaflet;
 						var latlng = this.getProjectedPoint(latlngs[j], map);
 						coords.push(latlng.lng + " " + latlng.lat);
 					}
-					if (layers[i] instanceof L.Polygon) {
+					if (type === "MultiPolygon") {
 						var firstPoint = this
 								.getProjectedPoint(latlngs[0], map);
 						coordsMulti.push("(" + coords.join(",") + ","
 								+ firstPoint.lng + " " + firstPoint.lat + ")");
-					} else if (layers[i] instanceof L.Polyline) {
+					} else {
 						coordsMulti.push("(" + coords.join(",") + ")");
 					}
 				}
-				if (layers[0] instanceof L.Polyline) {
-					return "SRID=" + srs + ";MULTILINESTRING("
-							+ coordsMulti.join(",") + ")";
-				} else if (layers[0] instanceof L.Polygon) {
+				if (type === "MultiPolygon") {
 					return "SRID=" + srs + ";POLYGON(" + coordsMulti.join(",")
 							+ ")";
+				} else {
+					return "SRID=" + srs + ";MULTILINESTRING("
+					+ coordsMulti.join(",") + ")";
 				}
 			}
 		},
@@ -7555,22 +8977,73 @@ var GvNIX_Map_Leaflet;
 		},
 
 		/**
-		 * Removes and unbind a Leaflet pop-up item from a geometry layer.
-		 *
-		 * @param oLayer
-		 *            Leaflet layer object to unbind pop-up
+		 * Function to start a wait animation
+		 * that blocks html body
 		 */
-		"unbindPopup" : function(oLayer) {
-			if (oLayer.getLayers) {
-				// oLayer is a Group
-				oLayer.eachLayer(function(layer) {
-					// Recursively call itself
-					this.unbindPopup(layer);
-				}, this);
-			} else {
-				oLayer.unbindPopup();
+		"startWaitMeAnimation" : function(waitText) {
+			if(waitText == null){
+				waitText = "Please wait...";
 			}
-		}
+			jQuery("body").waitMe({
+				effect: "ios",
+				text: waitText,
+				bg: 'rgba(255,255,255,0.7)',
+				color:'#000',
+				sizeW:'',
+				sizeH:''
+			});
+		},
+
+		/**
+		 * Function to stop a wait animation
+		 * that blocks html body
+		 */
+		"stopWaitMeAnimation" : function() {
+			jQuery("body").waitMe('hide');
+		},
+
+		/**
+		 * Create html list from json object or string that represents
+		 * a json object
+		 */
+		"JSONToHtml" : function (json){
+			var html = "";
+			// if is an array, iterate over it
+			if((json instanceof Array) == true){
+				for(i = 0; i < json.length; i++){
+					html += this.JSONToHtml(json[i]);
+				}
+			}else{
+				var oJson = json;
+				// if isn't an object, transform on it
+				if((json instanceof Object) == false){
+					oJson = jQuery.parseJSON(json);
+				}
+				var htmlChildren = "";
+				for (key in oJson) {
+					var value = oJson[key];
+					var label = key;
+					var htmlValue = "";
+					if(value instanceof Object || value instanceof Array){
+						htmlValue += this.JSONToHtml(value);
+					}else{
+						htmlValue += value;
+					}
+					// if don't have value, don't show it
+					if(htmlValue != null && htmlValue != "null" && htmlValue !== ""){
+						htmlChildren += "<dt>"+label+"</dt>";
+						htmlChildren += "<dd>"+htmlValue+"</dd>";
+					}
+				}
+				// if don't have value, don't show it
+				if(htmlChildren != null && htmlChildren != "null" && htmlChildren !== ""){
+					html += "<dl class='dl-horizontal'>";
+					html += htmlChildren;
+					html +="</dl>";
+				}
+			}
+			return html;
+		},
 	}; // GvNIX_Map_Leaflet.Util
 
 	/**
@@ -7664,43 +9137,31 @@ var GvNIX_Map_Leaflet;
 			}
 
 			// Check boolean checked
-			if (oPrevious.bFiltered != oCurrent.bFiltered) {
+			if (oPrevious.bFitered != oCurrent.bFiltered) {
 				return true;
 			}
 
 			// Gets array of parameters
-			var aoPreviousData = oPrevious.oSettings;
-			var aoCurrentData = oCurrent.oSettings;
+			var aoPreviousData = oPrevious.aoData;
+			var aoCurrentData = oCurrent.aoData;
 
 			// check simplest check of arrays
 			if (!aoPreviousData && !aoCurrentData) {
 				return false;
-			}else if(!aoPreviousData || !aoCurrentData){
+			} else if (!aoPreviousData || !aoCurrentData) {
+				return true;
+			}
+			if (aoPreviousData.length != aoCurrentData.length) {
 				return true;
 			}
 
-			var aoPreviousSearch = aoPreviousData.oPreviousSearch;
-			var aoCurrentSearch = aoCurrentData.oPreviousSearch;
-
-			if (!aoPreviousSearch && !aoCurrentSearch) {
-				return false;
-			}else if(!aoPreviousSearch || !aoCurrentSearch){
+			// Compare json string of arrays
+			var sPreviousData = jQuery.toJSON(aoPreviousData);
+			var sCurrentData = jQuery.toJSON(aoCurrentData);
+			if (sPreviousData.length != sCurrentData.length) {
 				return true;
-			}
-
-			var sPreviousSearch = aoPreviousSearch.sSearch;
-			var sCurrentSearch = aoCurrentSearch.sSearch;
-
-			if (!sPreviousSearch && !sCurrentSearch) {
-				return false;
-			}else if(!sPreviousSearch || !sCurrentSearch){
-				return true;
-			}
-
-			if (sPreviousSearch == sCurrentSearch) {
-				return false;
 			} else {
-				return true;
+				return sPreviousData != sCurrentData;
 			}
 		},
 

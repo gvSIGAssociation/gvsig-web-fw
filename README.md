@@ -77,7 +77,7 @@ Geospatial web framework that includes many geographical tools for Spring MVC ba
         ....
         ....
 
-- include web resources on `load-scripts.tagx`:
+- include web resources on `load-scripts.tagx` and `load-styles.tagx`:
 
 ```
       <jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core"
@@ -87,9 +87,13 @@ Geospatial web framework that includes many geographical tools for Spring MVC ba
            xmlns:gvsig="http://gvsig.org/web-framework/TLD/util"
            version="2.0">
          ....
-         ....
+         <!-- js -->
          ....
          <gvsig:load-scripts/>
+         ....
+         <!-- styles -->
+         ....
+         <gvsig:load-styles/>
       </jsp:root>
 ```
 

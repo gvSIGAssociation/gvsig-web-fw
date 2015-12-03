@@ -56,3 +56,25 @@
 .leaflet-control-toolbar-collapse-button:hover {
 	background-color: rgb(230, 230, 230);
 }
+
+#shape_progress_bar {
+  margin: 10px 0;
+  padding: 3px;
+  border: 1px solid #000;
+  font-size: 14px;
+  clear: both;
+  opacity: 0;
+  -moz-transition: opacity 1s linear;
+  -o-transition: opacity 1s linear;
+  -webkit-transition: opacity 1s linear;
+}
+
+#shape_progress_bar.loading {
+  opacity: 1.0;
+}
+
+#shape_progress_bar .percent {
+  background-color: #99ccff;
+  height: auto;
+  width: 0;
+}

@@ -14,6 +14,10 @@
   .leaflet-control-layers-collapse-button{
     display: none!important;
   }
+  .leaflet-control-layers-legend-button{
+    display: none!important;
+  }
+
   .leaflet-control-layers-list{
     font-size: 10px;
   }

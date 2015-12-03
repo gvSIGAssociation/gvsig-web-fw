@@ -73,7 +73,6 @@
 .fancytreeDiv{
   overflow-y: auto;
   margin-top: -2px;
-  padding: 10px;
 }
 .mapviewer_tools_bar{
 	font-size:10px;
@@ -130,6 +129,10 @@
 .toc_layers_button{
   margin-left: 4px;
   cursor: pointer;
+}
+
+.toc_layers_span{
+  float: right;
 }
 
 .leaflet-control-scale {
@@ -251,7 +254,36 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 }
 
 .tool-layer {
-	padding: 5px;
-	border-bottom: 1px solid #D3D3D3;
-	border-left: 1px solid #D3D3D3;
+  padding: 5px;
+  border-bottom: 1px solid #D3D3D3;
+  border-left: 1px solid #D3D3D3;
+}
+/* Styles of layers legend container */
+.leaflet-control-layers-legend {
+  min-width: 250px;
+  display: none;
+  height: 400px;
+  max-width: 375px;
+  overflow-y: scroll;
+}
+.leaflet-control-layers-legend p {
+  font-size: 16px;
+  font-weight: bold;
+}
+.leaflet-control-layers-legend img {
+  border:1px solid black;
+  margin-bottom: 4px;
+  max-width: 350px;
+}
+.leaflet-control-layers-legend-div {
+  border:1px solid black;
+  margin-bottom: 4px;
+  max-width: 350px;
+  padding: 4px;
+  overflow-x: auto;
+}
+.leaflet-control-layers-legend iframe {
+  border:1px solid black;
+  margin-bottom: 4px;
+  width: 350px;
 }

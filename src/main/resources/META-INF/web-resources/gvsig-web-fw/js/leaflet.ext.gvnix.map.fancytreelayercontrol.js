@@ -55,8 +55,8 @@ L.Control.FancytreeLayers = L.Control.extend({
    */
   "_initLayout" : function (tocDiv) {
     var className = 'leaflet-control-layers',
-        container = this._container = L.DomUtil.create('div', className);
-
+    container = this._container = L.DomUtil.create('div', className);
+    container.id = "toc_container";
     //Makes this work on IE10 Touch devices by stopping it from firing a mouseout event when the touch is released
     container.setAttribute('aria-haspopup', true);
 
@@ -67,8 +67,8 @@ L.Control.FancytreeLayers = L.Control.extend({
       L.DomEvent.on(container, 'click', L.DomEvent.stopPropagation);
     }
 
-    var form = this._form = L.DomUtil.create('form', className + '-list');
-
+    var form = this._form = L.DomUtil.create('div', className + '-list');
+    form.id = "toc_container_fancytree";
     container.appendChild(form);
 
     // Generate div for fancytree instance, which will contain layers
@@ -77,14 +77,43 @@ L.Control.FancytreeLayers = L.Control.extend({
     treeUl.setAttribute('style', 'display:none;');
     fancytreeDiv.appendChild(treeUl);
 
-    // Generating collapse button
-    this._button = L.DomUtil.create("div", className + '-collapse-button', container);
-    jQuery(this._button).html("<img src=\"styles/leaflet/images/layers.png\" />");
+    if(this._options.displayLegend){
+     	// Create legend container
+        var legendContainer = this._legendContainer = L.DomUtil.create('div', className + '-legend');
+        legendContainer.id = "toc_container_legend";
+        container.appendChild(legendContainer);
 
-    L.DomEvent.on(this._button, 'click', this._collapse, this);
+        // create the tabs
+        var listTabs = "<ul class="+className+"-tabs>";
+
+        // icons from http://www.webhostinghub.com/glyphs/
+        listTabs += "<li><a href='#toc_container_fancytree' class='icon-layers'></a></li>";
+        if(this._options.displayLegend){
+        	listTabs += "<li><a href='#toc_container_legend' class='icon-tags'><div></div></a></li>";
+        }
+        listTabs += "</ul>";
+        jQuery(container).prepend(listTabs);
+        jQuery(container).tabs();
+        jQuery(container).on( "tabsactivate", function( event, ui ){resizeMap();});
+    }
 
     // Instantiate fancytree with created div inside form
     this._fnMakeFancytree(fancytreeDiv);
+
+
+
+    // Generating collapse button
+    this._button = L.DomUtil.create("div", className + '-collapse-button '+
+    		className+ '-button icon-backward', container);
+    jQuery(this._button).html(" ");
+    L.DomEvent.on(this._button, 'click', this._collapse, this);
+  },
+
+  /**
+   * Get object legend container
+   */
+  "fnGetLegendContainer" : function(){
+	  return jQuery(this._legendContainer);
   },
 
   /**
@@ -117,10 +146,14 @@ L.Control.FancytreeLayers = L.Control.extend({
 	  if(button.data("function") == undefined || button.data("function") == "" || button.data("function") == "collapse"){
 		  jQuery(this._container).animate({left: "-100%"}, function(){
 			  button.data("function", "expand");
+			  var buttonClass = button.attr("class");
+			  button.attr("class", buttonClass.replace("icon-backward", "icon-forward"));
 		  });
 	  }else{
 		  jQuery(this._container).animate({left: "0%"}, function(){
 			  button.data("function", "collapse");
+			  var buttonClass = button.attr("class");
+			  button.attr("class", buttonClass.replace("icon-forward", "icon-backward"));
 		  });
 	  }
   },
@@ -129,7 +162,7 @@ L.Control.FancytreeLayers = L.Control.extend({
 
 /**
  * Returns the options from fancytree instance
- * 
+ *
  * @returns fancyOptions
  */
 "_fnGetFancytree" : function(){
@@ -140,7 +173,7 @@ L.Control.FancytreeLayers = L.Control.extend({
 		aExtensions.push("dnd");
 		var dragAndDrop = this._fnInitializeDragAndDrop();
 	}
-	
+
 	var fancyOptions = {
 		"extensions" : aExtensions,
 		"aria" : true, // Enable WAI-ARIA (Accessible Rich
@@ -158,10 +191,10 @@ L.Control.FancytreeLayers = L.Control.extend({
 
 /**
  * Instanciate fancytree from toc div
- * 
+ *
  * @param tocDiv
  *            div for instantiate TOC with fancytree
- * 
+ *
  * @return fancytree instance
  */
 "_fnMakeFancytree" : function(tocDiv) {
@@ -199,7 +232,7 @@ L.Control.FancytreeLayers = L.Control.extend({
 																// dragging
 																// of
 																// node
-			
+
 			dragEnter : jQuery.proxy(this._fnDragEnter, this), 	// Enable
 																// dropping
 																// node.
@@ -210,7 +243,7 @@ L.Control.FancytreeLayers = L.Control.extend({
 																// dropping
 																// on
 																// node.
-			
+
 			dragDrop : jQuery.proxy(this._fnDragDrop, this), 	// Action
 																// when
 																// node
@@ -222,7 +255,7 @@ L.Control.FancytreeLayers = L.Control.extend({
 /**
  * Enable dragging a toc layer element. Return false to cancel
  * dragging.
- * 
+ *
  * @param node
  *            Dragged node object
  * @param data
@@ -237,48 +270,48 @@ L.Control.FancytreeLayers = L.Control.extend({
 /**
  * Return available positions to drop the dragged element Return
  * false to disallow dropping a dragged element
- * 
+ *
  * @param node
  *            Dragged node object
  * @param data
  *            Tree status before start dragging
- * 
+ *
  * @return false if dropping is not available
  */
 "_fnDragEnter" : function(node, data) {
 	// Allow dragging only between siblings
-	if(node.parent !== data.otherNode.parent){ 
+	if(node.parent !== data.otherNode.parent){
 		return false;
 	}
      return ["before", "after"];
 },
 
 /**
- * Function that will be called when an item is dropped 
+ * Function that will be called when an item is dropped
  * on the tree
- * 
+ *
  * @param node
- *            Previous node that exists on the new position 
+ *            Previous node that exists on the new position
  *            to move.
  * @param data
  *            Tree status before start dragging. This var
- *            contains the dragged node. 
- */	
+ *            contains the dragged node.
+ */
 "_fnDragDrop" : function(node, data) {
-	// Delegates on method _fnMoveLayer getting layer id, referenced layer id, 
+	// Delegates on method _fnMoveLayer getting layer id, referenced layer id,
 	// hit mode ("after", "before") and true to be able to save current position
 	// on localStorage
 	this._fnMoveLayer(data.otherNode.key, node.key, data.hitMode, true);
-	
+
 
 },
 
 /**
  * Function that changes the position of a layer on TOC tree and
- * delegates on current map to update index positions of current 
+ * delegates on current map to update index positions of current
  * layers following new TOC positions.
- * 
- *  @param sLayerId 
+ *
+ *  @param sLayerId
  *  				String with registered layer id to move
  *  @param sReferencedLayerId
  *  				String with referenced layer id where sLayerId will be moved
@@ -286,7 +319,7 @@ L.Control.FancytreeLayers = L.Control.extend({
  *  				String with position of movement. Values "after" and "before"
  *  				are valid. By Default "before"
  *  @param bSaveOnLocalStorage
- *  				boolean that indicates if is necessary to save 
+ *  				boolean that indicates if is necessary to save
  *  				the new position on localStorage.
  */
  "fnMoveLayer" : function(sLayerId, sReferencedLayerId, sHitMode, bSaveOnLocalStorage){
@@ -295,12 +328,12 @@ L.Control.FancytreeLayers = L.Control.extend({
 
 /**
  * Function that changes the position of a layer on TOC tree and
- * delegates on current map to update index positions of current 
+ * delegates on current map to update index positions of current
  * layers following new TOC positions.
- * 
+ *
  * (Default implementation)
- * 
- *  @param sLayerId 
+ *
+ *  @param sLayerId
  *  				String with registered layer id to move
  *  @param sReferencedLayerId
  *  				String with referenced layer id where sLayerId will be moved
@@ -308,40 +341,39 @@ L.Control.FancytreeLayers = L.Control.extend({
  *  				String with position of movement. Values "after" and "before"
  *  				are valid. By Default "before"
  *  @param bSaveOnLocalStorage
- *  				boolean that indicates if is necessary to save 
+ *  				boolean that indicates if is necessary to save
  *  				the new position on localStorage.
  */
  "_fnMoveLayer" : function(sLayerId, sReferencedLayerId, sHitMode, bSaveOnLocalStorage){
-	 
 	if(sHitMode == undefined || sHitMode == null || sHitMode == ""){
 		sHitMode = "before";
 	}else if(sHitMode != "before" && sHitMode != "after"){
 		console.log("ERROR: sHit mode only support 'after' and 'before' values");
 		return;
 	}
-	
+
 	// Getting current toc
 	var toc = this.fnGetTocTree();
 
 	// Getting current layers Nodes
 	var aNodes = this._options.gvNIXMap.fnGetTocLayersNodes();
-	
+
 	var referencedNode = toc.getNodeByKey(sReferencedLayerId);
 	var oldPositionNode = toc.getNodeByKey(sLayerId);
-	
+
 	// Checks that nodes exists
 	if(!referencedNode || !oldPositionNode){
 		console.log("ERROR: You are trying to move an undefined layer");
 		return;
 	}
-	
-	
+
+
 	// Checks that nodes only moves on the same parent
 	if(referencedNode.getParent() != oldPositionNode.getParent()){
 		console.log("ERROR: You are trying to move a layer out of its parent.");
 		return;
 	}
-	
+
 	var newPositionNode;
 	if(sHitMode == "after") {
 		newPositionNode = referencedNode.getNextSibling();
@@ -350,7 +382,7 @@ L.Control.FancytreeLayers = L.Control.extend({
 		} else {
 			sHitMode = "before";
 		}
-		
+
 	}else{
 		newPositionNode = referencedNode.getPrevSibling();
 		if(newPositionNode == null) {
@@ -359,27 +391,29 @@ L.Control.FancytreeLayers = L.Control.extend({
 			sHitMode = "after";
 		}
 	}
-	
+
 	// Moving layer on TOC
-	oldPositionNode.moveTo(newPositionNode, sHitMode);	
+	oldPositionNode.moveTo(newPositionNode, sHitMode);
 
 	// Getting new ordered layers
 	var aLayers = this._options.gvNIXMap.fnGetTocLayersIds();
-	
-	// Update index of current layer on map. Delegates on map component to 
+
+	// Update index of current layer on map. Delegates on map component to
 	// do this operation.
 	this._options.gvNIXMap._fnUpdateLayersIndex(aLayers, bSaveOnLocalStorage);
-	
+	// recreate the legend
+	this._options.gvNIXMap.fnRecreateLegend();
+
  },
 
 /*
- * Add the span that contains the toolsºº
+ * Add the span that contains the tools
  */
 "_fnRenderNode" : function(event, data){
 	var node = data.node;
 	var $span = jQuery(node.span);
 	var spanTools = jQuery("#" + node.key + "_span-tools");
-	jQuery(spanTools).appendTo($span);
+	jQuery(spanTools).prependTo($span);
 
 },
 
@@ -434,12 +468,20 @@ L.Control.FancytreeLayers = L.Control.extend({
 					// Make layer visible
 					tocLayer.fnShow(true);
 
+					// Request entity_simple data to the server
+					if (tocLayer.s.layer_type == "entity_simple" || tocLayer.s.layer_type == "entity" || tocLayer.s.layer_type == "shape"){
+						tocLayer._fnRequestData();
+					}
+
 					// Make all parents visible
 					data.node.visitParents(function(parentNode) {
 						var parentLayer = map
 								.fnGetLayerById(parentNode.key);
 						if (parentLayer) {
 							parentLayer.fnShow(false);
+							if (parentLayer.s.layer_type == "entity"){
+								parentLayer._fnRequestData();
+							}
 						}
 					});
 
@@ -504,6 +546,14 @@ L.Control.FancytreeLayers = L.Control.extend({
 						});
 					}
 				}
+			}
+
+            // Reload a WMS layer according to its children
+			if (tocLayer.s.layer_type == "wms_child") {
+				tocLayer._fnOnCheckChanged();
+			} else if (tocLayer.s.layer_type == "wms") {
+				// Initialize all layers from WMS
+   			    tocLayer._fnInitializeWmsLayer();
 			}
 		});
 	},

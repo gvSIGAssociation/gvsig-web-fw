@@ -31,4 +31,8 @@
 		<name>load-scripts</name>
 		<path>/META-INF/tags/util/load-scripts.tagx</path>
 	</tag-file>
+  <tag-file>
+    <name>load-styles</name>
+    <path>/META-INF/tags/util/load-styles.tagx</path>
+  </tag-file>
 </taglib>

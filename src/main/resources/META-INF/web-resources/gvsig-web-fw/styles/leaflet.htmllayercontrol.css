@@ -21,6 +21,34 @@
 .leaflet-control-layers-collapse-button {
 	background-color: #F4F4F4;
     border-radius: 0 10px 10px 0;
+    font-family :'WebHostingHub-Glyphs';
+    color: darkgrey;
+    font-size: 14px;
+    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.176);
+    cursor: pointer;
+    font-weight: bold;
+    position: absolute;
+    text-align: center;
+    width: 40px;
+    z-index: 1200;
+}
+
+.leaflet-control-layers-tabs a {
+	text-decoration: none;
+	font-size: 20px !important;
+	font-family :'WebHostingHub-Glyphs';
+	color: darkgrey !important;
+	border-bottom : none;
+}
+
+.leaflet-control-layers-collapse-button:hover {
+	background-color: rgb(230, 230, 230);
+}
+
+
+.leaflet-control-layers-legend-button {
+  background-color: #F4F4F4;
+    border-radius: 0 10px 10px 0;
     box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.176);
     color: #FFFFFF;
     cursor: pointer;
@@ -32,6 +60,6 @@
     z-index: 1200;
 }
 
-.leaflet-control-layers-collapse-button:hover {
-	background-color: rgb(230, 230, 230);
+.leaflet-control-layers-legend-button:hover {
+  background-color: rgb(230, 230, 230);
 }

@@ -31,6 +31,14 @@
     <c:out default="en" value="${fn:replace(plocale, '_', '-')}"/>
   </c:set>
 
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.js" var="js_leaflet_ext_gvnix_url"/>
+  <script src="${js_leaflet_ext_gvnix_url}" type="text/javascript">
+      <!--required for FF3 and Opera-->
+  </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.fancytreelayercontrol.js" var="js_leaflet_fancytree_layer_control"/>
+  <script src="${js_leaflet_fancytree_layer_control}" type="text/javascript">
+      <!--required for FF3 and Opera-->
+  </script>
 <spring:url value="/resources/gvsig-web-fw/js/L.Control.ZoomBox.js" var="js_leaflet_zoom_box_js"/>
     <script src="${js_leaflet_zoom_box_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
@@ -108,30 +116,4 @@
     <script src="${js_leaflet_ext_gvnix_minzoom_tool}" type="text/javascript">
       <!--required for FF3 and Opera-->
     </script>
-<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.js" var="js_leaflet_ext_gvnix_url"/>
-  <script src="${js_leaflet_ext_gvnix_url}" type="text/javascript">
-      <!--required for FF3 and Opera-->
-  </script>
-<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.fancytreelayercontrol.js" var="js_leaflet_fancytree_layer_control"/>
-  <script src="${js_leaflet_fancytree_layer_control}" type="text/javascript">
-      <!--required for FF3 and Opera-->
-  </script>
-
-<spring:url value="/resources/gvsig-web-fw/styles/waitMe.min.css" var="styles_jquery_waitme"/>
-    <link href="${styles_jquery_waitme}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/gvsig-web-fw/styles/jquery.steps.css" var="styles_jquery_steps"/>
-    <link href="${styles_jquery_steps}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/gvsig-web-fw/styles/L.Control.ZoomBox.css" var="styles_zoom_box_css"/>
-    <link href="${styles_zoom_box_css}" media="screen,print" rel="stylesheet" type="text/css"/>
- <spring:url value="/resources/gvsig-web-fw/styles/leaflet-history-src.css" var="styles_history_css"/>
-    <link href="${styles_history_css}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/gvsig-web-fw/styles/gvnix.leaflet.bootstrap.css" var="styles_gvnix_leaflet_geo_css"/>
-    <link href="${styles_gvnix_leaflet_geo_css}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/gvsig-web-fw/styles/leaflet.htmllayercontrol.css" var="styles_leaflet_html_layers_control"/>
-    <link href="${styles_leaflet_html_layers_control}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/gvsig-web-fw/styles/leaflet.htmltoolbarcontrol.css" var="styles_leaflet_html_toolbar_control"/>
-    <link href="${styles_leaflet_html_toolbar_control}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/gvsig-web-fw/styles/leaflet.print.css" var="styles_leaflet_html_print"/>
-    <link href="${styles_leaflet_html_print}" media="screen,print" rel="stylesheet" type="text/css"/>
-
 </jsp:root>

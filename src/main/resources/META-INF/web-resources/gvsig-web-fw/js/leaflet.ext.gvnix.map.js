@@ -1239,6 +1239,17 @@ var GvNIX_Map_Leaflet;
 		},
 
 		/**
+		 * Returns current map CRS object
+		 */
+		"fnGetMapSRIDObject" : function() {
+			var mapCrs = this._data.map.options.crs;
+			if (!mapCrs) {
+				return null;
+			}
+			return mapCrs;
+		},
+
+		/**
 		 * Returns current map CRS code: (ex: 'EPSG:3857')
 		 */
 		"fnGetMapSRIDcode" : function() {
@@ -1564,32 +1575,54 @@ var GvNIX_Map_Leaflet;
 		/**
 		 * Register marker on markerLayer by Id and shows it in the map
 		 *
-		 * @param mId Id of the marker
-		 * @param lat Latitude of the marker
-		 * @param lng Longitude of the marker
-		 * @param text Text to show in the popup of the marker
-		 * @param style Style of the marker
-		 * @param closeBtn Boolean that indicates if show delete button in the
-		 *                 marker popup
+		 * @param mId
+		 * 		Unique identifier for new graphic
+		 * @param lat
+		 * 		Latittude coordinates to add graphic
+		 * @param lng
+		 * 		Longitude coordinates to add graphic
+		 * @param textFunction
+		 * 		Text content of pop-up. Can be an String or
+		 * 		a function to get the content.
+		 * @param color
+		 * 		(String) Color to display graphic
+		 * @param popupOptions
+		 * 		Style to display graphic pop-up
+		 * @param closeBtn
+		 * 		(Boolean) True to add a button to remove graphic
+		 * @param cleanMessage
+		 * 		Tooltip of button to remove the graphic
+		 *
 		 */
-		"fnAddGraphic" : function(mId, lat, lng, textFunction, color,
+		"fnAddGraphic" : function(mId, lat, lng, textFunction, color, popupOptions,
 				displayOnStart, closeBtn, cleanMessage) {
-			this._fnAddGraphic(mId, lat, lng, textFunction, color,
+			this._fnAddGraphic(mId, lat, lng, textFunction, color, popupOptions,
 					displayOnStart, closeBtn, cleanMessage);
 		},
 
 		/**
 		 * Register marker on markerLayer by Id and shows it in the map
 		 *
-		 * @param mId Id of the marker
-		 * @param lat Latitude of the marker
-		 * @param lng Longitude of the marker
-		 * @param text Text to show in the popup of the marker
-		 * @param style Style of the marker
-		 * @param closeBtn Boolean that indicates if show delete button in the
-		 *                 marker popup
+		 * @param mId
+		 * 		Unique identifier for new graphic
+		 * @param lat
+		 * 		Latittude coordinates to add graphic
+		 * @param lng
+		 * 		Longitude coordinates to add graphic
+		 * @param textFunction
+		 * 		Text content of pop-up. Can be an String or
+		 * 		a function to get the content.
+		 * @param color
+		 * 		(String) Color to display graphic
+		 * @param popupOptions
+		 * 		Style to display graphic pop-up
+		 * @param closeBtn
+		 * 		(Boolean) True to add a button to remove graphic
+		 * @param cleanMessage
+		 * 		Tooltip of button to remove the graphic
+		 *
 		 */
-		"_fnAddGraphic" : function(mId, lat, lng, textFunction, color,
+		"_fnAddGraphic" : function(mId, lat, lng, textFunction, color, popupOptions,
 				displayOnStart, closeBtn, cleanMessage) {
 			// Set position, style and display text to marker
 			var latlng = L.latLng(lat, lng);
@@ -1629,7 +1662,7 @@ var GvNIX_Map_Leaflet;
 					content = textFunction + additionalText;
 				}
 
-				marker.bindPopup(content).openPopup(marker._latlng);
+				marker.bindPopup(content, popupOptions).openPopup(marker._latlng);
 
 			}, this, textFunction, additionalText, marker));
 
@@ -2082,6 +2115,15 @@ var GvNIX_Map_Leaflet;
 
 			}
 		},
+		
+		/**
+		 * Function for retrieving map's minZoom value
+		 *
+		 *  @return map's instance minZoom value
+		 */
+		"_fnGetMinZoom" : function() {
+			return this.fnSettings().minZoom;
+		}
 	};
 
 	// Static variables * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -4379,6 +4421,8 @@ var GvNIX_Map_Leaflet;
 					var crsObject = L.CRS[s.crs];
 					if (crsObject) {
 						lop.crs = crsObject;
+					} else {
+						lop.crs = st.oMap.fnGetMapSRIDObject();
 					}
 					lop.layers = s.layers;
 					lop.format = s.format;
@@ -4534,7 +4578,7 @@ var GvNIX_Map_Leaflet;
 					var opts = this._state.layerOptions;
 					return {
 						"url" : s.url,
-						"crs" : s.crs,
+						"crs" : opts.crs.code,
 						"format" : s.format,
 						"layers" : opts.layers,
 						"styles" : opts.styles,
@@ -4631,36 +4675,77 @@ var GvNIX_Map_Leaflet;
 					});
 				},
 
+				/**
+				 * Function to get layer feature info
+				 *
+				 * @param point
+				 * 		Clicked point in pixels of cointainer layer where
+				 * 		user had clicked. Used for requesting data to WMS server.
+				 * @param callback
+				 * 		Function to call when data request finishes successfull
+				 */
 				"fnGetFeatureInfo" : function(point, callbackFn){
 					var html = "";
 					if(this.fnIsPrepareFeatureInfoDefined()){
+						// Use custom implementation
 						this.__fnGetFeatureInfoUserFn(point, callbackFn);
 					}else{
+						// Use default implementation
 						this._fnGetFeatureInfo(point, callbackFn);
 					}
 				},
 
+				/**
+				 * Function to get layer feature info
+				 *(Default implementation for WMS layers)
+				 *
+				 * @param point
+				 * 		Clicked point in pixels of cointainer layer where
+				 * 		user had clicked. Used for requesting data to WMS server.
+				 * @param callback
+				 * 		Function to call when data request finishes successfull
+				 */
 				"_fnGetFeatureInfo" : function(point, callbackFn){
 					var st = this._state;
 					var oThis = this;
 					var callbackFunction = callbackFn;
-					var opts = st.layerOptions;
-
+					var oUtil = this.Util;
+					// Start loading animation
+					oUtil.startWaitMeAnimation();
+					// Get common WMS service request params
 					var params = this.fnGetRequestParams();
-					params.width = point.x;
-					params.height = point.y;
-					params.bbox = st.oMap.fnGetMapObject().getBounds();
-
+					// Get click position in pixels
+					params["pointX"] = point.x;
+					params["pointY"] = point.y;
+					// Get map dimensions
+					var dimensions = st.oMap.fnGetMapObject().getSize();
+					params["mapHeight"] = dimensions.y;
+					params["mapWidth"] = dimensions.x;
+					// Get map bounding box
+					var oMapBbox = st.oMap.fnMapBondingBox();
+					var northEast = oMapBbox._northEast;
+					var southWest = oMapBbox._southWest;
+					// Fit bbox data in list String sepparated by commas
+					// Use the required order by WMS service (xmin,ymin,xmax,ymax)
+					params["bounds"] = [southWest.lng, southWest.lat, northEast.lng, northEast.lat].join();
+					// Request to controller
 					jQuery.ajax({
 						"url" : oThis.s.controller_url + "?getWmsFeatureInfo",
 						"data" : params,
 						"cache" : false,
+						"dataType" : 'html',
 						"success" : function(response) {
-							callbackFunction(response, "JSON");
+							// Call callback function to show the response
+							callbackFunction(response, "STRING");
 						},
 						"error" : function(jqXHR, textStatus, errorThrown) {
-							console.log("ERROR" +  errorThrown + ":" + textStatus);
+							console.log("["+ textStatus + "] " + errorThrown);
+							// Show popup with error message
 							oThis.__fnGetFeatureInfo(point, callbackFunction);
+						},
+						"complete" : function(){
+							// Stop loading animation
+							oUtil.stopWaitMeAnimation();
 						}
 					});
 				},
@@ -4819,6 +4904,8 @@ var GvNIX_Map_Leaflet;
 							}
 							// Register this layer in parent
 							st.oParentLayer._fnRegisterServerLayer(ctx);
+							// Reload children children
+							st.oParentLayer._fnUpdateChildren();
 							st.oMap.fnRecreateLegend();
 						},
 						"error" : function(jqXHR, textStatus, errorThrown) {

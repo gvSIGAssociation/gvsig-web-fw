@@ -125,13 +125,13 @@
     <link href="${styles_zoom_box_css}" media="screen,print" rel="stylesheet" type="text/css"/>
  <spring:url value="/resources/gvsig-web-fw/styles/leaflet-history-src.css" var="styles_history_css"/>
     <link href="${styles_history_css}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/styles/leaflet/gvnix.leaflet.bootstrap.css" var="styles_gvnix_leaflet_geo_css"/>
+<spring:url value="/resources/gvsig-web-fw/styles/gvnix.leaflet.bootstrap.css" var="styles_gvnix_leaflet_geo_css"/>
     <link href="${styles_gvnix_leaflet_geo_css}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/styles/leaflet/leaflet.htmllayercontrol.css" var="styles_leaflet_html_layers_control"/>
+<spring:url value="/resources/gvsig-web-fw/styles/leaflet.htmllayercontrol.css" var="styles_leaflet_html_layers_control"/>
     <link href="${styles_leaflet_html_layers_control}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/styles/leaflet/leaflet.htmltoolbarcontrol.css" var="styles_leaflet_html_toolbar_control"/>
+<spring:url value="/resources/gvsig-web-fw/styles/leaflet.htmltoolbarcontrol.css" var="styles_leaflet_html_toolbar_control"/>
     <link href="${styles_leaflet_html_toolbar_control}" media="screen,print" rel="stylesheet" type="text/css"/>
-<spring:url value="/resources/styles/leaflet/leaflet.print.css" var="styles_leaflet_html_print"/>
+<spring:url value="/resources/gvsig-web-fw/styles/leaflet.print.css" var="styles_leaflet_html_print"/>
     <link href="${styles_leaflet_html_print}" media="screen,print" rel="stylesheet" type="text/css"/>
 
 </jsp:root>

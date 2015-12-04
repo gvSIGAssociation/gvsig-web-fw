@@ -55,4 +55,33 @@
     <name>min-zoom</name>
     <path>/META-INF/tags/tools/min-zoom.tagx</path>
   </tag-file>
+
+  <tag-file>
+    <name>clean</name>
+    <path>/META-INF/tags/tools/clean.tagx</path>
+  </tag-file>
+  <tag-file>
+    <name>custom</name>
+    <path>/META-INF/tags/tools/custom.tagx</path>
+  </tag-file>
+  <tag-file>
+    <name>draw</name>
+    <path>/META-INF/tags/tools/draw.tagx</path>
+  </tag-file>
+  <tag-file>
+    <name>geosearch</name>
+    <path>/META-INF/tags/tools/geosearch.tagx</path>
+  </tag-file>
+  <tag-file>
+    <name>measure</name>
+    <path>/META-INF/tags/tools/measure.tagx</path>
+  </tag-file>
+  <tag-file>
+    <name>print</name>
+    <path>/META-INF/tags/tools/print.tagx</path>
+  </tag-file>
+  <tag-file>
+    <name>zoom-select-all</name>
+    <path>/META-INF/tags/tools/zoom-select-all.tagx</path>
+  </tag-file>
 </taglib>

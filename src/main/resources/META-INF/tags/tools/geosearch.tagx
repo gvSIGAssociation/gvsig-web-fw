@@ -1,0 +1,29 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure tool" />
+  <jsp:directive.attribute name="provider" type="java.lang.String" required="false" description="Provider to search the direction. Options: google, bing, nokia, openstreetmap, esri. Default google" />
+  <jsp:directive.attribute name="keepZoom" type="java.lang.Boolean" required="false" description="Indicate if the current zoom is kept. Default false" />
+  <jsp:directive.attribute name="showMarker" type="java.lang.Boolean" required="false" description="Indicate if shows a marker in found position. Default true" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <c:if test="${empty keepZoom}">
+    <c:set var="keepZoom" value="false"/>
+  </c:if>
+
+  <c:if test="${empty showMarker}">
+    <c:set var="showMarker" value="true"/>
+  </c:if>
+
+  <spring:message var="searchLabel" code="search_label" />
+  <spring:message var="notFoundMessage" code="search_not_found_message" />
+  <spring:message code="tooltip_tool_geo_search" var="tooltip"/>
+
+	<!-- Generating geosearch tool -->
+  <i id="${id}_geosearch_tool" class="whhg icon-search toolbar_button"
+        data-type="geosearch" data-provider_selected="${provider}"
+        data-retain_zoom_level="${keepZoom}" data-show_marker="${showMarker}"
+        data-search_label="${searchLabel}" data-not_found_message="${notFoundMessage}"
+        title="${tooltip}">&amp;nbsp;</i>
+
+</jsp:root>

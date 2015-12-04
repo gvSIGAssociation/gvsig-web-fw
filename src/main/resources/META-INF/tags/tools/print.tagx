@@ -1,0 +1,21 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify the tool" />
+  <jsp:directive.attribute name="printOnlyMap" type="java.lang.Boolean" required="false" description="Indicate if is printed only the map with markers or is printed everything (toc, plugins, etc). Default true" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <c:if test="${empty printOnlyMap}">
+    <c:set var="printOnlyMap" value="true" />
+  </c:if>
+
+  <spring:message code='processing_label' var='processingMessage' htmlEscape='false' />
+  <spring:message code="tooltip_tool_print" var="tooltip"/>
+
+	<!-- Generating info tool -->
+	<i id="${id}_print_tool" class="whhg icon-print toolbar_button"
+        data-type="print" data-printonlymap="${printOnlyMap}"
+        data-processingmessage="${processingMessage}"
+        title="${tooltip}"
+        >&amp;nbsp;</i>
+</jsp:root>

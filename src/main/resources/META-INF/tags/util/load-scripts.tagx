@@ -116,4 +116,49 @@
     <script src="${js_leaflet_ext_gvnix_minzoom_tool}" type="text/javascript">
       <!--required for FF3 and Opera-->
     </script>
+
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.clean.tool.js" var="js_leaflet_clean_tool"/>
+    <script src="${js_leaflet_clean_tool}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.coordinates.component.js" var="js_leaflet_ext_gvnix_coordinates_tool"/>
+    <script src="${js_leaflet_ext_gvnix_coordinates_tool}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.draw.tool.js" var="js_leaflet_ext_gvnix_draw_tool_url"/>
+    <script src="${js_leaflet_ext_gvnix_draw_tool_url}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.filter.tool.js" var="js_leaflet_ext_gvnix_filter_tool_url"/>
+    <script src="${js_leaflet_ext_gvnix_filter_tool_url}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.generic.tool.js" var="js_leaflet_ext_gvnix_generic_tool_url"/>
+    <script src="${js_leaflet_ext_gvnix_generic_tool_url}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.geosearch.tool.js" var="js_leaflet_geosearch_tool"/>
+    <script src="${js_leaflet_geosearch_tool}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.measure.tool.js" var="js_leaflet_ext_gvnix_measure_tool_url"/>
+    <script src="${js_leaflet_ext_gvnix_measure_tool_url}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.print.tool.js" var="js_leaflet_ext_gvnix_print_tool_url"/>
+    <script src="${js_leaflet_ext_gvnix_print_tool_url}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.scale.component.js" var="js_leaflet_scale_component"/>
+    <script src="${js_leaflet_scale_component}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.zoomselect.tool.js" var="js_leaflet_zoom_select_component"/>
+    <script src="${js_leaflet_zoom_select_component}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.zoomselectall.tool.js" var="js_leaflet_zoom_select_all_component"/>
+    <script src="${js_leaflet_zoom_select_all_component}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
 </jsp:root>

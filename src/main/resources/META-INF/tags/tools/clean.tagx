@@ -1,0 +1,28 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify measure clean" />
+  <jsp:directive.attribute name="layerId" type="java.lang.String" required="true" description="The identifier of the layer that is affected by clean tool" />
+  <jsp:directive.attribute name="messageConfirmDel" type="java.lang.String" required="false" description="The label code to get text from I18N properties that will be used as message to confirm delete." />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+
+  	<c:if test="${!empty preventExitMessage}">
+ 		<spring:message code="${preventExitMessage}" var="label" htmlEscape="false" />
+  	</c:if>
+
+
+    <c:if test="${empty messageConfirmDel}">
+      <c:set var="messageConfirmDel" value="confirm_clean_geometries"/>
+    </c:if>
+
+    <spring:message code="${messageConfirmDel}" var="msgDelete" htmlEscape="false" />
+    <spring:message code="tooltip_tool_clean" var="tooltip"/>
+
+  	<!-- Generating clean tool -->
+	<i id="${id}_clean_tool" class="whhg icon-trash toolbar_button"
+        data-type="clean" data-layerid="${layerId}"
+        data-messagedelete="${msgDelete}"
+        title="${tooltip}">&amp;nbsp;</i>
+
+</jsp:root>

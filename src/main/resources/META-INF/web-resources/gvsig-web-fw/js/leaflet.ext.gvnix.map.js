@@ -2115,7 +2115,7 @@ var GvNIX_Map_Leaflet;
 
 			}
 		},
-		
+
 		/**
 		 * Function for retrieving map's minZoom value
 		 *
@@ -8321,12 +8321,23 @@ var GvNIX_Map_Leaflet;
 			},
 
 			// Clean the map layer
-			"fnClear" : function() {
-				this._fnClear();
-				var st = this._state;
-				if (st.$Input) {
-					st.$Input.val("");
-				}
+			"fnClean" : function() {
+			    this.__fnClean();
+			},
+
+			"__fnClean" : function() {
+			    var st = this._state;
+			    if (st.oLayer) {
+			    	st.oMarkerLayer.clearLayers();
+			    	st.oPathLayer.clearLayers();
+			    	if(st.oLabelingLayer){
+				    	st.oLabelingMarkerLayer.clearLayers();
+				    	st.oLabelingPathLayer.clearLayers();
+			    	}
+			    }
+			    if(st.$Input){
+			    	st.$Input.val("");
+			    }
 			},
 
 			// Check if layer has geometry draws

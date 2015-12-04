@@ -1,0 +1,49 @@
+<jsp:root xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:util="urn:jsptagdir:/WEB-INF/tags/jquery/util" xmlns:form="http://www.springframework.org/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+  <jsp:output omit-xml-declaration="yes" />
+
+  <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify coordinates tool" />
+  <jsp:directive.attribute name="coordinatesMarkerRemoveLabel" type="java.lang.String" required="false" rtexprvalue="true" description="The label code to get text from I18N properties that will be used as 'remove point' text when marker of coordinates popup is shown. Coordinates must be 'true'. Default: 'Remove'" />
+  <jsp:directive.attribute name="enableInput" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Enable inputs to set coordinates. Default: 'True'" />
+  <jsp:directive.attribute name="centerInputCoordinates" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Center the map to the coodinates established by inputs. Need 'enableInput' enabled. Default: 'False'" />
+  <jsp:directive.attribute name="projections" type="java.lang.String" required="false" rtexprvalue="true" description="Set of projections to select in selector for calculate the coordinates, separated by ','. Supported projections are EPSG:4326, EPSG:4269, EPSG:3857, EPSG:25830, EPSG:23029, EPSG:23030 and EPSG:23031." />
+  <jsp:directive.attribute name="zoom" type="java.lang.String" required="false" rtexprvalue="true" description="Desired zoom when centering the map in the coordinates marker. Default: '10'" />
+  <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+
+  <!-- Set the remove text for coordinates marker -->
+  <c:choose>
+    <c:when test="${empty coordinatesMarkerRemoveLabel}">
+      <spring:message code="leaflet_coordinates_remove_marker" var="coordinatesMarkerRemoveLabel" htmlEscape="false" />
+    </c:when>
+    <c:otherwise>
+      <spring:message code="${coordinatesMarkerRemoveLabel}" var="coordinatesMarkerRemoveLabel" htmlEscape="false" />
+    </c:otherwise>
+  </c:choose>
+
+  <c:if test="${empty enableInput}">
+    <c:set var="enableInput" value="true"/>
+  </c:if>
+
+  <c:if test="${empty zoom}">
+    <c:set var="zoom" value="10"/>
+  </c:if>
+
+  <c:set var="showProjectionCoordinates" value="true" />
+  <c:if test="${empty projections}">
+    <c:set var="showProjectionCoordinates" value="false" />
+  </c:if>
+
+  <c:if test="${empty centerInputCoordinates}">
+    <c:set var="centerInputCoordinates" value="false"/>
+  </c:if>
+
+	<!-- Generating scale tool -->
+	<div id="${id}_coordinates_component" class="map_component"
+	data-coordinates_marker_remove_text="${coordinatesMarkerRemoveLabel}"
+	data-enable_input="${enableInput}"
+	data-center_input_coordinates="${centerInputCoordinates}"
+	data-show_projection="${showProjectionCoordinates}"
+	data-dest_srid="${projections}"
+	data-zoom="${zoom}"
+	data-type="coordinates">&amp;nbsp;</div>
+
+</jsp:root>

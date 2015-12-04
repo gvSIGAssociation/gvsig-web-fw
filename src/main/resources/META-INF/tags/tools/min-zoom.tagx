@@ -28,7 +28,7 @@
   <jsp:directive.attribute name="minZoom" type="java.lang.String" required="false" description="Minimum zoom value which is set with this tool." />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
-  <spring:message code="tooltip_minzoom_tool" var="tooltip"/>
+  <spring:message code="tooltip_tool_minzoom" var="tooltip"/>
 
   <c:if test="${empty minZoom}">
   	<c:set var="minZoom" value="map_defined" />

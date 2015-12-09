@@ -32,6 +32,8 @@
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (include at final substring '_wmts_wizard')" />
   <jsp:directive.attribute name="path" type="java.lang.String" required="true" rtexprvalue="true" description="Specify the relative URL path of the controller where do the conexion with server WMTS" />
   <jsp:directive.attribute name="title" type="java.lang.String" required="false" rtexprvalue="true" description="The label code to get text from I18N properties that will be used as title of the tab. Default 'WMTS'" />
+  <jsp:directive.attribute name="enableCheckMetadata" type="java.lang.Boolean" required="false" description="Indicate if show checkbox to select if load metadata tool. DEFAULT false." />
+  <jsp:directive.attribute name="enableCheckLegend" type="java.lang.Boolean" required="false" description="Indicate if show checkbox to select if load legend. Need map legend activated. DEFAULT false." />
 
   <spring:url value="${path}" var="controllerUrl" />
 
@@ -43,6 +45,14 @@
       <spring:message code="${title}" var="tabTitle"/>
     </c:otherwise>
   </c:choose>
+
+  <c:if test="${empty enableCheckMetadata}">
+    <c:set value="false" var="enableCheckMetadata"/>
+  </c:if>
+
+  <c:if test="${empty enableCheckLegend}">
+    <c:set value="false" var="enableCheckLegend"/>
+  </c:if>
 
   <!-- error messages -->
   <spring:message code="layers_not_found" var="layersNotFoundMsg"/>
@@ -73,10 +83,15 @@
   <spring:message code="wait_label" var="waitLabel" htmlEscape="false"/>
   <spring:message code="button_change_server" var="changeServerButton" />
   <spring:message code="tooltip_button_change_server" var="change_server_tooltip" />
+  <spring:message code="wmts_wizard_enable_legend_label" var="checkLegendLabel" />
+  <spring:message code="wmts_wizard_enable_metadata_label" var="checkMetadataLabel" />
+
+  <spring:url var="loading_img" value="/resources/images/loading.gif" />
 
   <div class="wizard_dialog" id="${fn:escapeXml(id)}_wmts_wizard"
        data-context_path="${pageContext.request.contextPath}"
        data-layer_type="wmts"
+       data-loading_img_url="${loading_img}"
        data-msg_connect_required="${msgConnectRequired}"
        data-msg_crs_supported="${crsSupportedLabel}"
        data-msg_formats_supported="${formatsSupportedLabel}"
@@ -90,6 +105,7 @@
        data-wait_label="${waitLabel}"
        data-wizard_next_label="${nextLabel}"
        data-wizard_previous_label="${prevLabel}">
+
 
     <h3>${titleConnect}</h3>
     <section>
@@ -116,6 +132,28 @@
       <div class="row">
           <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wmts_wizard_connection_error">&amp;nbsp;</div>
       </div>
+      <c:if test="${enableCheckMetadata}">
+	      <div class="row" id="${fn:escapeXml(id)}_wmts_wizard_row_metadata">
+	        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	          <div class='checkbox'>
+	            <label>
+	              <input id="${fn:escapeXml(id)}_wmts_wizard_metadata" type="checkbox" />${checkMetadataLabel}
+	            </label>
+	          </div>
+	        </div>
+	      </div>
+	    </c:if>
+	    <c:if test="${enableCheckLegend}">
+	      <div class="row" id="${fn:escapeXml(id)}_wmts_wizard_row_legend">
+	        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+	          <div class='checkbox'>
+	            <label>
+	              <input id="${fn:escapeXml(id)}_wmts_wizard_legend" type="checkbox" /> ${checkLegendLabel}
+	            </label>
+	          </div>
+	        </div>
+	     </div>
+	   </c:if>
     </section>
     <h3>${titleServerInfo}</h3>
     <section>

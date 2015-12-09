@@ -2219,6 +2219,25 @@ var GvNIX_Map_Leaflet;
 
 			},
 
+			/**
+			 * Register event click
+			 */
+			"fnRegisterOnClick" : function(){
+				this.__fnRegisterOnClick();
+			},
+
+			/**
+			 * Register event click
+			 */
+			"__fnRegisterOnClick" : function(){
+				var st = this._state;
+				var othis = jQuery("#" + st.sId);
+				st.othis = othis;
+
+				// Register click event
+				othis.click(jQuery.proxy(this._fnClick, this));
+			},
+
 			// Set map controls as enable
 			"isEnabled" : function() {
 				return true;
@@ -3200,6 +3219,8 @@ var GvNIX_Map_Leaflet;
 						var tool = this._state.aLayerToolsById[i];
 						// Adding tools to span tools
 						jQuery(tool.s.htmlElement).appendTo(spanTools);
+						// Register click event to the tool
+						tool.fnRegisterOnClick();
 					}
 				}
 			},
@@ -4027,6 +4048,14 @@ var GvNIX_Map_Leaflet;
 				// If bRefreshTOC is true, reload TOC to show
 				// new registered layer
 				if (bRefreshTOC == true) {
+					// Adding load img if not declared yet and exists on options data
+					if(this._state.loadingImg == null && this.s.loading_img_url){
+						var loadingImg = jQuery.parseHTML(
+								'<img width="15" style="display:none;" src="'+this.s.loading_img_url+'" id="'+sId+'_loading_img"/>');
+
+						this._state.oLoadingIcon = jQuery(loadingImg);
+
+					}
 					this.fnInitializeLayerNode();
 				}
 			},

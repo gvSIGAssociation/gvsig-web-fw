@@ -1772,7 +1772,6 @@
 							}
 						}
 
-
 						// get styles selected
 						var stylesSelected = this._fnGetSelectedStylesLayer(keysLayersSel);
 
@@ -1800,6 +1799,13 @@
 		    					this._fnSetErrorMessage("#".concat(st.sId).concat("_tree_error"),st.msgIncompatibleLayers);
 								return false;
 							}else{
+								// get if legend is enabled
+								var legendEnabled = false;
+								var checkLegend = jQuery("#"+st.sId+"_legend", "#"+st.containerId);
+								if(checkLegend.is(':checked')){
+									legendEnabled = true;
+								}
+
 								// generate root layer options and put selected layers
 								// into layers parameter
 								var layerOptions = {
@@ -1818,7 +1824,9 @@
 							        "node_icon": ".whhg icon-layerorderdown",
 							        "title": st.oWMSInfo.serviceTitle,
 							        "aLayers": st.oWMSInfo.layers,
-							        "context_path": st.contextPath
+							        "context_path": st.contextPath,
+							        "enable_legend": legendEnabled,
+							        "loading_img_url": this.s.loading_img_url
 						        };
 								return layerOptions;
 							}
@@ -1854,8 +1862,47 @@
 					var st = this._state;
 					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val(oData.url);
 					this._fnGetDataFromServer(true, oData);
-				}
+				},
 
+				/**
+				 * Remove check 'enable legend'
+				 */
+				"_fnRemoveCheckLegend" : function(){
+					var st = this._state;
+					jQuery("#" + st.sId + "_row_legend").remove();
+				},
+
+				/**
+				 * Register metadata tool if check 'enable metadata' is checked
+				 */
+				"fnRegisterMetadataTool" : function(oLayer){
+					this._fnRegisterMetadataTool(oLayer);
+				},
+
+				/**
+				 * Register metadata tool if check 'enable metadata' is checked
+				 */
+				"_fnRegisterMetadataTool" : function(oLayer){
+					var st = this._state;
+					var checkMetadata = jQuery("#"+st.sId+"_metadata", "#"+st.containerId);
+					if(checkMetadata.is(':checked')){
+						var toolId = oLayer.fnGetId()+"_metadata_tool";
+						// TODO change title i18n
+						var htmlTool = '<i title="Muestra información de la capa" '+
+						' data-dialog_width="800" data-dialog_height="500" class="whhg icon-info-sign toolbar_button toc_layers_button"'+
+						' layerid="'+oLayer.fnGetId()+'" data-type="metadata"'+
+						' id="'+toolId+'">&nbsp;</i>';
+						var options = {
+								dialog_height: 500,
+								dialog_width: 800,
+								layerid: oLayer.fnGetId(),
+								type: "metadata",
+								//htmlElement: htmlTool,
+								id: toolId
+						};
+						oLayer.fnRegisterLayerTool(toolId, options, htmlTool, true);
+					}
+				}
 	});
 
 	/**
@@ -2245,6 +2292,14 @@
 						var tileMatrixId = layerSel.tileMatrixSelected[i];
 						crsSelected.push(st.oWMTSInfo.tileMatrixCrsSupported[tileMatrixId]);
 					}
+
+					// get if legend is enabled
+					var legendEnabled = false;
+					var checkLegend = jQuery("#".concat(st.sId).concat("_legend"), "#".concat(st.containerId));
+					if(checkLegend.is(':checked')){
+						legendEnabled = true;
+					}
+
 					// generate root layer options and put selected layers
 					// into layers parameter
 					var layerOptions = {
@@ -2263,7 +2318,9 @@
 					        "crs" :  crsSelected.join(),
 					        "node_icon": ".whhg icon-layerorderup",
 							"title": layersSelected[0].title,
-							"context_path": st.contextPath
+							"context_path": st.contextPath,
+							"enable_legend": legendEnabled,
+					        "loading_img_url": this.s.loading_img_url
 					};
 					return layerOptions;
 				},
@@ -2295,6 +2352,46 @@
 					var st = this._state;
 					jQuery("#".concat(st.sId).concat("_server_id"), "#".concat(st.containerId)).val(oData.url);
 					this._fnGetDataFromServer(true, oData);
+				},
+
+				/**
+				 * Remove check 'enable legend'
+				 */
+				"_fnRemoveCheckLegend" : function(){
+					var st = this._state;
+					jQuery("#" + st.sId + "_row_legend").remove();
+				},
+
+				/**
+				 * Register metadata tool if check 'enable metadata' is checked
+				 */
+				"fnRegisterMetadataTool" : function(oLayer){
+					this._fnRegisterMetadataTool(oLayer);
+				},
+
+				/**
+				 * Register metadata tool if check 'enable metadata' is checked
+				 */
+				"_fnRegisterMetadataTool" : function(oLayer){
+					var st = this._state;
+					var checkMetadata = jQuery("#"+st.sId+"_metadata", "#"+st.containerId);
+					if(checkMetadata.is(':checked')){
+						var toolId = oLayer.fnGetId()+"_metadata_tool";
+						// TODO change title i18n
+						var htmlTool = '<i title="Muestra información de la capa" '+
+							'data-dialog_width="800" data-dialog_height="500" class="whhg icon-info-sign toolbar_button toc_layers_button"'+
+							'layerid="'+oLayer.fnGetId()+'" data-type="metadata"'+
+							'id="'+toolId+'">&nbsp;</i>';
+						var options = {
+								dialog_height: 500,
+								dialog_width: 800,
+								layerid: oLayer.fnGetId(),
+								type: "metadata",
+								htmlElement: htmlTool,
+								id: toolId
+						};
+						oLayer.fnRegisterLayerTool(toolId, options, undefined, true);
+					}
 				}
 	});
 

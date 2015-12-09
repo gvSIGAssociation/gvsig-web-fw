@@ -160,7 +160,8 @@ var GvNIX_Map_User_Layers_Tool;
 											"styles" : style,
 											"id_on_server" : oLayer.name,
 											"group" : idLayerToInsert,
-											"context_path" : layerOptions.context_path
+											"context_path" : layerOptions.context_path,
+											"enable_legend" : layerOptions.enable_legend
 								}
 								oLayerChild = {"id" : idChildLayer,
 										 	   "options" : oChildLayerOptions
@@ -175,6 +176,10 @@ var GvNIX_Map_User_Layers_Tool;
 						// Check this layer
 						if(!($focusedTab instanceof GvNIX_Map_Leaflet.USERLAYERTAB.shape)){
 							st.oMap.fnGetLayerById(idLayerToInsert).fnCheckLayer();
+						}
+						// register metadata tool if is necessary
+						if($focusedTab.fnRegisterMetadataTool){
+							$focusedTab.fnRegisterMetadataTool(st.oMap.fnGetLayerById(idLayerToInsert));
 						}
 					}
 				}

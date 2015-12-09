@@ -130,6 +130,7 @@
 		 *            Layer tab options
 		 */
 		"__fnRegisterUserLayerTab" : function(sId, container, aCrs, options) {
+			var st = this._state;
 			var sUserLayerTabType = options.type;
 
 			if (sUserLayerTabType == "Base") {
@@ -146,6 +147,11 @@
 			if (!newUserLayerTab) {
 				this.debug("ERROR: '" + sId + "': user layer tab not created");
 				return;
+			}
+
+			// Remove checkbox 'enable legend' if map doesn't support legend
+			if(st.oMap && !st.oMap.s.display_Legend && newUserLayerTab._fnRemoveCheckLegend){
+				newUserLayerTab._fnRemoveCheckLegend();
 			}
 			// store into the tool
 			this._state.aUserLayerTabs[sId] = newUserLayerTab;

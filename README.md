@@ -97,6 +97,35 @@ Geospatial web framework that includes many geographical tools for Spring MVC ba
       </jsp:root>
 ```
 
+- remove on `load-scripts.tagx` the following load of scripts:
+  * leaflet.ext.gvnix.map.js
+  * leaflet.ext.gvnix.map.fancytreelayercontrol.js
+  * leaflet.ext.gvnix.map.clean.tool.js
+  * leaflet.ext.gvnix.map.coordinates.component.js
+  * leaflet.ext.gvnix.map.draw.tool.js
+  * leaflet.ext.gvnix.map.filter.tool.js
+  * leaflet.ext.gvnix.map.generic.tool.js
+  * leaflet.ext.gvnix.map.geosearch.tool.js
+  * leaflet.ext.gvnix.map.measure.tool.js
+  * leaflet.ext.gvnix.map.print.tool.js
+  * leaflet.ext.gvnix.map.scale.component.js
+  * leaflet.ext.gvnix.map.zoomselect.tool.js
+  * leaflet.ext.gvnix.map.zoomselectall.tool.js
+
+- search in your project ```xmlns:components="urn:jsptagdir:/WEB-INF/tags/geo/components"```
+and include in the file where appear the definition of the xml namespace ```xmlns:gvsig-components="http://gvsig.org/web-framework/TLD/components"```
+
+- search in your project ```xmlns:layer-tool="urn:jsptagdir:/WEB-INF/tags/geo/layers/tools```
+ and include in the file where appear the definition of the xml namespace ```xmlns:gvsig-layers-tools="http://gvsig.org/web-framework/TLD/layers-tools"```
+
+- search in your project ```xmlns:tool="urn:jsptagdir:/WEB-INF/tags/geo/tools"```
+and include in the file where appear the definition of the xml namespace ```xmlns:gvsig-tools="http://gvsig.org/web-framework/TLD/tools"```
+
+- search and replace:
+  * ```<tool:...>``` by ```<gvsig-tools:...>```
+  * ```<layer-tool:...>``` by ```<gvsig-layers-tools:...>```
+  * ```<components:...>``` by ```<gvsig-components:...>```
+
 - copy files that contains the messages from  `src/main/resources/templates/i18n/` to `WEB-INF/i18n`. Include them into the configuration of the bean `ReloadableResourceBundleMessageSource` modifying the file `webmvc-config.xml`:
 ```
      ....

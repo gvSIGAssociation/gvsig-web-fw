@@ -640,7 +640,7 @@ L.Control.FancytreeLayers = L.Control.extend({
    * @map Leaflet map instance
    */
   "_fnInitializeCheckbox" : function ($treeNode, $layer, map){
-	  if ($layer._state.oCheckbox == true){
+	  if ($layer._state.oCheckbox == true || $layer.s.visible_on_start){
 		  $treeNode.setSelected(true);
 	  } else {
 		  $treeNode.setSelected(false);

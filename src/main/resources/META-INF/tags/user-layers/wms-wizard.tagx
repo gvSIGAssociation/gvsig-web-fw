@@ -147,28 +147,6 @@
       <div class="row">
           <div class="textError col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wms_wizard_connection_error">&amp;nbsp;</div>
       </div>
-      <c:if test="${enableCheckMetadata}">
-        <div class="row" id="${fn:escapeXml(id)}_wms_wizard_row_metadata">
-          <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-  	        <div class='checkbox'>
-	           <label>
-	             <input id="${fn:escapeXml(id)}_wms_wizard_metadata" type="checkbox" />${checkMetadataLabel}
-	           </label>
-	         </div>
-	       </div>
-  	    </div>
-  	  </c:if>
-  	  <c:if test="${enableCheckLegend}">
-  	    <div class="row" id="${fn:escapeXml(id)}_wms_wizard_row_legend">
-		      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-	          <div class='checkbox'>
-	            <label>
-	              <input id="${fn:escapeXml(id)}_wms_wizard_legend" type="checkbox" />${checkLegendLabel}
-	            </label>
-	          </div>
-	        </div>
-	      </div>
-	    </c:if>
     </section>
     <h3>${titleServerInfo}</h3>
     <section>
@@ -200,6 +178,26 @@
    </section>
     <h3>${titleSelectLayers}</h3>
     <section>
+    <div class="row">
+      <c:if test="${enableCheckMetadata}">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="${fn:escapeXml(id)}_wms_wizard_row_metadata">
+            <div class='checkbox'>
+             <label>
+               <input id="${fn:escapeXml(id)}_wms_wizard_metadata" type="checkbox" />${checkMetadataLabel}
+             </label>
+           </div>
+         </div>
+      </c:if>
+      <c:if test="${enableCheckLegend}">
+        <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6" id="${fn:escapeXml(id)}_wms_wizard_row_legend">
+          <div class='checkbox'>
+            <label>
+              <input id="${fn:escapeXml(id)}_wms_wizard_legend" type="checkbox" />${checkLegendLabel}
+            </label>
+          </div>
+        </div>
+        </c:if>
+      </div>
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" id="${fn:escapeXml(id)}_wms_wizard_tree_label" style="display:none">
         <h5>${treeLabel}</h5>

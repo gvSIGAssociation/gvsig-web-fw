@@ -45,6 +45,8 @@ var GvNIX_Map_Min_Zoom;
 					"sId" : sId,
 					"oMap" : oMap,
 					"minZoom" : null,
+					"mapCenter" : null,
+					"center" : false
 				});
 
 		this._fnConstructor();
@@ -55,27 +57,45 @@ var GvNIX_Map_Min_Zoom;
 				"_fnConstructor" : function() {
 					this.__simple_selectable_fnConstructor(false);
 					var st = this._state;
+					var s = this.s;
 					var map = this._state.oMap;
-					
+
 					// Set minZoom (user selected or oMap minumum)
-					if (st.othis.attr("minzoom") === "map_defined"){
+					if (s.min_zoom === "map_defined"){
 						st.minZoom = st.oMap._fnGetMinZoom();
 					}else{
-						st.minZoom = st.othis.attr("minZoom");
+						st.minZoom = s.min_zoom;
 					}
+
+					st.center = s.center;
+
+					if(st.center){
+						if (s.map_center){
+							st.mapCenter = s.map_center.split(",");
+						}else{
+							st.mapCenter = map.fnGetMapObject().getCenter();
+						}
+
+					}
+
+
 				},
 
 				/**
 				 * To do when click this tool. Set zoom to minimum supported by the map
 				 *
 				 * @param event click event on this tool
-				 *            
+				 *
 				 */
 				"_fnClick" : function(event) {
 					var st = this._state;
-					st.oMap.fnGetMapObject().setZoom(st.minZoom);
+					if(st.mapCenter){
+						st.oMap.fnGetMapObject().setView(st.mapCenter, st.minZoom);
+					}else{
+						st.oMap.fnGetMapObject().setZoom(st.minZoom);
+					}
 				}
-				
+
 			});
 
 })(jQuery, window, document);

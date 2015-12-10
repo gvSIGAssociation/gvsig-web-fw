@@ -26,6 +26,8 @@
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" description="Use this id to identify minzoom tool" />
   <jsp:directive.attribute name="minZoom" type="java.lang.String" required="false" description="Minimum zoom value which is set with this tool." />
+  <jsp:directive.attribute name="mapCenterCoord" type="java.lang.String" required="false" description="Coordinates that represents where is set the center of the map. Syntax: lat,long" />
+  <jsp:directive.attribute name="center" type="java.lang.Boolean" required="false" description="Indicate if center the map. Default : 'false'" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <spring:message code="tooltip_tool_minzoom" var="tooltip"/>
@@ -34,7 +36,13 @@
   	<c:set var="minZoom" value="map_defined" />
   </c:if>
 
+  <c:if test="${empty center}">
+    <c:set var="center" value="false" />
+  </c:if>
+
   <i id="${id}_minzoom_tool" class="whhg icon-world toolbar_button"
-     data-type="minzoom" title="${tooltip}" minzoom="${minZoom}" >&amp;nbsp;</i>
+     data-type="minzoom" title="${tooltip}" data-min_zoom="${minZoom}"
+     data-map_center="${mapCenter}" data-center="${center}"
+      >&amp;nbsp;</i>
 
 </jsp:root>

@@ -2632,7 +2632,8 @@ var GvNIX_Map_Leaflet;
 									if(currentOpacity == undefined){
 										currentOpacity = 1;
 									}
-									this.s.inputRange.val(1 - currentOpacity);
+									var opacity = 1 - currentOpacity;
+									this.s.inputRange.val(opacity);
 								} else {
 									// Disable input range
 									jQuery(this.s.inputRange).prop("disabled",
@@ -2891,6 +2892,11 @@ var GvNIX_Map_Leaflet;
 
 				if(s.enable_legend){
 					st.enableLegend = s.enable_legend;
+				}
+
+				// Save opacity in localStorage if it wasn't previously saved
+				if(s.opacity && this._fnLoadOpacityStatus() == undefined){
+					this._fnSaveOpacityStatus(s.opacity);
 				}
 
 				// Register on move listener
@@ -3950,7 +3956,7 @@ var GvNIX_Map_Leaflet;
 			"__fnSaveOpacityStatus" : function(opacityLevel) {
 				// Generating localStorageKey for opacity level
 				var localStorageKey = this._state.sId + "_opacity_level";
-				// Saving opacity level of current lavel on localStorage
+				// Saving opacity level of current layer on localStorage
 				this._state.oMap
 						._fnSaveMapStatus(localStorageKey, opacityLevel);
 
@@ -4468,11 +4474,12 @@ var GvNIX_Map_Leaflet;
 					st.oLayer = L.featureGroup();
 					st.oLayer._gvNIX_layer_id = st.sId;
 
+					// If WMS layer has children, add it to map and set its opacity
 					if (s.layers) {
 						// Create leaflet WMS layer instance
 						st.oWmsLayer = L.tileLayer.wms(s.url, st.layerOptions);
-						if (s.opacity != null) {
-							st.oWmsLayer.setOpacity(s.opacity);
+						if(s.opacity){
+							st.oWmsLayer.setOpacity(this._fnLoadOpacityStatus());
 						}
 						st.oLayer.addLayer(st.oWmsLayer);
 					} else {
@@ -4554,6 +4561,10 @@ var GvNIX_Map_Leaflet;
 									st.layerOptions);
 							st.oWmsLayer.setZIndex(st.oMap
 									.fnGetLayerIndex(st.sId));
+							if(s.opacity){
+								st.oWmsLayer.setOpacity(this._fnLoadOpacityStatus());
+							}
+
 							// Add new Leaflet layer to this layer
 							// object
 							st.oLayer.addLayer(st.oWmsLayer);
@@ -4787,7 +4798,7 @@ var GvNIX_Map_Leaflet;
 				},
 
 				/**
-				 * Function that sets opacity level of WMST layer
+				 * Function that sets opacity level of WMS layer
 				 *
 				 * @param opacityLevel
 				 *            to set on layer

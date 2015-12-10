@@ -555,6 +555,9 @@ L.Control.FancytreeLayers = L.Control.extend({
 				// Initialize all layers from WMS
    			    tocLayer._fnInitializeWmsLayer();
 			}
+
+			// recreate the legend
+			map.fnRecreateLegend();
 		});
 	},
 

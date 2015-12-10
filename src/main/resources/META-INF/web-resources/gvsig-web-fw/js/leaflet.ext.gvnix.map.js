@@ -2105,7 +2105,7 @@ var GvNIX_Map_Leaflet;
 				var layerId = aLayers[x];
 				var layerNode = toc.getNodeByKey(layerId);
 				// if layer has children, don't recreate it, create only children legends
-				if(!layerNode.hasChildren()){
+				if(!layerNode.hasChildren() && layerNode.isSelected()){
 					var gvNIXLayer = this.fnGetLayerById(layerId);
 					if(gvNIXLayer.fnIsLegendEnabled() == true){
 						var legend = gvNIXLayer.fnCreateLegend();

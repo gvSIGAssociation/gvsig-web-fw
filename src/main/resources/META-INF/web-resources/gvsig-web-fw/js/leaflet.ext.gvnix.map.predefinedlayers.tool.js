@@ -122,10 +122,10 @@ var GvNIX_Map_Predefined_Layers_Tool;
 				"__fnToggleMenu" : function() {
 					var st = this._state;
 					st.$menu.toggle().position({
-						my : "left bottom",
-						at : "left top-5px",
+						my : "right bottom",
+						at : "left+25px top-5px",
 						of : jQuery("#" + st.sId),
-						collision : "flip fit"
+						collision : "fit"
 					});
 				},
 
@@ -158,6 +158,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 						}
 
 						// Get the necessary info from layer
+						debugger;
 						var layerData = $layerDiv.data();
 						var $layerComponents = $layerDiv
 								.find("#layer-components")[0];

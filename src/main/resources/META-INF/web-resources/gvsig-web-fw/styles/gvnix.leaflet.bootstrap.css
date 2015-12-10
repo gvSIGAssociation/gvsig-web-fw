@@ -37,7 +37,7 @@
 }
 
 .mapviewer_layers{
-	margin-top: -2px;
+	margin-top: -2px;url
 	padding: 10px;
 	overflow-y: auto;
 }
@@ -286,4 +286,16 @@ input[type=range]:focus::-webkit-slider-runnable-track {
   border:1px solid black;
   margin-bottom: 4px;
   width: 350px;
+}
+
+/* Styles needed for predefined-layers menu */
+ul.ui-menu.ui-menu,
+ul.ui-menu{
+    z-index: 90000;
+    padding: 3px;
+    border: solid rgba(255, 255, 255, 1.0) 4px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+    border-radius: 3px;
+    background: #f8f8f9;
+    transition: all .2s;
 }

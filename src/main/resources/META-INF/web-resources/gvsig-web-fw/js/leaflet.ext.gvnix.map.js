@@ -5930,7 +5930,8 @@ var GvNIX_Map_Leaflet;
 					var aPks = [];
 					var oSelection = st.oSelection;
 
-					if (aRecords) {
+					if (aRecords != null && aRecords.length > 0) {
+										
 						// For each record
 						for ( var i in aRecords) {
 							var oRecord = aRecords[i];
@@ -5952,17 +5953,15 @@ var GvNIX_Map_Leaflet;
 							}
 						}
 					}
-					if (st.oFilterConfig
-							&& st.oFilterConfig.bFiltered) {
-						// Remove not visible element
-						// for each visible layer
-						for ( var j in aFLayers) {
-							// Add feature
-							aFLayers[j].fnCleanFeaturesNotIn(aPks);
-						}
-						// Clean custom property
-						delete this._state['__force'];
+
+					// Remove not visible element
+					// for each visible layer
+					for ( var j in aFLayers) {
+						// Add feature
+						aFLayers[j].fnCleanFeaturesNotIn(aPks);
 					}
+					// Clean custom property
+					delete this._state['__force'];
 
 					// If not-volatile-data param set and
 					// data loaded from a request and

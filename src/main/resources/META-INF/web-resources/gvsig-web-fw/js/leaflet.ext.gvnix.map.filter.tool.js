@@ -142,6 +142,11 @@
 				var fnSelectionModifiedProxy = jQuery.proxy(
 						layer._fnSelectionDataModified,layer);
 				datatableInstance.fnRegisterOnSelectCallback(fnSelectionModifiedProxy);
+				
+				// Registering on data change callback
+				var fnDataChangedProxy = jQuery.proxy(
+						layer._fnRequestData,layer);
+				datatableInstance.fnRegisterDataChangeCallback(fnDataChangedProxy);
 
 				// Changing create entity link
 				jQuery("#" + this._state.dialogId + " a[class='icon create_entity']").attr(

@@ -46,6 +46,10 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					"sId" : sId,
 					"oMap" : oMap,
 					"$menu" : null,
+					"oUtil" : null,
+					"msg_incompatible_map" : null,
+					"msg_incompatible_between" : null,
+					"msg_incompatible_with_service" : null
 				});
 
 		this._fnConstructor();
@@ -56,6 +60,12 @@ var GvNIX_Map_Predefined_Layers_Tool;
 				"_fnConstructor" : function() {
 					this.__simple_selectable_fnConstructor(false);
 					this._fnLoadMenu();
+					this._state.oUtil = GvNIX_Map_Leaflet.Util;
+
+					// Load alert messages
+					this._state.msg_incompatible_map = this.s.msg_incompatible_map;
+					this._state.msg_incompatible_between = this.s.msg_incompatible_between;
+					this._state.msg_incompatible_with_service = this.s.msg_incompatible_with_service;
 				},
 
 				"_fnDoSelect" : function() {
@@ -158,15 +168,24 @@ var GvNIX_Map_Predefined_Layers_Tool;
 						}
 
 						// Get the necessary info from layer
-						debugger;
 						var layerData = $layerDiv.data();
 						var $layerComponents = $layerDiv
 								.find("#layer-components")[0];
 
-						// Register layer in map and
-						// move selected layer to first position of TOC
-						st.oMap.fnRegisterLayer(layerId, layerData,
-								$layerComponents, true);
+						if (layerData.layer_type === "wms"){
+
+							// Connect to service, get more layer options and add WMS layer with its children
+							if(!this._fnAddWmsLayer(layerId, layerData)){
+								return;
+							}
+
+						}else{
+
+							// Register layer in map and
+							// move selected layer to first position of TOC
+							st.oMap.fnRegisterLayer(layerId, layerData,
+									$layerComponents, true);
+						}
 
 						// Save new layer in localStorage
 						var layerInfo = {
@@ -181,6 +200,213 @@ var GvNIX_Map_Predefined_Layers_Tool;
 						st.oMap.fnGetLayerById(layerId).fnCheckLayer();
 					}
 				},
+
+				/**
+				 * Add a WMS layer with its children layers to map and TOC
+				 */
+				"_fnAddWmsLayer" : function(layerId, layerData){
+					return this.__fnAddWmsLayer(layerId, layerData);
+				},
+
+				/**
+				 * Add a WMS layer with its children layers to map and TOC
+				 */
+				"__fnAddWmsLayer" : function(layerId, layerData){
+
+					this._fnGetDataFromServer(layerData);
+					var layerOptions = this._fnCreateWmsLayerOptions(layerData);
+					if (!layerOptions){
+						return false;
+					}
+
+					var idLayerToInsert = layerId;
+					layerOptions.layers = "";
+
+					// Create pattern layer
+					var oWmsLayer = {"id" : idLayerToInsert,
+									 "options" : layerOptions
+									};
+					var aoChildLayers = [];
+					var childrenStyles = [];
+
+					// Create children layers
+					for(i in layerOptions.aLayers){
+						var oLayer = layerOptions.aLayers[i];
+						var nameLayerAux = oLayer.name.concat("_");
+						var style = "";
+						var idChildLayer = GvNIX_Map_Leaflet.Util.getHashCode((oLayer.name).concat("_").concat(new Date().toString()));;
+						var oChildLayerOptions = { "layer_type" : "wms_child",
+									"title" : oLayer.title,
+									"visible" : "true",
+									"styles" : style,
+									"id_on_server" : oLayer.name,
+									"group" : idLayerToInsert,
+									"context_path" : layerOptions.context_path,
+									"enable_legend" : layerOptions.enable_legend
+						}
+						oLayerChild = {"id" : idChildLayer,
+								 	   "options" : oChildLayerOptions
+									  };
+						aoChildLayers.push(oLayerChild);
+					}
+					GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(this._state.oMap, oWmsLayer,
+							aoChildLayers, true);
+
+					return true;
+				},
+
+				/**
+				 * Get data from WMS server indicated in URL from layer div
+				 */
+				"_fnGetDataFromServer" : function(layerData) {
+					return this.__fnGetDataFromServer(layerData);
+				},
+
+				/**
+				 * Get data from WMS server indicated in URL from layer div
+				 */
+				"__fnGetDataFromServer" : function(layerData) {
+					var st = this._state;
+					var urlServ = layerData.url;
+					var instance = this;
+					if(urlServ){
+						st.oUtil.startWaitMeAnimation("Loading children layers from server...");
+
+						// Set crs for layer
+						if(!layerData.crs){
+							layerData.crs = st.oMap.fnGetMapSRIDcode();
+						}
+
+						var params = { url: urlServ, crs: layerData.crs, format: layerData.format };
+						jQuery.ajax({
+							url : layerData.controller_url + "?findWmsCapabilities",
+							async: false,
+							data : params,
+							cache : false,
+							success : function(element) {
+								st.oUtil.stopWaitMeAnimation();
+								layerData.oWMSInfo = element;
+								return layerData;
+							},
+							error : function(object) {
+								console.log('Error obtaining layers from provided server');
+								st.oUtil.stopWaitMeAnimation();
+							}
+						});
+
+					}else{
+						console.log('No URL provided!');
+					}
+				},
+
+				/**
+				 * Create WMS layer options and check CRS compatibility
+				 * between sub-layers, service and server
+				 */
+				"_fnCreateWmsLayerOptions" : function(layerData){
+					return this.__fnCreateWmsLayerOptions(layerData);
+				},
+
+				/**
+				 * Create WMS layer options and check CRS compatibility
+				 * between sub-layers, service and server
+				 */
+				"__fnCreateWmsLayerOptions" : function(layerData){
+
+					// Get common CRS between all children layers
+					if (layerData.oWMSInfo && layerData.oWMSInfo.layers){
+						var crsCommonSelected = this._fnGetCommonCRS(layerData.oWMSInfo);
+					}
+
+					if(crsCommonSelected.length == 0){
+						// Show message to user because he has selected
+						// incompatible layers
+						this._fnSetErrorMessage(this._state.msg_incompatible_between);
+						return false;
+					}else{
+						// Get the common crs between selected layers and
+						// selected crs by the server
+						var serverCRS = layerData.oWMSInfo.crsSelected;
+						crsSelected = serverCRS.filter(function(el) {
+						    return crsCommonSelected.indexOf(el) != -1
+						});
+
+						if(crsSelected.length == 0){
+							// Show message to user because he has selected
+							// incompatible layers
+							this._fnSetErrorMessage(this._state.msg_incompatible_with_service);
+							return false;
+
+						}else{
+
+							// Check if service's CRS is compatible with map's CRS
+							var mapCRS = this._state.oMap.fnGetMapSRIDcode();
+							if(crsSelected.indexOf(mapCRS) == -1){
+								this._fnSetErrorMessage(this._state.msg_incompatible_map);
+								return false;
+							}else{
+
+								// Generate root layer options and put selected layers
+								// into layers parameter
+								var layerOptions = {
+									"layer_type": layerData.layer_type,
+									"span": (layerData.oWMSInfo.id.toString()).concat("_span"),
+									"url": layerData.oWMSInfo.serviceUrl,
+									"format": layerData.oWMSInfo.formatSelected,
+									"transparent":"true",
+									"version":layerData.oWMSInfo.version,
+									"crs": crsSelected.join(),
+									"opacity": "1.0",
+									"allow_disable": true,
+									"node_icon": ".whhg icon-layerorderdown",
+									"title": layerData.oWMSInfo.serviceTitle,
+									"aLayers": layerData.oWMSInfo.layers,
+									"context_path": layerData.contextPath
+								};
+								return layerOptions;
+							}
+						}
+					}
+				},
+
+				/**
+			     * Get common CRS from selected layers
+			     * @param array of selected layers id
+			     * @return array of common crs from selected layers
+			     */
+			    "_fnGetCommonCRS" : function (oWMSInfo){
+			    	// Get the common crs for layers selected
+			    	var st = this._state;
+					var aCommonCRS = [];
+					for(i in oWMSInfo.layers){
+						var layer = oWMSInfo.layers[i]
+						if(layer){
+							if(aCommonCRS.length != 0 ){
+								// Add only different CRS
+								aCommonCRS = aCommonCRS.filter(function(el) {
+								    return layer.crs.indexOf(el) != -1
+								});
+							}else{
+								aCommonCRS = layer.crs;
+							}
+						}
+					}
+					return aCommonCRS;
+			    },
+
+			    /**
+				 * Set error message and show it in a dialog window.
+				 */
+				"_fnSetErrorMessage" : function(message) {
+					this.__fnSetErrorMessage(message);
+				},
+
+				/**
+				 * Set error message and show it in a dialog window.
+				 */
+				"__fnSetErrorMessage" : function(message) {
+					window.alert(message);
+				}
 
 			});
 })(jQuery, window, document);

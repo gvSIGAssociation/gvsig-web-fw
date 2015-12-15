@@ -28,10 +28,13 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <spring:message code="tooltip_tool_predefined_layers" var="tooltip"/>
+  <spring:message code="msg_layers_incompatible_with_map" var="msgIncompatibleMap"/>
+  <spring:message code="msg_children_incompatible_with_service" var="msgIncompatibleWithService"/>
 
   <!-- Generating predefined layers tool -->
   <i id="${id}_predefined_layers_tool" class="whhg icon-burstmode toolbar_button"
-       data-type="predefined_layers" title="${tooltip}"
+       data-type="predefined_layers" title="${tooltip}" data-msg_incompatible_map="${msgIncompatibleMap}"
+       data-msg_incompatible_with_service="${msgIncompatibleWithService}"
        >&amp;nbsp;</i>
 
   <ul id="${id}_predefined_layers_tool_root" style="display:none; position:absolute" >

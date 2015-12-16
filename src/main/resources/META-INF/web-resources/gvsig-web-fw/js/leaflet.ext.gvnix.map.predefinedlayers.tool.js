@@ -47,9 +47,8 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					"oMap" : oMap,
 					"$menu" : null,
 					"oUtil" : null,
-					"msg_incompatible_map" : null,
-					"msg_incompatible_between" : null,
-					"msg_incompatible_with_service" : null
+					"msg_layers_incompatible_map" : null,
+					"msg_children_incompatible" : null
 				});
 
 		this._fnConstructor();
@@ -63,9 +62,8 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					this._state.oUtil = GvNIX_Map_Leaflet.Util;
 
 					// Load alert messages
-					this._state.msg_incompatible_map = this.s.msg_incompatible_map;
-					this._state.msg_incompatible_between = this.s.msg_incompatible_between;
-					this._state.msg_incompatible_with_service = this.s.msg_incompatible_with_service;
+					this._state.msg_layers_incompatible_map = this.s.msg_layers_incompatible_map;
+					this._state.msg_children_incompatible = this.s.msg_children_incompatible;
 				},
 
 				"_fnDoSelect" : function() {
@@ -156,6 +154,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 
 					// Selected item is not a predefined-layers-group
 					if ("group" != $menuItem.attr('type')) {
+
 						// Get layer unique identifier
 						var $layerDiv = $menuItem
 								.find(".mapviewer_layers_layer");
@@ -273,11 +272,11 @@ var GvNIX_Map_Predefined_Layers_Tool;
 						st.oUtil.startWaitMeAnimation("Loading children layers from server...");
 
 						// Set crs for layer
-						if(!layerData.crs){
-							layerData.crs = st.oMap.fnGetMapSRIDcode();
+						if(st.oMap){
+							var mapCrs = st.oMap.fnGetMapSRIDcode();
 						}
 
-						var params = { url: urlServ, crs: layerData.crs, format: layerData.format };
+						var params = { url: urlServ, crs: mapCrs, format: layerData.format };
 						jQuery.ajax({
 							url : layerData.controller_url + "?findWmsCapabilities",
 							async: false,
@@ -313,86 +312,46 @@ var GvNIX_Map_Predefined_Layers_Tool;
 				 */
 				"__fnCreateWmsLayerOptions" : function(layerData){
 
-					// Get common CRS between all children layers
-					if (layerData.oWMSInfo && layerData.oWMSInfo.layers){
-						var crsCommonSelected = this._fnGetCommonCRS(layerData.oWMSInfo);
+					// Check layers size (must do it this way because it is an associative array
+					var layersSize = 0;
+					for (index in layerData.oWMSInfo.layers){
+						layersSize++;
 					}
 
-					if(crsCommonSelected.length == 0){
-						// Show message to user because he has selected
-						// incompatible layers
-						this._fnSetErrorMessage(this._state.msg_incompatible_between);
+					// Check if layers are compatible with map
+					if (layersSize == 0){
+						this._fnSetErrorMessage(this._state.msg_layers_incompatible_map);
 						return false;
 					}else{
-						// Get the common crs between selected layers and
-						// selected crs by the server
-						var serverCRS = layerData.oWMSInfo.crsSelected;
-						crsSelected = serverCRS.filter(function(el) {
-						    return crsCommonSelected.indexOf(el) != -1
-						});
 
-						if(crsSelected.length == 0){
-							// Show message to user because he has selected
-							// incompatible layers
-							this._fnSetErrorMessage(this._state.msg_incompatible_with_service);
-							return false;
-
-						}else{
-
-							// Check if service's CRS is compatible with map's CRS
-							var mapCRS = this._state.oMap.fnGetMapSRIDcode();
-							if(crsSelected.indexOf(mapCRS) == -1){
-								this._fnSetErrorMessage(this._state.msg_incompatible_map);
-								return false;
-							}else{
-
-								// Generate root layer options and put selected layers
-								// into layers parameter
-								var layerOptions = {
-									"layer_type": layerData.layer_type,
-									"span": (layerData.oWMSInfo.id.toString()).concat("_span"),
-									"url": layerData.oWMSInfo.serviceUrl,
-									"format": layerData.oWMSInfo.formatSelected,
-									"transparent":"true",
-									"version":layerData.oWMSInfo.version,
-									"crs": crsSelected.join(),
-									"opacity": "1.0",
-									"allow_disable": true,
-									"node_icon": ".whhg icon-layerorderdown",
-									"title": layerData.oWMSInfo.serviceTitle,
-									"aLayers": layerData.oWMSInfo.layers,
-									"context_path": layerData.contextPath
-								};
-								return layerOptions;
-							}
+						if (layerData.oWMSInfo.childrenCount > layerData.oWMSInfo.layers.length){
+							// Some children layers are incompatible
+							this._fnSetErrorMessage(this._state.msg_children_incompatible);
 						}
+
+						// Set supported CRS
+						var crsSelected = layerData.oWMSInfo.crsSelected;
+
+						// Generate root layer options and put selected layers
+						// into layers parameter
+						var layerOptions = {
+							"layer_type": layerData.layer_type,
+							"span": (layerData.oWMSInfo.id.toString()).concat("_span"),
+							"url": layerData.oWMSInfo.serviceUrl,
+							"format": layerData.oWMSInfo.formatSelected,
+							"transparent":"true",
+							"version":layerData.oWMSInfo.version,
+							"crs": crsSelected.join(),
+							"opacity": "1.0",
+							"allow_disable": true,
+							"node_icon": ".whhg icon-layerorderdown",
+							"title": layerData.oWMSInfo.serviceTitle,
+							"aLayers": layerData.oWMSInfo.layers,
+							"context_path": layerData.context_path
+						};
+						return layerOptions;
 					}
 				},
-
-				/**
-			     * Get common CRS from selected layers
-			     * @param array of selected layers id
-			     * @return array of common crs from selected layers
-			     */
-			    "_fnGetCommonCRS" : function (oWMSInfo){
-			    	// Get the common crs for layers selected
-			    	var st = this._state;
-					var aCommonCRS = [];
-					for(i in oWMSInfo.layers){
-						var layer = oWMSInfo.layers[i]
-						if(layer){
-							if(aCommonCRS.length != 0 ){
-								// Add only different CRS
-								aCommonCRS = aCommonCRS.filter(function(el) {
-								    return layer.crs.indexOf(el) != -1
-								});
-							}else{
-								aCommonCRS = layer.crs;
-							}
-						}
-					}
-					return aCommonCRS;
-			    },
 
 			    /**
 				 * Set error message and show it in a dialog window.

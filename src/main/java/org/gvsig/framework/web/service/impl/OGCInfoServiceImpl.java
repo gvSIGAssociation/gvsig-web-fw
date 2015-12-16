@@ -169,7 +169,6 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                 TreeNode rootNode = new TreeNode("rootLayer_"
                         + rootLayer.getName());
                 rootNode.setTitle(rootLayer.getTitle());
-
                 if (children.isEmpty()) {
                     rootNode.setFolder(false);
                 }
@@ -179,6 +178,10 @@ public class OGCInfoServiceImpl implements OGCInfoService {
                     generateWMSChildrenNodes(children, tree, listCrs, rootNode,
                             layersMap, wmsInfo);
                 }
+
+                // Set childrenLayers paramrootLayer.getChildren()
+                wmsInfo.setChildrenCount(children.size());
+
                 // Only register the tree if it has a layer with crs defined
                 if (rootNode.hasChildren()) {
                     tree.add(rootNode);

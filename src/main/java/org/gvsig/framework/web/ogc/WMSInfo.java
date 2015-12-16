@@ -22,6 +22,7 @@
  */
 package org.gvsig.framework.web.ogc;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -89,9 +90,13 @@ public class WMSInfo {
     private int id;
 
     /**
+     * Service root layer names
+     */
+    private int childrenCount;
+
+    /**
      * Map of the layers where the key represents the identifier of each layer
      * and the value is {@link WMSLayer} object
      */
     private Map<String, WMSLayer> layers;
-
 }

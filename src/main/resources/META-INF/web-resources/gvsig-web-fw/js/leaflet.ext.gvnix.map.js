@@ -2850,12 +2850,12 @@ var GvNIX_Map_Leaflet;
 				s.index = toInt(s.index);
 
 				if(s.fn_prepare_feature_info){
-					st.fnPrepareFeatureInfo = this.Util.getFunctionByName(s.fnpreparefeatureinfo,
+					st.fnPrepareFeatureInfo = this.Util.getFunctionByName(s.fn_prepare_feature_info,
 							jQuery.proxy(this.debug, this));
 				}
 
 				if(s.feature_info_type){
-					st.featureInfoType = s.featureinfotype.toUpperCase();
+					st.featureInfoType = s.feature_info_type.toUpperCase();
 				}
 
 				if(s.feature_info_eror_msg){
@@ -3328,6 +3328,17 @@ var GvNIX_Map_Leaflet;
 			 */
 			"__fnGetFeatureInfo" : function(point, callback){
 				callback(this._state.featureInfoErrorMsg, "STRING");
+			},
+
+			/**
+			 * Call function defined into fnPrepareFeatureInfo parameter
+			 * and call function to show pop-up with value received from
+			 * user function
+			 */
+			"__fnGetFeatureInfoUserFn" : function(point, callback){
+				var st = this._state;
+				var value = st.fnPrepareFeatureInfo(point, callback);
+				callback(value, st.featureInfoType);
 			},
 
 			/**
@@ -5931,7 +5942,7 @@ var GvNIX_Map_Leaflet;
 					var oSelection = st.oSelection;
 
 					if (aRecords != null && aRecords.length > 0) {
-										
+
 						// For each record
 						for ( var i in aRecords) {
 							var oRecord = aRecords[i];

@@ -3293,7 +3293,8 @@ var GvNIX_Map_Leaflet;
 			"fnIsPrepareFeatureInfoDefined" : function(){
 				var st = this._state;
 				if(st.fnPrepareFeatureInfo &&
-						(st.featureInfoType == "URL" || st.featureInfoType == "STRING")){
+						(st.featureInfoType == "URL" || st.featureInfoType == "STRING"
+							|| st.featureInfoType == "JSON")){
 					return true;
 				}else{
 					return false;
@@ -4736,7 +4737,6 @@ var GvNIX_Map_Leaflet;
 				 * 		Function to call when data request finishes successfull
 				 */
 				"fnGetFeatureInfo" : function(point, callbackFn){
-					var html = "";
 					if(this.fnIsPrepareFeatureInfoDefined()){
 						// Use custom implementation
 						this.__fnGetFeatureInfoUserFn(point, callbackFn);
@@ -4765,7 +4765,7 @@ var GvNIX_Map_Leaflet;
 					oUtil.startWaitMeAnimation();
 					// Get common WMS service request params
 					var params = this.fnGetRequestParams();
-					// Get click position in pixels
+					// Get coordinates in pixels of  of query point on map
 					params["pointX"] = point.x;
 					params["pointY"] = point.y;
 					// Get map dimensions

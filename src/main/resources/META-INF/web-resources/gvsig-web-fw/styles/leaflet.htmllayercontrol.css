@@ -19,14 +19,12 @@
 }
 
 .leaflet-control-layers-collapse-button {
-	background-color: #F4F4F4;
+	background-color: inherit;
     border-radius: 0 10px 10px 0;
     font-family :'WebHostingHub-Glyphs';
     color: darkgrey;
     font-size: 14px;
-    box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.176);
     cursor: pointer;
-    font-weight: bold;
     position: absolute;
     text-align: center;
     width: 40px;
@@ -42,7 +40,7 @@
 }
 
 .leaflet-control-layers-collapse-button:hover {
-	background-color: rgb(230, 230, 230);
+	font-weight: bold;
 }
 
 

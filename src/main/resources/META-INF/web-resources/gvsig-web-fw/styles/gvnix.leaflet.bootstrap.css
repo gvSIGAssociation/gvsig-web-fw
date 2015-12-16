@@ -255,8 +255,6 @@ input[type=range]:focus::-webkit-slider-runnable-track {
 
 .tool-layer {
   padding: 5px;
-  border-bottom: 1px solid #D3D3D3;
-  border-left: 1px solid #D3D3D3;
 }
 /* Styles of layers legend container */
 .leaflet-control-layers-legend {
@@ -297,5 +295,32 @@ ul.ui-menu{
     box-shadow: 0 1px 5px rgba(0,0,0,0.65);
     border-radius: 3px;
     background: #f8f8f9;
-    transition: all .2s;
+}
+li.ui-menu-item{
+    cursor:pointer;
+}
+
+/* Overriding jquery-ui.bootstrap.css and fancytree styles for layers list control */
+.leaflet-control-layers-list.ui-tabs-panel{
+	border: solid #ddd !important;
+	border-width: 0px 1px 1px 1px !important;
+	margin: 0px !important;
+	padding: 1em 0px 0px 0px;
+}
+.leaflet-control-layers-tabs.ui-tabs-nav.ui-helper-reset.ui-helper-clearfix.ui-widget-header.ui-corner-all{
+	margin-bottom: 0px !important;
+}
+ul.fancytree-container.fancytree-plain{
+	border: none;
+}
+ul.fancytree-container.fancytree-plain:focus{
+	border: none;
+}
+
+/* Overriding jquery-ui.bootstrap.css styles for legend control */
+.leaflet-control-layers-legend.ui-tabs-panel.ui-widget-content.ui-corner-bottom{
+	border: solid #ddd !important;
+	border-width: 0px 1px 1px 1px !important;
+	margin: 0px !important;
+	padding: 1em 0px 0px 0px;
 }

@@ -48,7 +48,8 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					"$menu" : null,
 					"oUtil" : null,
 					"msg_layers_incompatible_map" : null,
-					"msg_children_incompatible" : null
+					"msg_children_incompatible" : null,
+					"$layerComponents" : null
 				});
 
 		this._fnConstructor();
@@ -168,15 +169,13 @@ var GvNIX_Map_Predefined_Layers_Tool;
 
 						// Get the necessary info from layer
 						var layerData = $layerDiv.data();
-						var $layerComponents = $layerDiv
+						st.$layerComponents = $layerDiv
 								.find("#layer-components")[0];
 
 						if (layerData.layer_type === "wms"){
 
 							// Connect to service, get more layer options and add WMS layer with its children
-							if(!this._fnAddWmsLayer(layerId, layerData)){
-								return;
-							}
+							this._fnAddWmsLayer(layerId, layerData);
 
 						}else{
 
@@ -184,19 +183,10 @@ var GvNIX_Map_Predefined_Layers_Tool;
 							// move selected layer to first position of TOC
 							st.oMap.fnRegisterLayer(layerId, layerData,
 									$layerComponents, true);
+
+							// Save layer in localStorage and check it
+							this._fnSaveAndCheckLayer(layerId, layerData, $layerComponents);
 						}
-
-						// Save new layer in localStorage
-						var layerInfo = {
-							"id" : layerId,
-							"data" : layerData,
-							"components" : $layerComponents
-						};
-						st.oMap._fnSaveMapStatus("predefined_" + layerId,
-								layerInfo);
-
-						// Check on new layer on TOC
-						st.oMap.fnGetLayerById(layerId).fnCheckLayer();
 					}
 				},
 
@@ -236,7 +226,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 								var layerOptions = instance._fnCreateWmsLayerOptions(layerData);
 								if (!layerOptions){
 									instance._state.oUtil.stopWaitMeAnimation();
-									return false;
+									return;
 								}
 
 								var idLayerToInsert = layerId;
@@ -274,7 +264,9 @@ var GvNIX_Map_Predefined_Layers_Tool;
 								GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(st.oMap, oWmsLayer,
 										aoChildLayers, true);
 								st.oUtil.stopWaitMeAnimation();
-								return true;
+
+								// Save layer in localStorage and check it
+								instance._fnSaveAndCheckLayer(layerId, layerData, st.$layerComponents);
 							},
 							error : function(object) {
 								console.log('Error obtaining layers from provided server');
@@ -309,7 +301,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 
 					// Check if layers are compatible with map
 					if (layersSize == 0){
-						instance._state.oUtil.stopWaitMeAnimation();
+						this._state.oUtil.stopWaitMeAnimation();
 						this._fnSetErrorMessage(this._state.msg_layers_incompatible_map);
 						return false;
 					}else{
@@ -345,6 +337,32 @@ var GvNIX_Map_Predefined_Layers_Tool;
 						};
 						return layerOptions;
 					}
+				},
+
+				/**
+				 * Save layer in localStorage and check it
+				 */
+				"_fnSaveAndCheckLayer" : function(layerId, layerData, $layerComponents){
+					this.__fnSaveAndCheckLayer(layerId, layerData, $layerComponents);
+				},
+
+				/**
+				 * Save layer in localStorage and check it
+				 */
+				"__fnSaveAndCheckLayer" : function(layerId, layerData, $layerComponents){
+					var st = this._state;
+
+					// Save new layer in localStorage
+					var layerInfo = {
+						"id" : layerId,
+						"data" : layerData,
+						"components" : $layerComponents
+					};
+					st.oMap._fnSaveMapStatus("predefined_" + layerId,
+							layerInfo);
+
+					// Check on new layer on TOC
+					st.oMap.fnGetLayerById(layerId).fnCheckLayer();
 				},
 
 			    /**

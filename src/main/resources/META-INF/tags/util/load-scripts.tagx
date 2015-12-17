@@ -91,6 +91,10 @@
     <script src="${js_leaflet_ext_gvnix_predefinedlayers_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->
     </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.thematiclayers.tool.js" var="js_leaflet_ext_gvnix_thematiclayers_tool"/>
+    <script src="${js_leaflet_ext_gvnix_thematiclayers_tool}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
   <!-- leaflet.shapefile scripts and CSS -->
 <spring:url value="/resources/gvsig-web-fw/js/leaflet.shpfile.js" var="js_leaflet_shpfile"/>
     <script src="${js_leaflet_shpfile}" type="text/javascript">
@@ -159,6 +163,10 @@
     </script>
 <spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.zoomselectall.tool.js" var="js_leaflet_zoom_select_all_component"/>
     <script src="${js_leaflet_zoom_select_all_component}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.predefinedviews.tool.js" var="js_leaflet_ext_gvnix_predefinedviews_tool"/>
+    <script src="${js_leaflet_ext_gvnix_predefinedviews_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->
     </script>
 </jsp:root>

@@ -24,15 +24,11 @@
  along with this program. If not, see &lt;http://www.gnu.org/licenses /&gt;.
 
 -->
-	<uri>http://gvsig.org/web-framework/TLD/layers</uri>
-	<tlib-version>${project.version}</tlib-version>
-	<short-name>gvsig-fw-layers</short-name>
-	<tag-file>
-		<name>shape</name>
-		<path>/META-INF/tags/layers/shape.tagx</path>
-	</tag-file>
-  <tag-file>
-    <name>thematic-group</name>
-    <path>/META-INF/tags/layers/thematic-group.tagx</path>
-  </tag-file>
+   <uri>http://gvsig.org/web-framework/TLD/predefined-views</uri>
+   <tlib-version>${project.version}</tlib-version>
+   <short-name>gvsig-fw-predefined-views</short-name>
+   <tag-file>
+     <name>group</name>
+     <path>/META-INF/tags/predefined-views/group.tagx</path>
+   </tag-file>
 </taglib>

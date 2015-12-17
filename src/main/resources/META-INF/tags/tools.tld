@@ -84,4 +84,12 @@
     <name>zoom-select-all</name>
     <path>/META-INF/tags/tools/zoom-select-all.tagx</path>
   </tag-file>
+  <tag-file>
+    <name>predefined-views</name>
+    <path>/META-INF/tags/tools/predefined-views.tagx</path>
+  </tag-file>
+  <tag-file>
+    <name>thematic-layers</name>
+    <path>/META-INF/tags/tools/thematic-layers.tagx</path>
+  </tag-file>
 </taglib>

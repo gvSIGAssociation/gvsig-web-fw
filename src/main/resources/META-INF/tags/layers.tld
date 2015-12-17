@@ -31,4 +31,8 @@
 		<name>shape</name>
 		<path>/META-INF/tags/layers/shape.tagx</path>
 	</tag-file>
+  <tag-file>
+    <name>thematic-group</name>
+    <path>/META-INF/tags/layers/thematic-group.tagx</path>
+  </tag-file>
 </taglib>

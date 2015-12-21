@@ -49,7 +49,10 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					"oUtil" : null,
 					"msg_layers_incompatible_map" : null,
 					"msg_children_incompatible" : null,
-					"$layerComponents" : null
+					"msg_loading_children" : null,
+					"$layerComponents" : null,
+					"blurTimer" : null,
+			    	"blurTimeAbandoned" : 1000
 				});
 
 		this._fnConstructor();
@@ -65,6 +68,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					// Load alert messages
 					this._state.msg_layers_incompatible_map = this.s.msg_layers_incompatible_map;
 					this._state.msg_children_incompatible = this.s.msg_children_incompatible;
+					this._state.msg_loading_children = this.s.msg_loading_children;
 				},
 
 				"_fnDoSelect" : function() {
@@ -105,6 +109,14 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					var menuOptions = {
 						"select" : function(event, ui) {
 							self._fnOnMenuItemSelected(event, ui);
+						},
+						"focus" : function(event, ui) {
+							clearTimeout(st.blurTimer);
+						},
+						"blur" : function(event, ui) {
+							st.blurTimer = setTimeout(function() {
+					            st.$menu.toggle();
+					        }, st.blurTimeAbandoned);
 						}
 					};
 					// Load menu with predefined options
@@ -190,7 +202,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					}
 				},
 
-				/**						this._state.oUtil.stopWaitMeAnimation();
+				/**
 				 * Add a WMS layer with its children layers to map and TOC
 				 */
 				"_fnAddWmsLayer" : function(layerId, layerData){
@@ -207,7 +219,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 					var urlServ = layerData.url;
 					var instance = this;
 					if(urlServ){
-						st.oUtil.startWaitMeAnimation("Loading children layers from server...");
+						st.oUtil.startWaitMeAnimation(st.msg_loading_children);
 
 						// Set crs for layer
 						if(st.oMap){

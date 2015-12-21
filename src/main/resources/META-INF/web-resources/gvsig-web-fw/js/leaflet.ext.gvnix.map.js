@@ -3280,6 +3280,30 @@ var GvNIX_Map_Leaflet;
 			},
 
 			/**
+			 * Function to check current layer on Toc
+			 */
+			"fnUncheckLayer" : function() {
+				this._fnUncheckLayer();
+			},
+
+			/**
+			 * Function to check current layer on Toc
+			 *
+			 * (Default implementation)
+			 */
+			"_fnUncheckLayer" : function() {
+				var node = this._state.oMap._data.tree
+					.getNodeByKey(this._state.sId);
+
+				if (node != null) {
+					setTimeout(function() {
+						// Activate layer
+						node.setSelected(false);
+					}, 100);
+				}
+			},
+
+			/**
 			 * Function to get layer checkbox status
 			 */
 			"fnIsSelected" : function() {

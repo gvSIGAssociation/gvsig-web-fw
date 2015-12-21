@@ -46,6 +46,10 @@ var GvNIX_Map_Predefined_Views_Tool;
 					"sId" : sId,
 					"oMap" : oMap,
 					"$menu" : null,
+					"oUtil" : null,
+					"msg_layers_incompatible_map" : null,
+					"msg_children_incompatible" : null,
+					"msg_loading_children" : null,
 					"blurTimer" : null,
 			    	"blurTimeAbandoned" : 1000
 				});
@@ -58,6 +62,12 @@ var GvNIX_Map_Predefined_Views_Tool;
 				"_fnConstructor" : function() {
 					this.__simple_selectable_fnConstructor(false);
 					this._fnLoadMenu();
+					this._state.oUtil = GvNIX_Map_Leaflet.Util;
+
+					// Load alert messages
+					this._state.msg_layers_incompatible_map = this.s.msg_layers_incompatible_map;
+					this._state.msg_children_incompatible = this.s.msg_children_incompatible;
+					this._state.msg_loading_children = this.s.msg_loading_children;
 				},
 
 				"_fnDoSelect" : function() {
@@ -175,22 +185,206 @@ var GvNIX_Map_Predefined_Views_Tool;
 								self._fnSelectLayer(layer, layerIds[id]);
 							}
 						}
+
+						// Check if there are declared layers inside the component and add them
+						aLayers = jQuery(".mapviewer_layers_layer", $menuItem);
+						aLayers.each(function(index) {
+							var layerId = jQuery(this).attr("id");
+							st.$layerComponents = jQuery(this).find("#layer-components")[0];
+
+							// Get the necessary info from layer
+							var layerData = jQuery(this).data();
+
+							if (layerData.layer_type === "wms"){
+
+								// Connect to service, get more layer options and add WMS layer with its children
+								self._fnAddWmsLayer(layerId, layerData);
+
+							}else{
+
+								// Register layer in map and
+								// move selected layer to first position of TOC
+								st.oMap.fnRegisterLayer(layerId, layerData,
+										st.$layerComponents, true);
+
+								// Save layer in localStorage and check it
+								self._fnModifyAndSaveLayer(layerId, true, layerData, st.$layerComponents);
+							}
+						});
+
 					}else{
 						console.log("Predefined-view:group need a layer attribute defined!");
 					}
 				},
 
 				/**
-				 * Activate layer's checkbox with the provided id
+				 * Add a WMS layer with its children layers to map and TOC
 				 */
-				"_fnSelectLayer" : function(layer, id) {
-					this.__fnSelectLayer(layer, id);
+				"_fnAddWmsLayer" : function(layerId, layerData){
+					return this.__fnAddWmsLayer(layerId, layerData);
+				},
+
+				/**
+				 * Add a WMS layer with its children layers to map and TOC
+				 */
+				"__fnAddWmsLayer" : function(layerId, layerData){
+
+					// Get data from WMS server indicated in URL from layer div
+					var st = this._state;
+					var urlServ = layerData.url;
+					var instance = this;
+					if(urlServ){
+						st.oUtil.startWaitMeAnimation(st.msg_loading_children);
+
+						// Set crs for layer
+						if(st.oMap){
+							var mapCrs = st.oMap.fnGetMapSRIDcode();
+						}
+
+						var params = { url: urlServ, crs: mapCrs, format: layerData.format };
+						jQuery.ajax({
+							url : layerData.controller_url + "?findWmsCapabilities",
+							data : params,
+							cache : false,
+							success : function(element) {
+								layerData.oWMSInfo = element;
+
+								// Create layer options
+								var layerOptions = instance._fnCreateWmsLayerOptions(layerData);
+								if (!layerOptions){
+									instance._state.oUtil.stopWaitMeAnimation();
+									return;
+								}
+
+								var idLayerToInsert = layerId;
+								layerOptions.layers = "";
+
+								// Create pattern layer
+								var oWmsLayer = {"id" : idLayerToInsert,
+												 "options" : layerOptions
+												};
+								var aoChildLayers = [];
+								var childrenStyles = [];
+
+								// Create children layers
+								for(i in layerOptions.aLayers){
+									var oLayer = layerOptions.aLayers[i];
+									var nameLayerAux = oLayer.name.concat("_");
+									var style = "";
+									var idChildLayer = GvNIX_Map_Leaflet.Util.getHashCode((oLayer.name).concat("_").concat(new Date().toString()));;
+									var oChildLayerOptions = { "layer_type" : "wms_child",
+												"title" : oLayer.title,
+												"visible" : "true",
+												"styles" : style,
+												"id_on_server" : oLayer.name,
+												"group" : idLayerToInsert,
+												"context_path" : layerOptions.context_path,
+												"enable_legend" : layerOptions.enable_legend,
+												"msg_legend_undefined" : layerOptions.msg_legend_undefined,
+												"msg_metadata_undefined" : layerOptions.msg_metadata_undefined
+									}
+									oLayerChild = {"id" : idChildLayer,
+											 	   "options" : oChildLayerOptions
+												  };
+									aoChildLayers.push(oLayerChild);
+								}
+								GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(st.oMap, oWmsLayer,
+										aoChildLayers, true);
+								st.oUtil.stopWaitMeAnimation();
+
+								// Save layer in localStorage and check it
+								instance._fnModifyAndSaveLayer(layerId, false, layerData, st.$layerComponents);
+							},
+							error : function(object) {
+								console.log('Error obtaining layers from provided server');
+								st.oUtil.stopWaitMeAnimation();
+							}
+						});
+
+					}else{
+						console.log('No URL provided!');
+					}
+				},
+
+				/**
+				 * Create WMS layer options and check CRS compatibility
+				 * between sub-layers, service and server
+				 */
+				"_fnCreateWmsLayerOptions" : function(layerData){
+					return this.__fnCreateWmsLayerOptions(layerData);
+				},
+
+				/**
+				 * Create WMS layer options and check CRS compatibility
+				 * between sub-layers, service and server
+				 */
+				"__fnCreateWmsLayerOptions" : function(layerData){
+
+					// Check layers size (must do it this way because it is an associative array
+					var layersSize = 0;
+					for (index in layerData.oWMSInfo.layers){
+						layersSize++;
+					}
+
+					// Get title
+					var title = undefined;
+					if(!layerData.title){
+						title = layerData.title;
+					}else{
+						title = layerData.oWMSInfo.serviceTitle;
+					}
+
+					// Check if layers are compatible with map
+					if (layersSize == 0){
+						this._state.oUtil.stopWaitMeAnimation();
+						this._fnSetErrorMessage(this._state.msg_layers_incompatible_map, title);
+						return false;
+					}else{
+
+						if (layerData.oWMSInfo.childrenCount > layerData.oWMSInfo.layers.length){
+
+							// Some children layers are incompatible
+							this._fnSetErrorMessage(this._state.msg_children_incompatible, title);
+						}
+
+						// Set supported CRS
+						var crsSelected = layerData.oWMSInfo.crsSelected;
+
+						// Generate root layer options and put selected layers
+						// into layers parameter
+						var layerOptions = {
+							"layer_type": layerData.layer_type,
+							"span": (layerData.oWMSInfo.id.toString()).concat("_span"),
+							"url": layerData.oWMSInfo.serviceUrl,
+							"format": layerData.oWMSInfo.formatSelected,
+							"transparent":"true",
+							"version":layerData.oWMSInfo.version,
+							"crs": crsSelected.join(),
+							"opacity": "1.0",
+							"allow_disable": true,
+							"node_icon": ".whhg icon-layerorderdown",
+							"title": layerData.oWMSInfo.serviceTitle,
+							"aLayers": layerData.oWMSInfo.layers,
+							"context_path": layerData.context_path,
+							"enable_legend" : layerData.enable_legend,
+							"msg_legend_undefined" : layerData.msg_legend_undefined,
+							"msg_metadata_undefined" : layerData.msg_metadata_undefined
+						};
+						return layerOptions;
+					}
 				},
 
 				/**
 				 * Activate layer's checkbox with the provided id
 				 */
-				"__fnSelectLayer" : function(layer, id) {
+				"_fnSelectLayer" : function(layer, layerId) {
+					this.__fnSelectLayer(layer, layerId);
+				},
+
+				/**
+				 * Activate layer's checkbox with the provided id
+				 */
+				"__fnSelectLayer" : function(layer, layerId) {
 					layer.fnShow(true);
 					this._state.oMap.fnGetLayerById(layerId).fnCheckLayer();
 				},
@@ -198,16 +392,61 @@ var GvNIX_Map_Predefined_Views_Tool;
 				/**
 				 * Deselect layer's checkbox with the provided id
 				 */
-				"_fnDeselectLayer" : function(id) {
-					this.__fnDeselectLayer(id);
+				"_fnDeselectLayer" : function(layerId) {
+					this.__fnDeselectLayer(layerId);
 				},
 
 				/**
 				 * Deselect layer's checkbox with the provided id
 				 */
-				"__fnDeselectLayer" : function(id) {
-					this._state.oMap.fnGetLayerById(id).fnHide(true);
+				"__fnDeselectLayer" : function(layerId) {
+					this._state.oMap.fnGetLayerById(layerId).fnHide(true);
 					this._state.oMap.fnGetLayerById(layerId).fnUncheckLayer();
+				},
+
+				/**
+				 * Save layer in localStorage and check it
+				 */
+				"_fnModifyAndSaveLayer" : function(layerId, existInToc, layerData, $layerComponents){
+					this.__fnModifyAndSaveLayer(layerId, existInToc, layerData, $layerComponents);
+				},
+
+				/**
+				 * Save layer in localStorage and check it
+				 */
+				"__fnModifyAndSaveLayer" : function(layerId, existInToc, layerData, $layerComponents){
+					var st = this._state;
+
+					if (existInToc){
+
+						// Modify check of new layer on TOC
+						st.oMap.fnGetLayerById(layerId).fnCheckLayer();
+					}else{
+
+						// Save new layer in localStorage
+						var layerInfo = {
+							"id" : layerId,
+							"data" : layerData,
+							"components" : $layerComponents
+						};
+						st.oMap._fnSaveMapStatus("predefined_" + layerId,
+								layerInfo);
+						st.oMap.fnGetLayerById(layerId).fnCheckLayer();
+					}
+				},
+
+				/**
+				 * Set error message and show it in a dialog window.
+				 */
+				"_fnSetErrorMessage" : function(message, serviceTitle) {
+					this.__fnSetErrorMessage(message, serviceTitle);
+				},
+
+				/**
+				 * Set error message and show it in a dialog window.
+				 */
+				"__fnSetErrorMessage" : function(message, serviceTitle) {
+					window.alert(serviceTitle + " " + message);
 				}
 
 			});

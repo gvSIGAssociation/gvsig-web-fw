@@ -312,17 +312,25 @@ var GvNIX_Map_thematic_Layers_Tool;
 								layersSize++;
 							}
 
+							// Get title
+							var title = undefined;
+							if(!layerData.title){
+								title = layerData.title;
+							}else{
+								title = layerData.oWMSInfo.serviceTitle;
+							}
+
 							// Check if layers are compatible with map
 							if (layersSize == 0){
 								this._state.oUtil.stopWaitMeAnimation();
-								this._fnSetErrorMessage(this._state.msg_layers_incompatible_map, layerData.oWMSInfo.serviceTitle);
+								this._fnSetErrorMessage(this._state.msg_layers_incompatible_map, title);
 								return false;
 							}else{
 
 								if (layerData.oWMSInfo.childrenCount > layerData.oWMSInfo.layers.length){
 
 									// Some children layers are incompatible
-									this._fnSetErrorMessage(this._state.msg_children_incompatible, layerData.oWMSInfo.serviceTitle);
+									this._fnSetErrorMessage(this._state.msg_children_incompatible, title);
 								}
 
 								// Set supported CRS
@@ -360,12 +368,16 @@ var GvNIX_Map_thematic_Layers_Tool;
 						},
 
 						/**
-						 * Save layer in localthis._state.msg_layers_incompatible_map, layerData.oWMSInfo.serviceTitleStorage and check it
+						 * Save layer in localStorage and check it
 						 */
 						"__fnModifyAndSaveLayer" : function(layerId, existInToc, layerData, $layerComponents){
 							var st = this._state;
 
-							if (!existInToc){
+							if (existInToc){
+
+								// Modify check of new layer on TOC
+								st.oMap.fnGetLayerById(layerId).fnCheckLayer();
+							}else{
 
 								// Save new layer in localStorage
 								var layerInfo = {
@@ -375,10 +387,8 @@ var GvNIX_Map_thematic_Layers_Tool;
 								};
 								st.oMap._fnSaveMapStatus("predefined_" + layerId,
 										layerInfo);
+								st.oMap.fnGetLayerById(layerId).fnUncheckLayer();
 							}
-
-							// Check new layer on TOC
-							st.oMap.fnGetLayerById(layerId).fnCheckLayer();
 						},
 
 						/**

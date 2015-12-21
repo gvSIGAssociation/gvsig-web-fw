@@ -34,7 +34,8 @@
 
   <!-- Generating thematic layers tool -->
   <i id="${id}_thematic_layers_tool" class="fa fa-map toolbar_button"
-       data-type="thematic_layers" title="${tooltip}" data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
+       data-type="thematic_layers" title="${tooltip}"
+       data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
        data-msg_children_incompatible="${msgChildrenIncompatible}"
        data-msg_loading_children="${msgLoadingChildren}"
        >&amp;nbsp;</i>

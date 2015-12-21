@@ -37,6 +37,8 @@
        id="${id}"
        data-label="${label}"
        data-layers="${layers}">
-       ${label}</li>
+       ${label}
+     		<jsp:doBody />
+     </li>
 
 </jsp:root>

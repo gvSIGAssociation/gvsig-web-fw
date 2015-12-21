@@ -13,10 +13,8 @@
        id="${id}"
        data-label="${label}">
        ${label}
-        <ul>
           <jsp:doBody />
-        </ul>
-        </li>
+      </li>
 </jsp:root>
 
 

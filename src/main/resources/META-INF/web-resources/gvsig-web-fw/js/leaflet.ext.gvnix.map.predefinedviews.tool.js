@@ -46,7 +46,8 @@ var GvNIX_Map_Predefined_Views_Tool;
 					"sId" : sId,
 					"oMap" : oMap,
 					"$menu" : null,
-					"tocTree" : null
+					"blurTimer" : null,
+			    	"blurTimeAbandoned" : 1000
 				});
 
 		this._fnConstructor();
@@ -57,7 +58,6 @@ var GvNIX_Map_Predefined_Views_Tool;
 				"_fnConstructor" : function() {
 					this.__simple_selectable_fnConstructor(false);
 					this._fnLoadMenu();
-					this._state.tocTree = this._state.oMap.fnGetTocTree();
 				},
 
 				"_fnDoSelect" : function() {
@@ -100,6 +100,14 @@ var GvNIX_Map_Predefined_Views_Tool;
 					var menuOptions = {
 						"select" : function(event, ui) {
 							self._fnOnMenuItemSelected(event, ui);
+						},
+						"focus" : function(event, ui) {
+							clearTimeout(st.blurTimer);
+						},
+						"blur" : function(event, ui) {
+							st.blurTimer = setTimeout(function() {
+					            st.$menu.toggle();
+					        }, st.blurTimeAbandoned);
 						}
 					};
 					// Load menu with predefined options
@@ -158,7 +166,7 @@ var GvNIX_Map_Predefined_Views_Tool;
 						}
 
 						// Get selected group layers and select them
-						var layerIds = $menuItem.data().layers.split(",");
+						var layerIds = $menuItem.data().layers.replace(" ", "").split(",");
 						for (id in layerIds) {
 
 							// If layer is in TOC, select it
@@ -184,8 +192,7 @@ var GvNIX_Map_Predefined_Views_Tool;
 				 */
 				"__fnSelectLayer" : function(layer, id) {
 					layer.fnShow(true);
-					var node = this._state.tocTree.getNodeByKey(id);
-					node.setSelected(true);
+					this._state.oMap.fnGetLayerById(layerId).fnCheckLayer();
 				},
 
 				/**
@@ -200,8 +207,7 @@ var GvNIX_Map_Predefined_Views_Tool;
 				 */
 				"__fnDeselectLayer" : function(id) {
 					this._state.oMap.fnGetLayerById(id).fnHide(true);
-					var node = this._state.tocTree.getNodeByKey(id);
-					node.setSelected(false);
+					this._state.oMap.fnGetLayerById(layerId).fnUncheckLayer();
 				}
 
 			});

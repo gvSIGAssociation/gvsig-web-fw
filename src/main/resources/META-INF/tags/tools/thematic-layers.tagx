@@ -28,12 +28,15 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <spring:message code="tooltip_tool_thematic_layers" var="tooltip"/>
-  <spring:message code="msg_layers_incompatible" var="msgAllLayersIncompatible"/>
+  <spring:message code="msg_thematic_layers_incompatible" var="msgAllLayersIncompatible"/>
+  <spring:message code="msg_thematic_children_incompatible" var="msgChildrenIncompatible"/>
+  <spring:message code="msg_loading_children" var="msgLoadingChildren"/>
 
   <!-- Generating thematic layers tool -->
-  <i id="${id}_thematic_layers_tool" class="whhg icon-burstmode toolbar_button"
+  <i id="${id}_thematic_layers_tool" class="fa fa-map toolbar_button"
        data-type="thematic_layers" title="${tooltip}" data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
        data-msg_children_incompatible="${msgChildrenIncompatible}"
+       data-msg_loading_children="${msgLoadingChildren}"
        >&amp;nbsp;</i>
 
   <ul id="${id}_thematic_layers_tool_root" style="display:none; position:absolute" >

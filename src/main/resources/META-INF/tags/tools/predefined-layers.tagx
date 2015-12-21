@@ -30,11 +30,13 @@
   <spring:message code="tooltip_tool_predefined_layers" var="tooltip"/>
   <spring:message code="msg_layers_incompatible" var="msgAllLayersIncompatible"/>
   <spring:message code="msg_children_incompatible" var="msgChildrenIncompatible"/>
+  <spring:message code="msg_loading_children" var="msgLoadingChildren"/>
 
   <!-- Generating predefined layers tool -->
   <i id="${id}_predefined_layers_tool" class="whhg icon-burstmode toolbar_button"
        data-type="predefined_layers" title="${tooltip}" data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
        data-msg_children_incompatible="${msgChildrenIncompatible}"
+       data-msg_loading_children="${msgLoadingChildren}"
        >&amp;nbsp;</i>
 
   <ul id="${id}_predefined_layers_tool_root" style="display:none; position:absolute" >

@@ -173,5 +173,8 @@
     <script src="${js_leaflet_ext_gvnix_predefinedviews_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->
     </script>
-
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.help.tool.js" var="js_leaflet_ext_gvnix_help_tool"/>
+    <script src="${js_leaflet_ext_gvnix_help_tool}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+    </script>
 </jsp:root>

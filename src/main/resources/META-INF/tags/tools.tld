@@ -92,4 +92,8 @@
     <name>thematic-layers</name>
     <path>/META-INF/tags/tools/thematic-layers.tagx</path>
   </tag-file>
+    <tag-file>
+    <name>help</name>
+    <path>/META-INF/tags/tools/help.tagx</path>
+  </tag-file>
 </taglib>

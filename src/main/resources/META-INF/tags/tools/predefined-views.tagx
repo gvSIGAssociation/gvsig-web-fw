@@ -28,8 +28,8 @@
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
 
   <spring:message code="tooltip_tool_predefined_views" var="tooltip"/>
-  <spring:message code="msg_thematic_layers_incompatible" var="msgAllLayersIncompatible"/>
-  <spring:message code="msg_thematic_children_incompatible" var="msgChildrenIncompatible"/>
+  <spring:message code="msg_service_layers_incompatible" var="msgAllLayersIncompatible"/>
+  <spring:message code="msg_service_children_incompatible" var="msgChildrenIncompatible"/>
   <spring:message code="msg_loading_children" var="msgLoadingChildren"/>
 
   <!-- Generating predefined views tool -->

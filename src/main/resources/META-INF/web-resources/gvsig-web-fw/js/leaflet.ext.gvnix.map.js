@@ -2163,6 +2163,23 @@ var GvNIX_Map_Leaflet;
 		}
 	};
 
+	/**
+	 * Function to remove an Instance with given Id
+	 */
+	GvNIX_Map_Leaflet.fnRemoveInstance = function(id) {
+		// Getting all instances
+		var instances = GvNIX_Map_Leaflet._aInstances;
+
+		// Iterating instances and returning the correct one
+		for (i in instances) {
+			var instance = instances[i];
+			var settings = instance.s;
+			if (settings.id == id) {
+				instances.splice(i, 1);
+			}
+		}
+	};
+
 	// Control types register * * * * * * * * * * * * * * * * * * * * *
 
 	GvNIX_Map_Leaflet.CONTROLS = {};

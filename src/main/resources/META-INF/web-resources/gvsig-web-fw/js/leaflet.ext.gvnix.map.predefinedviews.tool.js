@@ -81,7 +81,7 @@ var GvNIX_Map_Predefined_Views_Tool;
 						}
 
 						// Get selected group layers and select them
-						var layerIds = $menuItem.data().layers.replace(" ", "").split(",");
+						var layerIds = $menuItem.data().layers.toString().replace(" ", "").split(",");
 						for (id in layerIds) {
 
 							// If layer is in TOC, select it

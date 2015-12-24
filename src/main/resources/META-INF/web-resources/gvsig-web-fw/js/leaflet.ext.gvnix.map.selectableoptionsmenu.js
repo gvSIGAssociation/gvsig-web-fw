@@ -56,7 +56,7 @@ var GvNIX_Map_Selectable_Options_Menu;
 					"msg_loading_children" : null,
 					"$layerComponents" : null,
 					"blurTimer" : null,
-			    	"blurTimeAbandoned" : 1000
+			    	"blurTimeAbandoned" : 1000,
 				});
 
 		this._fnConstructor();
@@ -173,6 +173,10 @@ var GvNIX_Map_Selectable_Options_Menu;
 
 					// Get all layers inside this theme
 					aLayers = jQuery(".mapviewer_layers_layer", $menuItem);
+
+					// Get last WMS layer
+					var lastWmsLayer = this._fnGetLastWmsLayer(aLayers);
+
 					aLayers.each(function(index) {
 						var layerId = jQuery(this).attr("id");
 						st.$layerComponents = jQuery(this).find("#layer-components")[0];
@@ -186,8 +190,14 @@ var GvNIX_Map_Selectable_Options_Menu;
 
 							if (layerData.layer_type === "wms"){
 
+								// Check if this is the last WMS layer
+								var stopWaitAnimation = false;
+								if (this === lastWmsLayer){
+									stopWaitAnimation = true;
+								}
+
 								// Connect to service, get more layer options and add WMS layer with its children
-								self._fnAddWmsLayer(layerId, layerData);
+								self._fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
 
 							}else{
 
@@ -200,6 +210,7 @@ var GvNIX_Map_Selectable_Options_Menu;
 								self._fnModifyAndSaveLayer(layerId, false, layerData, st.$layerComponents);
 							}
 						}else{
+
 							// If already in TOC activate layer checkbox
 							self._fnModifyAndSaveLayer(layerId, true);
 						}
@@ -209,14 +220,14 @@ var GvNIX_Map_Selectable_Options_Menu;
 				/**
 				 * Add a WMS layer with its children layers to map and TOC
 				 */
-				"_fnAddWmsLayer" : function(layerId, layerData){
-					return this.__fnAddWmsLayer(layerId, layerData);
+				"_fnAddWmsLayer" : function(layerId, layerData, stopWaitAnimation){
+					return this.__fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
 				},
 
 				/**
 				 * Add a WMS layer with its children layers to map and TOC
 				 */
-				"__fnAddWmsLayer" : function(layerId, layerData){
+				"__fnAddWmsLayer" : function(layerId, layerData, stopWaitAnimation){
 
 					// Get data from WMS server indicated in URL from layer div
 					var st = this._state;
@@ -279,14 +290,17 @@ var GvNIX_Map_Selectable_Options_Menu;
 								}
 								GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(st.oMap, oWmsLayer,
 										aoChildLayers, true);
-								st.oUtil.stopWaitMeAnimation();
 
 								// Save layer in localStorage and uncheck it
 								instance._fnModifyAndSaveLayer(layerId, false, layerData, st.$layerComponents);
+
+								// Stop animation if it is last layer
+								if (stopWaitAnimation){
+									st.oUtil.stopWaitMeAnimation();
+								}
 							},
 							error : function(object) {
 								console.log('Error obtaining layers from provided server');
-								st.oUtil.stopWaitMeAnimation();
 							}
 						});
 
@@ -330,7 +344,7 @@ var GvNIX_Map_Selectable_Options_Menu;
 						return false;
 					}else{
 
-						if (layerData.oWMSInfo.childrenCount > layerData.oWMSInfo.layers.length){
+						if (layerData.oWMSInfo.childrenCount > layersSize){
 
 							// Some children layers are incompatible
 							this._fnSetErrorMessage(this._state.msg_children_incompatible, title);
@@ -394,6 +408,29 @@ var GvNIX_Map_Selectable_Options_Menu;
 						// If layer can be disabled, uncheck it
 						st.oMap.fnGetLayerById(layerId).fnUncheckLayer();
 					}
+				},
+
+				/**
+				 * Get last WMS layer from an array of layers
+				 * Useful for stopping wait me animation
+				 */
+				"_fnGetLastWmsLayer" : function(layers){
+					return this.__fnGetLastWmsLayer(layers);
+				},
+
+				/**
+				 * Get last WMS layer from an array of layers
+				 * Useful for stopping wait me animation
+				 */
+				"__fnGetLastWmsLayer" : function(layers){
+					var wmsLayers = [];
+					layers.each(function(index) {
+						var layerData = jQuery(this).data();
+						if(layerData && layerData.layer_type === "wms"){
+							wmsLayers.push(this);
+						}
+					});
+					return wmsLayers[wmsLayers.length-1];
 				},
 
 				/**

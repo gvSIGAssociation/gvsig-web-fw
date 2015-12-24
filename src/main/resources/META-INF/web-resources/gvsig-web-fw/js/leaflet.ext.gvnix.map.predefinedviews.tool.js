@@ -93,6 +93,10 @@ var GvNIX_Map_Predefined_Views_Tool;
 
 						// Check if there are declared layers inside the component and add them
 						aLayers = jQuery(".mapviewer_layers_layer", $menuItem);
+
+						// Get last WMS layer
+						var lastWmsLayer = this._fnGetLastWmsLayer(aLayers);
+
 						aLayers.each(function(index) {
 							var layerId = jQuery(this).attr("id");
 							st.$layerComponents = jQuery(this).find("#layer-components")[0];
@@ -105,8 +109,14 @@ var GvNIX_Map_Predefined_Views_Tool;
 
 								if (layerData.layer_type === "wms"){
 
+									// Check if this is the last WMS layer
+									var stopWaitAnimation = false;
+									if (this === lastWmsLayer){
+										stopWaitAnimation = true;
+									}
+
 									// Connect to service, get more layer options and add WMS layer with its children
-									self._fnAddWmsLayer(layerId, layerData);
+									self._fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
 
 								}else{
 
@@ -124,7 +134,6 @@ var GvNIX_Map_Predefined_Views_Tool;
 								self._fnSelectLayer(st.oMap.fnGetLayerById(layerId));
 							}
 						});
-
 					}else{
 						console.log("Predefined-view:group need a layer attribute defined!");
 					}

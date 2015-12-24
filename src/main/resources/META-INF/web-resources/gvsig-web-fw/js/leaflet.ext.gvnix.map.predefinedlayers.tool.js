@@ -94,7 +94,7 @@ var GvNIX_Map_Predefined_Layers_Tool;
 						if (layerData.layer_type === "wms"){
 
 							// Connect to service, get more layer options and add WMS layer with its children
-							this._fnAddWmsLayer(layerId, layerData);
+							this._fnAddWmsLayer(layerId, layerData, true);
 
 						}else{
 

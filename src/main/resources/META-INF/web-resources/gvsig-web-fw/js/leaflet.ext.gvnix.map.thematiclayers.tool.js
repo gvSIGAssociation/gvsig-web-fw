@@ -76,6 +76,10 @@ var GvNIX_Map_Thematic_Layers_Tool;
 
 			// Get all layers inside this theme
 			aLayers = jQuery(".mapviewer_layers_layer", $menuItem);
+
+			// Get last WMS layer
+			var lastWmsLayer = this._fnGetLastWmsLayer(aLayers);
+
 			aLayers.each(function(index) {
 				var layerId = jQuery(this).attr("id");
 				st.$layerComponents = jQuery(this).find("#layer-components")[0];
@@ -89,8 +93,14 @@ var GvNIX_Map_Thematic_Layers_Tool;
 
 					if (layerData.layer_type === "wms"){
 
+						// Check if this is the last WMS layer
+						var stopWaitAnimation = false;
+						if (this === lastWmsLayer){
+							stopWaitAnimation = true;
+						}
+
 						// Connect to service, get more layer options and add WMS layer with its children
-						self._fnAddWmsLayer(layerId, layerData);
+						self._fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
 
 					}else{
 

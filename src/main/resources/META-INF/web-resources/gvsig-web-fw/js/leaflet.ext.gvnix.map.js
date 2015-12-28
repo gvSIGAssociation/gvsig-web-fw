@@ -2163,6 +2163,23 @@ var GvNIX_Map_Leaflet;
 		}
 	};
 
+	/**
+	 * Function to remove an Instance with given Id
+	 */
+	GvNIX_Map_Leaflet.fnRemoveInstance = function(id) {
+		// Getting all instances
+		var instances = GvNIX_Map_Leaflet._aInstances;
+
+		// Iterating instances and returning the correct one
+		for (i in instances) {
+			var instance = instances[i];
+			var settings = instance.s;
+			if (settings.id == id) {
+				instances.splice(i, 1);
+			}
+		}
+	};
+
 	// Control types register * * * * * * * * * * * * * * * * * * * * *
 
 	GvNIX_Map_Leaflet.CONTROLS = {};
@@ -3280,26 +3297,30 @@ var GvNIX_Map_Leaflet;
 			},
 
 			/**
-			 * Function to check current layer on Toc
+			 * Function to uncheck current layer on TOC if it could be disabled
 			 */
 			"fnUncheckLayer" : function() {
 				this._fnUncheckLayer();
 			},
 
 			/**
-			 * Function to check current layer on Toc
+			 * Function to uncheck current layer on TOC if it could be disabled
 			 *
 			 * (Default implementation)
 			 */
 			"_fnUncheckLayer" : function() {
-				var node = this._state.oMap._data.tree
+
+				// Check allow_disable property
+				if (this.s.allow_disable == true){
+					var node = this._state.oMap._data.tree
 					.getNodeByKey(this._state.sId);
 
-				if (node != null) {
-					setTimeout(function() {
-						// Activate layer
-						node.setSelected(false);
-					}, 100);
+					if (node != null) {
+						setTimeout(function() {
+							// Activate layer
+							node.setSelected(false);
+						}, 100);
+					}
 				}
 			},
 

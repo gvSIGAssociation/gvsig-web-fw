@@ -4532,7 +4532,7 @@ var GvNIX_Map_Leaflet;
 					st.oLayer._gvNIX_layer_id = st.sId;
 
 					// If WMS layer has children, add it to map and set its opacity
-					if (s.layers) {
+					if (s.layers != undefined && s.layers !== "") {
 						// Create leaflet WMS layer instance
 						st.oWmsLayer = L.tileLayer.wms(s.url, st.layerOptions);
 						if(s.opacity){

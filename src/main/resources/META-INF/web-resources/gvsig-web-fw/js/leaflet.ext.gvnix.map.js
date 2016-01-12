@@ -4756,7 +4756,7 @@ var GvNIX_Map_Leaflet;
 					// Request to server
 					var params = { url: this.s.url};
 					jQuery.ajax({
-						"url" : "ogcinfo?getWmsMetadata",
+						"url" : oThis.s.controller_url + "?getWmsMetadata",
 						"data" : params,
 						"cache" : false,
 						"success" : function(response) {
@@ -5426,7 +5426,7 @@ var GvNIX_Map_Leaflet;
 					// Request to server
 					var params = { url: this.s.url};
 					jQuery.ajax({
-						"url" : "ogcinfo?getWmtsMetadata",
+						"url" : oThis.s.controller_url + "?getWmtsMetadata",
 						"data" : params,
 						"cache" : false,
 						"success" : function(response) {

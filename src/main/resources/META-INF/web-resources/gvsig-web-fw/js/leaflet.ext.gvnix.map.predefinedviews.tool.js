@@ -116,7 +116,7 @@ var GvNIX_Map_Predefined_Views_Tool;
 									}
 
 									// Connect to service, get more layer options and add WMS layer with its children
-									self._fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
+									self._fnAddWmsLayer(layerId, layerData, st.$layerComponents, st.$layerComponents, stopWaitAnimation);
 
 								}else{
 

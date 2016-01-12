@@ -169,7 +169,7 @@ var GvNIX_Map_User_Layers_Tool;
 								aoChildLayers.push(oLayerChild);
 							}
 							GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(st.oMap, oWmsLayer,
-									aoChildLayers, true);
+									aoChildLayers, null, true);
 						}else{
 							st.oMap.fnRegisterLayer(idLayerToInsert, layerOptions, null, true);
 						}

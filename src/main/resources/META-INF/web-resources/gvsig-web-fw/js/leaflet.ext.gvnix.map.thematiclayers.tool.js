@@ -100,7 +100,7 @@ var GvNIX_Map_Thematic_Layers_Tool;
 						}
 
 						// Connect to service, get more layer options and add WMS layer with its children
-						self._fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
+						self._fnAddWmsLayer(layerId, layerData, st.$layerComponents, stopWaitAnimation);
 
 					}else{
 

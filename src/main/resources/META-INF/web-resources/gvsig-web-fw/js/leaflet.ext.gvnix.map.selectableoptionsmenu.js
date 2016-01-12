@@ -197,7 +197,7 @@ var GvNIX_Map_Selectable_Options_Menu;
 								}
 
 								// Connect to service, get more layer options and add WMS layer with its children
-								self._fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
+								self._fnAddWmsLayer(layerId, layerData, st.$layerComponents, stopWaitAnimation);
 
 							}else{
 
@@ -220,14 +220,14 @@ var GvNIX_Map_Selectable_Options_Menu;
 				/**
 				 * Add a WMS layer with its children layers to map and TOC
 				 */
-				"_fnAddWmsLayer" : function(layerId, layerData, stopWaitAnimation){
-					return this.__fnAddWmsLayer(layerId, layerData, stopWaitAnimation);
+				"_fnAddWmsLayer" : function(layerId, layerData, layerComponents, stopWaitAnimation){
+					return this.__fnAddWmsLayer(layerId, layerData, layerComponents, stopWaitAnimation);
 				},
 
 				/**
 				 * Add a WMS layer with its children layers to map and TOC
 				 */
-				"__fnAddWmsLayer" : function(layerId, layerData, stopWaitAnimation){
+				"__fnAddWmsLayer" : function(layerId, layerData, layerComponents, stopWaitAnimation){
 
 					// Get data from WMS server indicated in URL from layer div
 					var st = this._state;
@@ -289,7 +289,7 @@ var GvNIX_Map_Selectable_Options_Menu;
 									aoChildLayers.push(oLayerChild);
 								}
 								GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer(st.oMap, oWmsLayer,
-										aoChildLayers, true);
+										aoChildLayers, layerComponents, true);
 
 								// Save layer in localStorage and uncheck it
 								instance._fnModifyAndSaveLayer(layerId, false, layerData, st.$layerComponents);

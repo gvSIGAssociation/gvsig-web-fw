@@ -4752,11 +4752,12 @@ var GvNIX_Map_Leaflet;
 					// Set loading img
 					this._fnShowLoadingIcon();
 					var oThis = this;
+					var st = this._state;
 					var callbackFunction = callbackFn;
 					// Request to server
 					var params = { url: this.s.url};
 					jQuery.ajax({
-						"url" : oThis.s.controller_url + "?getWmsMetadata",
+						"url" : st.contextPath + "/ogcinfo?getWmsMetadata",
 						"data" : params,
 						"cache" : false,
 						"success" : function(response) {
@@ -4826,7 +4827,7 @@ var GvNIX_Map_Leaflet;
 					params["bounds"] = [southWest.lng, southWest.lat, northEast.lng, northEast.lat].join();
 					// Request to controller
 					jQuery.ajax({
-						"url" : oThis.s.controller_url + "?getWmsFeatureInfo",
+						"url" : st.contextPath + "/ogcinfo?getWmsFeatureInfo",
 						"data" : params,
 						"cache" : false,
 						"dataType" : 'html',
@@ -4883,10 +4884,10 @@ var GvNIX_Map_Leaflet;
      *            boolean to indicate if insert the layer at begin
      */
     GvNIX_Map_Leaflet.LAYERS.wms.fnRegisterWmsLayer = function(oMap, oWmsLayer,
-            aoChildLayers, insertAtBegin) {
+            aoChildLayers, layerComponents, insertAtBegin) {
         var map = oMap;
         // Register "parent" Wms layer on toc
-        map.fnRegisterLayer(oWmsLayer.id, oWmsLayer.options, null, insertAtBegin);
+        map.fnRegisterLayer(oWmsLayer.id, oWmsLayer.options, layerComponents, insertAtBegin);
         // Register and append wms_child layers into its parent
         for(var i in aoChildLayers){
             var childLayer = aoChildLayers[i];
@@ -5422,11 +5423,12 @@ var GvNIX_Map_Leaflet;
 					// Set loading img
 					this._fnShowLoadingIcon();
 					var oThis = this;
+					var st = this._state;
 					var callbackFunction = callbackFn;
 					// Request to server
 					var params = { url: this.s.url};
 					jQuery.ajax({
-						"url" : oThis._state.contextPath + "/ogcinfo?getWmtsMetadata",
+						"url" : st.contextPath + "/ogcinfo?getWmtsMetadata",
 						"data" : params,
 						"cache" : false,
 						"success" : function(response) {

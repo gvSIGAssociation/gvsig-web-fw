@@ -144,12 +144,17 @@ var GvNIX_Map_User_Layers_Tool;
 							// create children layers
 							for(i = 0; i < aLayerIdSelected.length; i++){
 								var oLayer = layerOptions.aLayers[aLayerIdSelected[i]];
-								var nameLayerAux = oLayer.name.concat("_");
+								var nameLayerAux = oLayer.name;
 								var style = "";
 								// get the style for the layer that starts with oLayer.name
 								for(j = 0; j < childrenStyles.length; j++){
-									if(childrenStyles[j].startsWith(nameLayerAux)){
-										style = childrenStyles[j].substring(nameLayerAux.length,childrenStyles[j].length);
+									var curChildStyle = childrenStyles[j];
+									var layerStyleName = curChildStyle.substring(0, curChildStyle.lastIndexOf("_"));
+									if(nameLayerAux === layerStyleName){
+										style = curChildStyle.substring(nameLayerAux.length+1,curChildStyle.length);
+										if(style.indexOf("undefined") > -1){
+											style = "";
+										}
 										break;
 									}
 								}

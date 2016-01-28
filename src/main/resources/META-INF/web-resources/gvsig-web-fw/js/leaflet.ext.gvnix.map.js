@@ -371,7 +371,8 @@ var GvNIX_Map_Leaflet;
 			}
 
 			var options = {
-				zoomControl : false
+				zoomControl : false,
+				loadingControl : true
 			};
 
 			// Getting center LatLng
@@ -2772,7 +2773,8 @@ var GvNIX_Map_Leaflet;
 			"index" : null, // Set fixed layer index inside container
 			"msgLegendUndefined" : "Legend ins't defined", // message to show when legend isn't defined or has an error
 			"msgMetadataUndefined" : "Layer information not available ", // message to show when metadata isn't defined or has an error
-			"enable_legend" : true // Indicate if legend is enabled
+			"enable_legend" : true, // Indicate if legend is enabled
+			"loading_message": null	//Message loading data
 		},
 
 		/**
@@ -2795,7 +2797,8 @@ var GvNIX_Map_Leaflet;
 			"legendType" : null, // Specify legend type returned by fnPrepareLegend function
 			"metadataType" : null, // Specify metadata type returned by fnPrepareMetadata function
 			"fnPrepareLegend" : null, // Specify the name of function to draw layer legend
-			"fnPrepareMetadata" : null // Specify the name of function to get layer metadata
+			"fnPrepareMetadata" : null, // Specify the name of function to get layer metadata
+			"oPanelLoading": null	//tool panel diplaying loading message
 		},
 
 		/**
@@ -2990,6 +2993,38 @@ var GvNIX_Map_Leaflet;
 				}
 				html += "</div>"
 				return html;
+			},
+
+			/**
+			 * Create html with load message
+			 */
+			"fnCreateLoadingPanel" : function(){
+				this._fnCreateLoadingPanel();
+			},
+
+			/**
+			 * Create html with load message
+			 */
+			"_fnCreateLoadingPanel" : function(){
+				var st = this._state;
+
+				//create loading message
+				var panelHtml = '<div id="loadingMessageId" style="diplay:none; padding-right: 10px;" class="leaflet-control-toolbar leaflet-control-toolbar-expanded leaflet-control leaflet-control-toolbar-list"><i title="loading data" class="fa fa-spinner fa-spin" id="loadingText"></i><span>' + this.s.loading_message + '</span></div>';
+				st.oPanelLoading = jQuery.parseHTML(panelHtml);
+				// get height and with from parent element
+				var parentHeight = jQuery(".mapviewer_control").height();
+				var parentWidth = jQuery(".mapviewer_control").width();
+
+				//add panel loading
+				jQuery('.mapviewer_control').prepend(st.oPanelLoading);
+
+				//get height and with from loading message
+				var loadingHeight = jQuery("#loadingMessageId").height();
+				var loadingWidth = jQuery("#loadingMessageId").width();
+
+				//setting margin to panel
+				jQuery("#loadingMessageId").css("margin-top", ((parentHeight / 2 - loadingHeight/2)) + "px" );
+				jQuery("#loadingMessageId").css("margin-left", ((parentWidth / 2 - loadingWidth/2)) + "px" );
 			},
 
 			/**
@@ -4461,6 +4496,7 @@ var GvNIX_Map_Leaflet;
 					"styles" : "", // Styles of layer request (coma separated)
 					"crs" : null, // CRS id for layer from L.CRS
 					"opacity" : null // opacity level
+
 				});
 
 		this.s = jQuery.extend({}, this._default_options, options);
@@ -4476,6 +4512,7 @@ var GvNIX_Map_Leaflet;
 			"aoServerLayers" : [],
 			"contextPath" : null,
 			"oLoadingIcon" : null // Loading image
+
 		});
 
 		this.fnSettings = function() {
@@ -4535,6 +4572,18 @@ var GvNIX_Map_Leaflet;
 					if (s.layers != undefined && s.layers !== "") {
 						// Create leaflet WMS layer instance
 						st.oWmsLayer = L.tileLayer.wms(s.url, st.layerOptions);
+
+						//inicializate loading message
+						this.fnCreateLoadingPanel();
+
+						//show loading messages
+						st.oWmsLayer.on("loading", function(){
+							jQuery(st.oPanelLoading).show();
+	                    });
+						//hide loading messages
+	                    st.oWmsLayer.on("load", function(){
+	                    	jQuery(st.oPanelLoading).hide();
+	                    });
 						if(s.opacity){
 							st.oWmsLayer.setOpacity(this._fnLoadOpacityStatus());
 						}
@@ -4542,6 +4591,7 @@ var GvNIX_Map_Leaflet;
 					} else {
 						st.oWmsLayer = null;
 					}
+
 					// Set context path. Is necessary to get the layer legend
 					st.contextPath = s.context_path;
 				},
@@ -5228,6 +5278,17 @@ var GvNIX_Map_Leaflet;
 							st.oLayer.setZIndex(this.s.index);
 						}
 					}
+					//inicializate loading message
+					this.fnCreateLoadingPanel();
+
+					//show loading messages
+					st.oLayer.on("loading", function(){
+						jQuery(st.oPanelLoading).show();
+                    });
+					//hide loading messages
+                    st.oLayer.on("load", function(){
+                    	jQuery(st.oPanelLoading).hide();
+                    });
 				},
 
 				/**
@@ -5339,6 +5400,18 @@ var GvNIX_Map_Leaflet;
 					}
 					// Set context path. Is necessary to get the layer legend
 					st.contextPath = s.context_path;
+
+					//inicializate loading message
+					this.fnCreateLoadingPanel();
+
+					//show loading messages
+					st.oLayer.on("loading", function(){
+						jQuery(st.oPanelLoading).show();
+                    });
+					//hide loading messages
+                    st.oLayer.on("load", function(){
+                    	jQuery(st.oPanelLoading).hide();
+                    });
 				},
 
 				/**
@@ -5473,7 +5546,8 @@ var GvNIX_Map_Leaflet;
 					"opacity" : null,
 					"pk" : null, // propertity which contains kp info (from return data)
 					"selection" : false, // if true layer will draw selected items (from Datatables) in special way (depending on entity_field layer definition)
-					"not_volatile" : false // if true layer data is cache by bbox otherwise data is required every map change
+					"not_volatile" : false
+
 				});
 
 		this.s = jQuery.extend({}, this._default_options, options);

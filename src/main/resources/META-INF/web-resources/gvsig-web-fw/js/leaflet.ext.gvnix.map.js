@@ -3007,24 +3007,25 @@ var GvNIX_Map_Leaflet;
 			 */
 			"_fnCreateLoadingPanel" : function(){
 				var st = this._state;
-
 				//create loading message
-				var panelHtml = '<div id="loadingMessageId" style="diplay:none; padding-right: 10px;" class="leaflet-control-toolbar leaflet-control-toolbar-expanded leaflet-control leaflet-control-toolbar-list"><i title="loading data" class="fa fa-spinner fa-spin" id="loadingText"></i><span>' + this.s.loading_message + '</span></div>';
-				st.oPanelLoading = jQuery.parseHTML(panelHtml);
-				// get height and with from parent element
-				var parentHeight = jQuery(".mapviewer_control").height();
-				var parentWidth = jQuery(".mapviewer_control").width();
+			    if( !jQuery('#loadingMessageId').length ) {
+			    	var panelHtml = '<div id="loadingMessageId" style="diplay:none; padding-right: 10px;" class="leaflet-control-toolbar leaflet-control-toolbar-expanded leaflet-control leaflet-control-toolbar-list"><i title="loading data" class="fa fa-spinner fa-spin" id="loadingText"></i><span>' + this.s.loading_message + '</span></div>';
+			    	st.oPanelLoading = jQuery.parseHTML(panelHtml);
+			    	// get height and with from parent element
+			    	var parentHeight = jQuery(".mapviewer_control").height();
+			    	var parentWidth = jQuery(".mapviewer_control").width();
 
-				//add panel loading
-				jQuery('.mapviewer_control').prepend(st.oPanelLoading);
+			    	//add panel loading
+			    	jQuery('.mapviewer_control').prepend(st.oPanelLoading);
 
-				//get height and with from loading message
-				var loadingHeight = jQuery("#loadingMessageId").height();
-				var loadingWidth = jQuery("#loadingMessageId").width();
+			    	//get height and with from loading message
+			    	var loadingHeight = jQuery("#loadingMessageId").height();
+			    	var loadingWidth = jQuery("#loadingMessageId").width();
 
-				//setting margin to panel
-				jQuery("#loadingMessageId").css("margin-top", ((parentHeight / 2 - loadingHeight/2)) + "px" );
-				jQuery("#loadingMessageId").css("margin-left", ((parentWidth / 2 - loadingWidth/2)) + "px" );
+			    	//setting margin to panel
+			    	jQuery("#loadingMessageId").css("margin-top", ((parentHeight / 2 - loadingHeight/2)) + "px" );
+			    	jQuery("#loadingMessageId").css("margin-left", ((parentWidth / 2 - loadingWidth/2)) + "px" );
+			    }
 			},
 
 			/**

@@ -6869,16 +6869,16 @@ var GvNIX_Map_Leaflet;
 
 				// Get custom genera info function (if any)
 				if (s.fn_prepare_info) {
-					st.fnPreparInfo = window[s.fn_prepare_info];
-					if (!st.fnPreparInfo) {
+					st.fnPrepareInfo = window[s.fn_prepare_info];
+					if (!st.fnPrepareInfo) {
 						this
 								.debug("ERROR: function '"
 										+ s.fn_prepare_info
 										+ "' not found");
-					} else if (typeof st.fnPreparInfo != "function") {
+					} else if (typeof st.fnPrepareInfo != "function") {
 						this.debug("ERROR: '" + s.fn_prepare_info
 								+ "' is not a function");
-						st.fnPreparInfo = null;
+						st.fnPrepareInfo = null;
 					}
 				}
 
@@ -8443,7 +8443,7 @@ var GvNIX_Map_Leaflet;
 
 				// [field]
 				this._fnConstructor_prepareRenderAndInfo(s,st);
-				if (!st.fnPreparInfo) {
+				if (!st.fnPrepareInfo) {
 					s.show_info = false;
 				}
 				this._fnConstructor_prepareStyleOps(s,st);

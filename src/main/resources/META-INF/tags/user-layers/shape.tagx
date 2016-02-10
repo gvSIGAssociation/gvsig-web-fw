@@ -37,6 +37,12 @@
   </c:if>
 
   <spring:message code="wait_label" var="waitLabel" htmlEscape="false"/>
+  <spring:message code="shape_wizard_info1" var="shapeInfo1" htmlEscape="false"/>
+  <spring:message code="shape_wizard_info2" var="shapeInfo2" htmlEscape="false"/>
+  <spring:message code="map_crs_label" var="mapCrsLabel" htmlEscape="false"/>
+  <spring:message code="shape_file" var="shapeFile" />
+  <spring:message code="shape_file_name" var="shapeFileName" />
+
 
   <div id="${fn:escapeXml(id)}_shape"
        data-layer_type="shape"
@@ -44,24 +50,25 @@
        data-user_layer_tab="true" data-type="shape"
        data-wait_label="${waitLabel}">
     <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-        Layer Name:
-        <input class="form-control input-sm"
-          id="${fn:escapeXml(id)}_shape_name_id" name="${fn:escapeXml(id)}_shape_name" type="text" />
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 input_file">
-        <input id="${fn:escapeXml(id)}_shape_file_input" type="file"
-          value="FILE"/>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-12">
+        <h5><c:out value="${shapeFile}" />:</h5>
+        <input id="${fn:escapeXml(id)}_shape_file_input" type="file" value="FILE"/>
+        <p class="help-block"> <c:out value="${shapeInfo2}" /> </p>
       </div>
     </div>
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-        <div id="shape_progress_bar"><div class="percent">0%</div></div>
+         <h5><c:out value="${shapeFileName}" />:</h5>
+         <input class="form-control input-sm" id="${fn:escapeXml(id)}_shape_name_id" name="${fn:escapeXml(id)}_shape_name" type="text" />
       </div>
-      <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
-        <button onclick="abortRead();">Cancel read</button>
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-12 help-block">
+          <c:out value="${shapeInfo1}" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
+        <c:out value="${mapCrsLabel}" />
+        <input class="form-control input-sm" id="${fn:escapeXml(id)}_shape_map_crs_input" disabled="disabled" type="text" />
       </div>
     </div>
   </div>

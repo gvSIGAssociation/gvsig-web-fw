@@ -179,9 +179,7 @@ var GvNIX_Map_User_Layers_Tool;
 							st.oMap.fnRegisterLayer(idLayerToInsert, layerOptions, null, true);
 						}
 						// Check this layer
-						if(!($focusedTab instanceof GvNIX_Map_Leaflet.USERLAYERTAB.shape)){
 							st.oMap.fnGetLayerById(idLayerToInsert).fnCheckLayer();
-						}
 						// register metadata tool if is necessary
 						if($focusedTab.fnRegisterMetadataTool){
 							$focusedTab.fnRegisterMetadataTool(st.oMap.fnGetLayerById(idLayerToInsert));

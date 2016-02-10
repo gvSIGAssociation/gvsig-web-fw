@@ -7206,7 +7206,6 @@ var GvNIX_Map_Leaflet;
 					return;
 				}
 				var oGeomLayer = U.parseWkt(sWkt);
-
 				if (!oGeomLayer) {
 					return;
 				}
@@ -8634,7 +8633,8 @@ var GvNIX_Map_Leaflet;
 			"file" : this.s.file,// File loaded in input file
 			"url" :this.s.url,
 			"shapeLoaded" : false, // boolean which indicates if this layer has been loaded from arrayBuffer
-			"oUtil" : null
+			"oUtil" : null,
+			"waitLabel" : "Loading..."
 		});
 
 		this.fnSettings = function() {
@@ -8665,6 +8665,7 @@ var GvNIX_Map_Leaflet;
 
 				var s = this.s;
 				var st = this._state;
+				st.waitLabel = s.wait_label;
 
 				// Call LAYERS.Base constructor
 				this.__fnConstructor();
@@ -8709,12 +8710,13 @@ var GvNIX_Map_Leaflet;
 			 * Load data for showing the shape layer
 			 */
 			"_fnLoadData" : function(){
-				this._state.oUtil.startWaitMeAnimation();
+				this._state.oUtil.startWaitMeAnimation(this._state.waitLabel);
 				if (this._state.file){
 					return this._fnLoadDataFromLocalFile();
 				}else{
 					return this._fnLoadDataFromURL();
 				}
+
 			},
 
 			/**
@@ -8731,6 +8733,7 @@ var GvNIX_Map_Leaflet;
 	            	shpLayer._fnLoadLayerData(reader.result);
 	            }
 	            reader.readAsArrayBuffer(st.file);
+	            st.oUtil.stopWaitMeAnimation();
 			},
 
 			/**
@@ -8858,7 +8861,18 @@ var GvNIX_Map_Leaflet;
 			var srs = null;
 			// Check for given CRS to get maps default if necessary
 			if (!oCrs) {
-				srs = map.options.crs.code.substring(5, 9);
+				var	sSrid = map.options.crs.code;
+				if (sSrid) {
+					if (sSrid.indexOf("EPSG:") == 0) {
+						srs = sSrid.substring("EPSG:".length);
+						console.log("srs: " + srs);
+					}else{
+						console.log("No srs in map.options.crs: " + sSrid);
+					}
+				}else{
+					console.log("map.options.crs empty. No CRS available. ");
+				}
+
 			} else {
 				srs = oCrs;
 			}

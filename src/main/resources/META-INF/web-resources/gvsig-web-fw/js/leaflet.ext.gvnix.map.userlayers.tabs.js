@@ -2444,6 +2444,14 @@
         "_fnConstructor" : function() {
           // Call to super
           this.__fnConstructor();
+          var s = this.s;
+		  var st = this._state;
+
+			// set input with crs established in constructor
+			if(st.aCrs){
+				jQuery("#".concat(st.sId).concat("_map_crs_input")).val(st.aCrs);
+				jQuery("#".concat(st.sId).concat("_map_crs")).show();
+			}
         },
 
         /**
@@ -2501,7 +2509,8 @@
             "node_icon": ".glyphicon glyphicon-floppy-open",
             "title": title,
             "file" : st.file,
-            "layerId" : st.idLayer
+            "layerId" : st.idLayer,
+            "wait_label" : st.waitLabel
           };
 
           return layerOptions;

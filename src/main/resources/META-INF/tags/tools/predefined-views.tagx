@@ -33,7 +33,7 @@
   <spring:message code="msg_loading_children" var="msgLoadingChildren"/>
 
   <!-- Generating predefined views tool -->
-  <i id="${id}_predefined_views_tool" class="fa fa-sitemap toolbar_button"
+  <i id="${id}_predefined_views_tool" class="whhg icon-treediagram toolbar_button"
        data-type="predefined_views"
        data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
        data-msg_children_incompatible="${msgChildrenIncompatible}"

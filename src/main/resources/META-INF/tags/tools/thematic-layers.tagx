@@ -33,7 +33,7 @@
   <spring:message code="msg_loading_children" var="msgLoadingChildren"/>
 
   <!-- Generating thematic layers tool -->
-  <i id="${id}_thematic_layers_tool" class="fa fa-map toolbar_button"
+  <i id="${id}_thematic_layers_tool" class="whhg icon-map toolbar_button"
        data-type="thematic_layers" title="${tooltip}"
        data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
        data-msg_children_incompatible="${msgChildrenIncompatible}"

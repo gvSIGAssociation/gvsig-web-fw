@@ -2287,7 +2287,7 @@ var GvNIX_Map_Leaflet;
 		this._default_options = jQuery.extend({},
 				GvNIX_Map_Leaflet.CONTROLS.Base.default_options, {
 					"default_selected" : false,
-					"cursor_icon" : "resources/images/cursor_hand.png", // Icon
+					//"cursor_icon" : "resources/images/cursor_hand.png", // Icon
 					// to
 					// use
 					// as
@@ -2444,7 +2444,7 @@ var GvNIX_Map_Leaflet;
 		this._default_options = jQuery.extend({},
 				GvNIX_Map_Leaflet.CONTROLS.simple_selectable.default_options, {
 					"default_selected" : false,
-					"cursor_icon" : "resources/images/cursor_hand.png", // Icon
+					//"cursor_icon" : "resources/images/cursor_hand.png", // Icon
 				// to
 				// use
 				// as

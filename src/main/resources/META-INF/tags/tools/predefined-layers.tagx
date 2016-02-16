@@ -33,7 +33,7 @@
   <spring:message code="msg_loading_children" var="msgLoadingChildren"/>
 
   <!-- Generating predefined layers tool -->
-  <i id="${id}_predefined_layers_tool" class="whhg icon-burstmode toolbar_button"
+  <i id="${id}_predefined_layers_tool" class="whhg icon-layerorderdown toolbar_button"
        data-type="predefined_layers" title="${tooltip}" data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
        data-msg_children_incompatible="${msgChildrenIncompatible}"
        data-msg_loading_children="${msgLoadingChildren}"

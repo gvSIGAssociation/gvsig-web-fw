@@ -3065,7 +3065,7 @@ var GvNIX_Map_Leaflet;
 				var st = this._state;
 				//create loading message
 			    if( !jQuery('#loadingMessageId').length ) {
-			    	var panelHtml = '<div id="loadingMessageId" style="diplay:none; padding-right: 10px;" class="leaflet-control-toolbar leaflet-control-toolbar-expanded leaflet-control leaflet-control-toolbar-list"><i title="loading data" class="fa fa-spinner fa-spin" id="loadingText"></i><span>' + this.s.loading_message + '</span></div>';
+			    	var panelHtml = '<div id="loadingMessageId" style="diplay:none; padding-right: 10px;" class="leaflet-control-toolbar leaflet-control-toolbar-expanded leaflet-control leaflet-control-toolbar-list"><i title="loading data" class="fa fa-spinner fa-spin" id="loadingText"></i></div>';
 			    	st.oPanelLoading = jQuery.parseHTML(panelHtml);
 			    	// get height and with from parent element
 			    	var parentHeight = jQuery(".mapviewer_control").height();
@@ -3079,8 +3079,8 @@ var GvNIX_Map_Leaflet;
 			    	var loadingWidth = jQuery("#loadingMessageId").width();
 
 			    	//setting margin to panel
-			    	jQuery("#loadingMessageId").css("margin-top", ((parentHeight / 2 - loadingHeight/2)) + "px" );
-			    	jQuery("#loadingMessageId").css("margin-left", ((parentWidth / 2 - loadingWidth/2)) + "px" );
+			    	jQuery("#loadingMessageId").css("margin-top", ((parentHeight - parentHeight/5)) + "px" );
+			    	jQuery("#loadingMessageId").css("margin-left", ((parentWidth - loadingWidth - 15)) + "px" );
 			    }
 			},
 

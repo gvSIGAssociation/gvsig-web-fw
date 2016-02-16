@@ -9777,7 +9777,7 @@ function toBool(value) {
 function predefinedViewsComponent(menu, selectedItem){
 	var $menu = jQuery(menu);
 	var triggerItem = $menu.children(selectedItem);
-	jQuery(triggerItem).addClass("ui-state-focus ui-selected")
+	jQuery(triggerItem).addClass("ui-selected")
 	triggerItem.click();
 }
 

@@ -31,4 +31,8 @@
      <name>group</name>
      <path>/META-INF/tags/predefined-views/group.tagx</path>
    </tag-file>
+    <tag-file>
+     <name>groupComponent</name>
+     <path>/META-INF/tags/predefined-views/groupComponent.tagx</path>
+   </tag-file>
 </taglib>

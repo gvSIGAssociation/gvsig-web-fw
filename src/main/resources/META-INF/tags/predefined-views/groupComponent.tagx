@@ -25,40 +25,20 @@
   <jsp:output omit-xml-declaration="yes" />
 
   <jsp:directive.attribute name="id" type="java.lang.String" required="true" rtexprvalue="true" description="The identifier for this tag (do not change!)" />
+  <jsp:directive.attribute name="layers" type="java.lang.String" required="true" rtexprvalue="true" description="Coma-separated list of layer's id's which compose this group" />
+  <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
-  <jsp:directive.attribute name="visible" type="java.lang.Boolean" required="false" description="Used to show or not the tool" />
 
-  <spring:message code="tooltip_tool_predefined_views" var="tooltip"/>
-  <spring:message code="msg_service_layers_incompatible" var="msgAllLayersIncompatible"/>
-  <spring:message code="msg_service_children_incompatible" var="msgChildrenIncompatible"/>
-  <spring:message code="msg_loading_children" var="msgLoadingChildren"/>
+    <c:if test="${empty label}">
+      <spring:message code="label_${fn:toLowerCase(id)}" var="label" htmlEscape="false" />
+    </c:if>
 
-   <c:if test="${empty visible}">
-		<c:set var="visible" value="true" />
-   </c:if>
-
-   <c:set var="display" value="inline" />
-
-     <c:if test="${!visible}">
-		<c:set var="display" value="none" />
-   </c:if>
-
-
-  <div style="display:${display};">
-
-
-  <!-- Generating predefined views tool -->
-  <i id="${id}_predefined_views_tool" class="whhg icon-treediagram toolbar_button"
-       data-type="predefined_views"
-       data-msg_layers_incompatible_map="${msgAllLayersIncompatible}"
-       data-msg_children_incompatible="${msgChildrenIncompatible}"
-       data-msg_loading_children="${msgLoadingChildren}"
-       title="${tooltip}">&amp;nbsp;</i>
-
-  <ul id="${id}_predefined_views_tool_root" style="display:none; position:absolute" >
-    <jsp:doBody />
-  </ul>
-  </div>
-
+      <div class="predefined_views_group_component"
+       id="${id}"
+       data-label="${label}"
+       data-layers="${layers}">
+       ${label}
+     		<jsp:doBody />
+     </div>
 
 </jsp:root>

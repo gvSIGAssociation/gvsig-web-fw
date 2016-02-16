@@ -346,6 +346,8 @@ var GvNIX_Map_Leaflet;
 			this._fnInitializeComponents();
 			// Initialize miniMap (if any)
 			this._fnInitializeOverviewMap();
+			// Initialize predefinedViews
+			this._fnInitializePredefinedViews();
 			// Initialize layer order
 			this._fnInitializeLayerOrder();
 			//Initialize Storage Event
@@ -824,6 +826,60 @@ var GvNIX_Map_Leaflet;
 					.addTo(map.fnGetMapObject());
 
 			// store overview info structure on status object
+			st.oOverviewMap = oOverview;
+		},
+
+		/**
+		 * Initialize the overview-map: a mini map which helps to user to
+		 * identify current view.
+		 */
+		"_fnInitializePredefinedViews" : function initializePredefinedViews() {
+
+			var st = this._data;
+
+			// locate the definition div in map container
+			var $overviewDiv = jQuery(".predefined_views_class", st.$div
+					.parent());
+
+			if (!$overviewDiv || $overviewDiv.length == 0) {
+				// not found: nothing to do
+				return;
+			}
+
+			var sId = $overviewDiv.attr('id');
+			var options = $overviewDiv.data();
+
+			// create a structure to store overview related information
+			var oOverview = {
+				"$overviewDiv" : $overviewDiv,
+				"sId" : sId
+			};
+			// Search for overview layers
+			var aLayers = jQuery(".predefined_views_group_component", $overviewDiv)
+
+			var map = this;
+
+			// Default  options
+			var overlayOptions = {
+
+				"toggleDisplay" : true,
+				"autoToggleDisplay" : true,
+				"position" : "topright",
+				"capas" : aLayers
+			}
+
+			setOption(options, "width", overlayOptions, "width", null, toInt);
+			setOption(options, "height", overlayOptions, "height", null, toInt);
+			setOption(options, 'capas', aLayers);
+
+			var sComponentType = options.type;
+
+			// Get component type
+			var oComponentClass = GvNIX_Map_Leaflet.CONTROLS[sComponentType];
+
+			// Create predefined views
+			var newComponent = new oComponentClass(this, sId, overlayOptions);
+
 			st.oOverviewMap = oOverview;
 		},
 
@@ -2287,7 +2343,7 @@ var GvNIX_Map_Leaflet;
 		this._default_options = jQuery.extend({},
 				GvNIX_Map_Leaflet.CONTROLS.Base.default_options, {
 					"default_selected" : false,
-					"cursor_icon" : "resources/images/cursor_hand.png", // Icon
+					//"cursor_icon" : "resources/images/cursor_hand.png", // Icon
 					// to
 					// use
 					// as
@@ -2444,7 +2500,7 @@ var GvNIX_Map_Leaflet;
 		this._default_options = jQuery.extend({},
 				GvNIX_Map_Leaflet.CONTROLS.simple_selectable.default_options, {
 					"default_selected" : false,
-					"cursor_icon" : "resources/images/cursor_hand.png", // Icon
+					//"cursor_icon" : "resources/images/cursor_hand.png", // Icon
 				// to
 				// use
 				// as
@@ -9711,6 +9767,18 @@ function toBool(value) {
 	} else {
 		return null;
 	}
+}
+
+/**
+ * Select predefined views from component.
+ * @param menu
+ * @param selectedItem
+ */
+function predefinedViewsComponent(menu, selectedItem){
+	var $menu = jQuery(menu);
+	var triggerItem = $menu.children(selectedItem);
+	jQuery(triggerItem).addClass("ui-state-focus ui-selected")
+	triggerItem.click();
 }
 
 /**

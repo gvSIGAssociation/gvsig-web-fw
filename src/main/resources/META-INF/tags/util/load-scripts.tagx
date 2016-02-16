@@ -59,6 +59,10 @@
     <script src="${js_leaflet_history_component_js}" type="text/javascript">
         <!--required for FF3 and Opera-->
 </script>
+<spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.predefinedviews.component.js" var="js_leaflet_predefined_views_component_js"/>
+    <script src="${js_leaflet_predefined_views_component_js}" type="text/javascript">
+        <!--required for FF3 and Opera-->
+</script>
  <spring:url value="/resources/gvsig-web-fw/js/leaflet.ext.gvnix.map.zoombox.tool.js" var="js_leaflet_zoom_box_tool"/>
     <script src="${js_leaflet_zoom_box_tool}" type="text/javascript">
         <!--required for FF3 and Opera-->

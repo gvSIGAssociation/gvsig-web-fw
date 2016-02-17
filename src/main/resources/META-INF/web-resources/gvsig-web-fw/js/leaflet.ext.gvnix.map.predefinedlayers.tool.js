@@ -106,6 +106,12 @@ var GvNIX_Map_Predefined_Layers_Tool;
 							// Save layer in localStorage and check it
 							this._fnModifyAndSaveLayer(layerId, false, layerData, st.$layerComponents);
 						}
+
+						//adding class layerInToc in li element
+						var oldClasses = $menuItem.attr('class');
+						var newClasses = oldClasses.concat(" ").concat("layerInToc");
+						var $liElement = jQuery("#" + $menuItem.attr('id'));
+						$liElement.addClass(newClasses);
 					}
 				},
 

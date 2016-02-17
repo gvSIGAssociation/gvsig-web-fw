@@ -33,12 +33,22 @@
   <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
   <jsp:directive.attribute name="icon" type="java.lang.String" required="false" rtexprvalue="true" description="Icon or image to display on this layer" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  <jsp:directive.attribute name="layerInToc" type="java.lang.Boolean" required="false" rtexprvalue="true" description="Used for cheking if layer is in Toc." />
 
   <c:if test="${empty label}">
     <spring:message code="label_${fn:toLowerCase(id)}" var="label" htmlEscape="false" />
   </c:if>
 
-  <li class="predefined_layers_layer">
+  <c:if test="${empty layerInToc}">
+     <c:set var="layerInToc" value="false" />
+  </c:if>
+
+  <c:set var="classLiElement" value="predefined_layers_layer" />
+  <c:if test="${layerInToc}">
+     <c:set var="classLiElement" value="predefined_layers_layer layerInToc" />
+  </c:if>
+
+  <li class="${classLiElement}">
     <c:if test="${not empty icon}">
       <span class="menu-item-icon ${icon}">&amp;nbsp;</span>
     </c:if>

@@ -3079,7 +3079,7 @@ var GvNIX_Map_Leaflet;
 			    	var loadingWidth = jQuery("#loadingMessageId").width();
 
 			    	//setting margin to panel
-			    	jQuery("#loadingMessageId").css("margin-top", ((parentHeight - parentHeight/5)) + "px" );
+			    	jQuery("#loadingMessageId").css("margin-top", ((parentHeight - parentHeight/7)) + "px" );
 			    	jQuery("#loadingMessageId").css("margin-left", ((parentWidth - loadingWidth - 15)) + "px" );
 			    }
 			},

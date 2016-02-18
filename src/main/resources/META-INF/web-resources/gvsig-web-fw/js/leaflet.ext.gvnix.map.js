@@ -3204,7 +3204,7 @@ var GvNIX_Map_Leaflet;
 				if (this._state.aLayerToolsById
 						&& this._state.aLayerToolsById.length > 0) {
 					node.title += "<div id='" + node.key
-							+ "_span-tools' class='col-xs-4 toc_layers_span toc_layersDiv'></div>";
+							+ "_span-tools' class='col-xs-3 toc_layers_span toc_layersDiv'></div>";
 				}
 
 				return node;

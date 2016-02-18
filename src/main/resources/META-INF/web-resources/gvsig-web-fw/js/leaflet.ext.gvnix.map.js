@@ -2755,7 +2755,7 @@ var GvNIX_Map_Leaflet;
 																	// improved CSS
 																	"margin-left",
 																	$this.val()
-																			* 100
+																			* 170
 																			+ "px");
 
 													// Change opacity

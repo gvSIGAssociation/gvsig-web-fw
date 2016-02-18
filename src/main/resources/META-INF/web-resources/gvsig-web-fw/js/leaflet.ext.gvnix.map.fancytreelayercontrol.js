@@ -35,7 +35,9 @@ L.Control.FancytreeLayers = L.Control.extend({
 	this._fnAddExpandEvent();
 	this._fnAddCollapseEvent();
 
-    this._expand();
+    // default expand
+	//this._expand();
+//	this._collapse();
 
 	this.toolsLayersCallbacks = jQuery.Callbacks();
 
@@ -87,13 +89,20 @@ L.Control.FancytreeLayers = L.Control.extend({
         var listTabs = "<ul class="+className+"-tabs>";
 
         // icons from http://www.webhostinghub.com/glyphs/
-        listTabs += "<li><a href='#toc_container_fancytree' class='icon-layers'></a></li>";
+        //added function onclic
+        var javascriptToc = "javascript:collapseToc('capas')";
+        var javascriptTocLegend = "javascript:collapseToc('legend')";
+//        listTabs += '<li style="display:none;"><a href="#">aa</a></li>';
+        listTabs += '<li><a href="#toc_container_fancytree" onclick="'+javascriptToc+'" class="icon-layers"></a></li>';
         if(this._options.displayLegend){
-        	listTabs += "<li><a href='#toc_container_legend' class='icon-tags'><div></div></a></li>";
+        	listTabs += '<li><a href="#toc_container_legend" onclick="'+javascriptTocLegend+'" class="icon-tags"><div></div></a></li>';
         }
         listTabs += "</ul>";
         jQuery(container).prepend(listTabs);
-        jQuery(container).tabs();
+        jQuery(container).tabs({
+        	  active: false,
+        	  collapsible: true
+        });
         jQuery(container).on( "tabsactivate", function( event, ui ){resizeMap();});
     }
 
@@ -103,10 +112,15 @@ L.Control.FancytreeLayers = L.Control.extend({
 
 
     // Generating collapse button
-    this._button = L.DomUtil.create("div", className + '-collapse-button '+
-    		className+ '-button icon-backward', container);
-    jQuery(this._button).html(" ");
-    L.DomEvent.on(this._button, 'click', this._collapse, this);
+    //
+    // No necesario
+    //
+//    this._button = L.DomUtil.create("div", className + '-collapse-button '+
+//    		className+ '-button glyphicon glyphicon-chevron-left', container);
+//    jQuery(this._button).html(" ");
+//    // cambio por defecto collapse, ahora expand
+//    //L.DomEvent.on(this._button, 'click', this._expand, this);
+//    L.DomEvent.on(this._button, 'click', this._collapse, this);
   },
 
   /**
@@ -138,25 +152,33 @@ L.Control.FancytreeLayers = L.Control.extend({
     L.DomUtil.addClass(this._container, 'leaflet-control-layers-expanded');
   },
 
-  /**
-   * Collapse TOC control
-   */
-  "_collapse" : function () {
-	  var button = jQuery(this._button);
-	  if(button.data("function") == undefined || button.data("function") == "" || button.data("function") == "collapse"){
-		  jQuery(this._container).animate({left: "-100%"}, function(){
-			  button.data("function", "expand");
-			  var buttonClass = button.attr("class");
-			  button.attr("class", buttonClass.replace("icon-backward", "icon-forward"));
-		  });
-	  }else{
-		  jQuery(this._container).animate({left: "0%"}, function(){
-			  button.data("function", "collapse");
-			  var buttonClass = button.attr("class");
-			  button.attr("class", buttonClass.replace("icon-forward", "icon-backward"));
-		  });
-	  }
-  },
+//  /**
+//   * Collapse TOC control
+//   */
+//  "_collapse" : function () {
+//	  var button = jQuery(this._button);
+//	  if(button.data("function") == undefined || button.data("function") == "" || button.data("function") == "collapse"){
+//	  //if(button.data("function") == undefined || button.data("function") == "" || button.data("function") == "expand"){
+//
+//		  // TOC icons visible
+//		  // TBC -80%
+//		  jQuery(this._container).animate({left: "0%"}, function(){
+//			  button.data("function", "expand");
+//			  //button.data("function", "collapse");
+//			  var buttonClass = button.attr("class");
+//			  // Glyphicons
+//			  button.attr("class", buttonClass.replace("glyphicon glyphicon-chevron-left", "glyphicon glyphicon-chevron-right"));
+//		  });
+//	  }else{
+//		  jQuery(this._container).animate({left: "0%"}, function(){
+//			  button.data("function", "collapse");
+//			  //button.data("function", "expand");
+//			  var buttonClass = button.attr("class");
+//			  // Glyphicons
+//			  button.attr("class", buttonClass.replace("glyphicon glyphicon-chevron-right", "glyphicon glyphicon-chevron-left"));
+//		  });
+//	  }
+//  },
 
   // Functions related to fancytree
 
@@ -468,15 +490,6 @@ L.Control.FancytreeLayers = L.Control.extend({
 					// Make layer visible
 					tocLayer.fnShow(true);
 
-					//change li background
-					var $element = jQuery("#" + tocLayerId);
-					var $liElement = $element.closest("li");
-					if($liElement && $liElement !== undefined && $liElement.length > 0){
-						var oldClasses = $liElement.attr('class');
-						var newClasses = oldClasses.concat(" ").concat("layerInToc");
-						$liElement.addClass(newClasses);
-					}
-
 					// Request entity_simple data to the server
 					if (tocLayer.s.layer_type == "entity_simple" || tocLayer.s.layer_type == "entity" || tocLayer.s.layer_type == "shape"){
 						tocLayer._fnRequestData();
@@ -506,13 +519,6 @@ L.Control.FancytreeLayers = L.Control.extend({
 
 					// Make layer invisible
 					tocLayer.fnHide(true);
-
-					//change li background
-					var $element = jQuery("#" + tocLayerId);
-					var $liElement = $element.closest("li");
-					if($liElement && $liElement !== undefined && $liElement.length > 0){
-						$liElement.removeClass("layerInToc");
-					}
 
 					// Make all children invisible
 					data.node.visit(function(childNode) {

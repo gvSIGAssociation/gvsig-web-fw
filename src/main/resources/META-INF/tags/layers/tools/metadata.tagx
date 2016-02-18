@@ -40,7 +40,7 @@
   <spring:message code="tooltip_tool_metadata" var="tooltip"/>
 
   <!-- Generating info tool -->
-  <i id="${id}_metadata_tool" class="whhg icon-info-sign toolbar_button toc_layers_button"
+  <i id="${id}_metadata_tool" class="glyphicon glyphicon-info-sign toolbar_button toc_layers_button"
         data-type="metadata" data-layerid="${current_layer}"
         data-dialog_height="${dialogHeight}"  data-dialog_width="${dialogWidth}"
         title="${tooltip}">&amp;nbsp;</i>

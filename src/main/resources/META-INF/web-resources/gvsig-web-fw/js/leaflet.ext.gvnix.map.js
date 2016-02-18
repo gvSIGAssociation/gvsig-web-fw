@@ -2745,12 +2745,14 @@ var GvNIX_Map_Leaflet;
 													// Changing tooltip and
 													// moving tooltip
 													instance.s.inputRangeToolTip
-															.text("Transparency "
+													// no display text
+															.text(""
 																	+ ($this
 																			.val() * 100)
-																	+ "%");
+																	+ "");
 													instance.s.inputRangeToolTip
 															.css(
+																	// improved CSS
 																	"margin-left",
 																	$this.val()
 																			* 100
@@ -3196,10 +3198,14 @@ var GvNIX_Map_Leaflet;
 				node.key = this._state.sId;
 
 				// Check if is necessary to include new tools span on node title
+				//
+				// TBC layers icons
+				// Added DIV colspan
+				//
 				if (this._state.aLayerToolsById
 						&& this._state.aLayerToolsById.length > 0) {
-					node.title += "<span id='" + node.key
-							+ "_span-tools' class='toc_layers_span'></span>";
+					node.title += "<div id='" + node.key
+							+ "_span-tools' class='col-xs-3 toc_layers_span toc_layersDiv'></div>";
 				}
 
 				return node;
@@ -3326,8 +3332,9 @@ var GvNIX_Map_Leaflet;
 							"#" + this._state.sId + "_span-tools");
 
 					if (spanTools.length == 0) {
-						var spanTools = jQuery.parseHTML("<span class='toc_layers_span' id='" + this._state.sId
-								+ "_span-tools'></span>")[0];
+
+						var spanTools = jQuery.parseHTML("<div class='pull-right toc_layersDiv'><span class='toc_layers_span' id='" + this._state.sId
+								+ "_span-tools'></span></div>")[0];
 					}
 					jQuery(spanTools).prependTo(node.span);
 					for (i in this._state.aLayerToolsById) {
@@ -9780,6 +9787,29 @@ function predefinedViewsComponent(menu, selectedItem){
 	jQuery(triggerItem).addClass("ui-selected")
 	triggerItem.click();
 }
+
+
+/**
+ * Collapse toc
+ */
+function collapseToc(element){
+	var aux;
+	var toc = jQuery("#toc-container");
+	if(element === "capas"){
+		aux = jQuery(".icon-layers");
+	}else{
+		aux = jQuery(".icon-tags");
+	}
+	if(aux.parent().hasClass("ui-tabs-active") && !toc.hasClass( "collapse" ) || !aux.parent().hasClass("ui-tabs-active") && toc.hasClass( "collapse" )){
+		if( toc.hasClass( "collapse" )){
+			toc.removeClass("collapse");
+		}else{
+			toc.addClass("collapse");
+
+		}
+	}
+}
+
 
 /**
  * Sets option if exist in origin

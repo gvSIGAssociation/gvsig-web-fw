@@ -529,6 +529,13 @@ L.Control.FancytreeLayers = L.Control.extend({
 					// Make layer invisible
 					tocLayer.fnHide(true);
 
+					//change li background
+					var $element = jQuery("#" + tocLayerId);
+					var $liElement = $element.closest("li");
+					if($liElement && $liElement !== undefined && $liElement.length > 0){
+						$liElement.removeClass("layerInToc");
+					}
+
 					// Make all children invisible
 					data.node.visit(function(childNode) {
 						var childLayer = map

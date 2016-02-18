@@ -495,6 +495,15 @@ L.Control.FancytreeLayers = L.Control.extend({
 						tocLayer._fnRequestData();
 					}
 
+					//change li background
+					var $element = jQuery("#" + tocLayerId);
+					var $liElement = $element.closest("li");
+					if($liElement && $liElement !== undefined && $liElement.length > 0){
+						var oldClasses = $liElement.attr('class');
+						var newClasses = oldClasses.concat(" ").concat("layerInToc");
+						$liElement.addClass(newClasses);
+					}
+
 					// Make all parents visible
 					data.node.visitParents(function(parentNode) {
 						var parentLayer = map

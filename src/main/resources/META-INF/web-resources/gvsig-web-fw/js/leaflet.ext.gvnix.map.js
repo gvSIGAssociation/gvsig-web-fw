@@ -3065,7 +3065,7 @@ var GvNIX_Map_Leaflet;
 				var st = this._state;
 				//create loading message
 			    if( !jQuery('#loadingMessageId').length ) {
-			    	var panelHtml = '<div id="loadingMessageId" style="diplay:none; padding-right: 10px;" class="leaflet-control-toolbar leaflet-control-toolbar-expanded leaflet-control leaflet-control-toolbar-list"><i title="loading data" class="fa fa-spinner fa-spin" id="loadingText"></i></div>';
+			    	var panelHtml = '<div id="loadingMessageId" style="diplay:none; padding-right: 7px;" class="leaflet-control-toolbar leaflet-control-toolbar-expanded leaflet-control leaflet-control-toolbar-list"><i title="loading data" class="fa fa-spinner fa-spin" id="loadingText"></i></div>';
 			    	st.oPanelLoading = jQuery.parseHTML(panelHtml);
 			    	// get height and with from parent element
 			    	var parentHeight = jQuery(".mapviewer_control").height();

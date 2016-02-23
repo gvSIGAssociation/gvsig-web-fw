@@ -88,8 +88,15 @@ var GvNIX_Map_Predefined_Views_Component;
                         // id current link
 						var idLink = "predefinedViews_".concat(layerName);
 						var javascript = "javascript:predefinedViewsComponent('"+menu+"','"+idLayer+"')";
-						var linkLayer = '<a id="'+idLink+'" href="#" onclick="'+javascript+'"  alt="layer" title="'+ $layerDiv.text().trim() + '" class=" predefined-views-layer-link ">' +$layerDiv.text().trim()+ '</a>';
+						var linkLayer = '<span><a id="'+idLink+'" href="#" onclick="'+javascript+'"  alt="layer" title="'+ $layerDiv.text().trim() + '" class=" predefined-views-layer-link ">' +$layerDiv.text().trim()+ '</a></span>';
 						layer.innerHTML = linkLayer;
+						var logo = $layerDiv.attr('data-logo');
+						if(logo.length > 0) {
+							var imgLogo = L.DomUtil.create('img');
+							imgLogo.setAttribute('src', logo);
+							var styleImage = "background-image: url(".concat(logo).concat(")");
+							layer.setAttribute('style', styleImage);
+						}
 						htmlLayout.appendChild(layer.cloneNode(true));
 
 					});

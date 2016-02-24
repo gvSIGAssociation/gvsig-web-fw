@@ -5,18 +5,37 @@
   <jsp:directive.attribute name="label" type="java.lang.String" required="false" rtexprvalue="true" description="The label used for this object, will default to a message bundle if not supplied" />
   <jsp:directive.attribute name="icon" type="java.lang.String" required="false" rtexprvalue="true" description="Icon or image to display on this layer group" />
   <jsp:directive.attribute name="z" type="java.lang.String" required="false" description="Used for checking if element has been modified (to recalculate simply provide empty string value)" />
+  <jsp:directive.attribute name="logoString" type="java.lang.String" required="false" description="logo asociated to predefined views" />
 
   <c:if test="${empty label}">
     <spring:message code="label_${fn:toLowerCase(id)}" var="label" htmlEscape="false" />
   </c:if>
 
-  <li class="thematic_group" type="group" id="${id}" data-label="${label}">
-    <c:if test="${not empty icon}">
-      <span class="menu-item-icon ${icon}">&amp;nbsp;</span>
-    </c:if>
-    ${label}
-    <jsp:doBody />
-  </li>
+
+	<c:choose>
+	  <c:when test="${not empty logoString}">
+	   <li class="thematic_group thematicLogo" type="group" id="${id}" data-label="${label}">
+		      <span> ${label}</span>
+		    <jsp:doBody />
+	    </li>
+	       <script type="text/javascript">
+	       <![CDATA[
+	            var img = "url(".concat('${logoString}').concat(")");
+				jQuery('#${id}').css('background-image',  img);
+			]]>
+			</script>
+	   </c:when>
+	  <c:otherwise>
+	   <li class="thematic_group" type="group" id="${id}" data-label="${label}">
+	      <c:if test="${not empty icon}">
+		      <span class="menu-item-icon ${icon}">&amp;nbsp;</span>
+		    </c:if>
+		    ${label}
+		    <jsp:doBody />
+	    </li>
+	   </c:otherwise>
+	  </c:choose>
+
 </jsp:root>
 
 

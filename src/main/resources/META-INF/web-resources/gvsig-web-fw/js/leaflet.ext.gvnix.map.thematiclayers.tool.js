@@ -117,6 +117,25 @@ var GvNIX_Map_Thematic_Layers_Tool;
 					self._fnModifyAndSaveLayer(layerId, true);
 				}
 			});
+		},
+
+		/**
+		 * Save layer in localStorage and check it
+		 */
+		"__fnModifyAndSaveLayer" : function(layerId, existsInToc, layerData, $layerComponents){
+			var st = this._state;
+
+			// Save new layer in localStorage
+			var layerInfo = {
+				"id" : layerId,
+				"data" : layerData,
+				"components" : $layerComponents
+			};
+			st.oMap._fnSaveMapStatus("predefined_" + layerId,
+					layerInfo);
+
+			// Check on new layer on TOC
+			st.oMap.fnGetLayerById(layerId).fnCheckLayer();
 		}
 
 	});

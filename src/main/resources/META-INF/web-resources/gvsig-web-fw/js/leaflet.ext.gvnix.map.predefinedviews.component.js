@@ -96,6 +96,7 @@ var GvNIX_Map_Predefined_Views_Component;
 							imgLogo.setAttribute('src', logo);
 							var styleImage = "background-image: url(".concat(logo).concat(")");
 							layer.setAttribute('style', styleImage);
+							layer.classList.add('predefinedLogo');
 						}
 						htmlLayout.appendChild(layer.cloneNode(true));
 

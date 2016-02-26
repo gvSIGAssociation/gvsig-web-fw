@@ -690,6 +690,7 @@ var GvNIX_Map_Leaflet;
 					oDivContainer.append(legend);
 				}
 			}
+			return newLayer;
 		},
 
 		/**
@@ -9787,6 +9788,27 @@ function predefinedViewsComponent(menu, selectedItem){
 	triggerItem.click();
 }
 
+/**
+ * used to display or not opacity from layer
+ * @param event
+ */
+function openConfigurationAction(event){
+	var $span= jQuery(event.target);
+	var $parentSpan = $span.parent().closest("span");
+	var $opacityTool = jQuery(".tool-opacity");
+	//cheking if layer has opacity
+	if($parentSpan.find(".tool-opacity").length == 0){
+		//if it hasn't, we add opacity to the layer
+		$parentSpan.append($opacityTool);
+		$opacityTool.show();
+	}else{
+		//if it has, we hide opacity tool and move
+		$opacityTool.hide();
+		jQuery('.fancytreeDiv').prepend($opacityTool);
+
+	}
+}
+
 
 /**
  * Collapse toc
@@ -9807,6 +9829,54 @@ function collapseToc(element){
 
 		}
 	}
+}
+
+/**
+ * add conf button to layer
+ */
+function addConfButton(){
+	jQuery(".fancytree-node .col-xs-3").each(function(index) {
+		var $node = jQuery(this);
+		if($node.find( "a.btn-toc-tools").length == 0){
+			$node.prepend("<a onclick='javascript:openConfigurationAction(event);' class='btn-toc-tools' data-original-title='Control de opacidad de la capa' title='Control de opacidad de la capa'><span aria-hidden='true' class='toc-tools glyphicon glyphicon-cog'></span></a>");
+		}
+
+	});
+}
+
+/**
+ * Used to add tools (configuracion, metainfo and delete) to layers in toc
+ * @param newLayer
+ * @param idLayer
+ * @param idLayerToc
+ */
+function addToolsToLayer(newLayer, idLayer, idLayerToc){
+	 var $prueba = jQuery("#ftal_"+idLayer);
+     var divPadre = $prueba.parent().parent();
+     var idTool = idLayerToc.concat("_span-tools");
+
+     var configurationIcon = "<a onclick='javascript:openConfigurationAction(event);' class='btn-toc-tools' data-original-title='Control de opacidad de la capa' title='Control de opacidad de la capa'><span aria-hidden='true' class='toc-tools glyphicon glyphicon-cog'></span></a>";
+     var metaInfoIcon = "<i id='"+idLayerToc+"_metadata_metadata_tool' class='glyphicon glyphicon-info-sign toolbar_button toc_layers_button' data-type='metadata' data-layerid='"+idLayerToc+"' data-dialog_height='500' data-dialog_width='800' title='Muestra información de la capa'>&nbsp;</i>";
+     var deleteIcon = " <a id='removeLayerButton' href='#' data-original-title='${removeLayerTitle}' title='${removeLayerTitle}' alt='${removeLayerTitle}' onclick='javascript:removeLayer(event)'><span aria-hidden='true' class='toc-tools whhg icon-trash'></span></a>";
+
+     var tool = "<div id='" + idTool + "' class='col-xs-3 toc_layers_span toc_layersDiv'>".concat(configurationIcon).concat(metaInfoIcon).concat(deleteIcon).concat("</div>");
+     jQuery(divPadre).prepend(tool);
+
+     var tools = jQuery(divPadre).find("i");
+		for (i = 0; i < tools.length; i++) {
+			var tool = tools[i];
+			var toolData = jQuery(tool).data();
+			// Check if current tool is assigned to current layer
+			// or is assigned to some child layer
+
+				toolData.id = tool.id;
+				toolData.htmlElement = tool;
+				if (toolData.type != undefined) {
+					newLayer.fnRegisterLayerTool(toolData.id,
+							toolData);
+				}
+
+		}
 }
 
 

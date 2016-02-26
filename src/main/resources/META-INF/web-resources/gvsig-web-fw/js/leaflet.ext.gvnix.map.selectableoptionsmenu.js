@@ -297,6 +297,7 @@ var GvNIX_Map_Selectable_Options_Menu;
 								// Stop animation if it is last layer
 								if (stopWaitAnimation){
 									st.oUtil.stopWaitMeAnimation();
+									addConfButton();
 								}
 							},
 							error : function(object) {

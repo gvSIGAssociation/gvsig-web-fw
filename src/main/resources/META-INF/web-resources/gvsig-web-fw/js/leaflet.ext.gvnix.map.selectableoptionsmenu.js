@@ -148,6 +148,11 @@ var GvNIX_Map_Selectable_Options_Menu;
 				 */
 				"__fnToggleMenu" : function() {
 					var st = this._state;
+
+					//revert position
+					jQuery(st.$menu).css('top', '');
+					jQuery(st.$menu).css('left', '');
+
 					st.$menu.toggle().position({
 						my : "right bottom",
 						at : "left+25px top-5px",

@@ -1,2 +1,0 @@
-Repositorio para el proyecto ExportJobs del IVACE.
-
